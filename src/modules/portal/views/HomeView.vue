@@ -9,6 +9,9 @@
       :registrationPoints="registrationPoints"
       :form="form"
       :submitRegistration="submitRegistration"
+      :isSubmitting="isSubmitting"
+      :successMessage="successMessage"
+      :errorMessage="errorMessage"
     />
     <TimelineSection :timeline="timeline" />
     <AlumniSection :metrics="metrics" />
@@ -19,6 +22,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { registerApplicant } from '../../../api/endpoints';
 import TopNav from '../components/TopNav.vue';
 import HeroSection from '../components/HeroSection.vue';
 import PartnersSection from '../components/PartnersSection.vue';
@@ -90,8 +94,23 @@ const form = ref({
   program: 'Teknologi Informatika'
 });
 
-const submitRegistration = () => {
-  alert(`Terima kasih! Pendaftaran ${form.value.name || 'Anda'} telah diterima.`);
-  form.value = { name: '', email: '', nisn: '', program: 'Teknologi Informatika' };
+const isSubmitting = ref(false);
+const successMessage = ref('');
+const errorMessage = ref('');
+
+const submitRegistration = async () => {
+  isSubmitting.value = true;
+  successMessage.value = '';
+  errorMessage.value = '';
+  try {
+    const response = await registerApplicant(form.value);
+    successMessage.value = response.data?.message || `Pendaftaran ${form.value.name} berhasil!`;
+    form.value = { name: '', email: '', nisn: '', program: 'Teknologi Informatika' };
+  } catch (error) {
+    console.error('Gagal mengirim pendaftaran:', error);
+    errorMessage.value = error.response?.data?.message || 'Gagal mengirim pendaftaran. Pastikan server backend berjalan.';
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>

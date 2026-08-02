@@ -1,5 +1,5 @@
 <template>
-  <section class="timeline-section">
+  <section class="timeline-section" id="tracer">
     <div class="container section-block timeline-block">
       <div class="section-heading section-heading-center white-text">
         <h2>Timeline Seleksi &amp; Penempatan</h2>

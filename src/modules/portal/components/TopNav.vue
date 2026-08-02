@@ -8,8 +8,12 @@
         <a href="#pendaftaran">Daftar PKL</a>
         <a href="#tracer">Timeline</a>
         <a href="#kontak">Kontak</a>
+        <router-link to="/login">Login Admin</router-link>
       </div>
-      <a class="nav-cta" href="#pendaftaran">Daftar PKL</a>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <router-link to="/login" class="nav-cta" style="background: transparent; border: 1px solid var(--primary); color: var(--primary);">Login Admin</router-link>
+        <a class="nav-cta" href="#pendaftaran">Daftar PKL</a>
+      </div>
     </div>
   </nav>
 </template>

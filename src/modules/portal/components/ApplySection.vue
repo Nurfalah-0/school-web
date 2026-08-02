@@ -17,6 +17,12 @@
       </div>
 
       <div class="form-card">
+        <div v-if="successMessage" style="padding: 1rem; background: #e6f4ea; color: #137333; border-radius: 8px; margin-bottom: 1rem; font-weight: 500;">
+          ✓ {{ successMessage }}
+        </div>
+        <div v-if="errorMessage" style="padding: 1rem; background: #fce8e6; color: #c5221f; border-radius: 8px; margin-bottom: 1rem; font-weight: 500;">
+          ⚠ {{ errorMessage }}
+        </div>
         <form @submit.prevent="submitRegistration">
           <label>
             <span>Nama Lengkap</span>
@@ -44,7 +50,9 @@
             <span>Klik atau seret CV / Portofolio</span>
             <small>PDF / JPG / PNG maksimal 5 MB</small>
           </label>
-          <button type="submit" class="button-primary">Kirim Lamaran</button>
+          <button type="submit" class="button-primary" :disabled="isSubmitting" style="width: 100%;">
+            {{ isSubmitting ? 'Mengirim Data...' : 'Kirim Lamaran' }}
+          </button>
         </form>
       </div>
     </div>
@@ -64,6 +72,18 @@ const props = defineProps({
   submitRegistration: {
     type: Function,
     required: true
+  },
+  isSubmitting: {
+    type: Boolean,
+    default: false
+  },
+  successMessage: {
+    type: String,
+    default: ''
+  },
+  errorMessage: {
+    type: String,
+    default: ''
   }
 });
 </script>

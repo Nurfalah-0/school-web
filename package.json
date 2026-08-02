@@ -1,6 +1,7 @@
 {
   "name": "smk-sekolah-web",
   "private": true,
+  "type": "module",
   "version": "0.1.0",
   "scripts": {
     "dev": "concurrently \"npm:dev:client\" \"npm:dev:server\"",
@@ -11,8 +12,10 @@
     "start": "node server/index.js"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "pinia": "^2.2.8",
     "vue": "^3.4.0",
     "vue-router": "^4.6.4"
   },
