@@ -14,3 +14,7 @@ Frontend akan tersedia di `http://localhost:5173` dan backend di `http://localho
 
 - `src/` : aplikasi Vue
 - `server/` : backend Express API
+
+## Login Admin
+
+username: admin password: admin123
