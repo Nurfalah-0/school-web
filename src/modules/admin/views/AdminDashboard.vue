@@ -9,7 +9,7 @@
         <div class="user-area">
           <span class="user-badge">Admin BKK</span>
           <span class="user-name">{{ user.name || 'Administrator' }}</span>
-          <router-link to="/" class="nav-btn text-btn">Lihat Portal Portal ↗</router-link>
+          <router-link to="/" class="nav-btn text-btn">Lihat Portal ↗</router-link>
           <button @click="handleLogout" class="nav-btn logout-btn">Keluar</button>
         </div>
       </div>

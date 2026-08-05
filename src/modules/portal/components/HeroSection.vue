@@ -16,10 +16,15 @@
 
       <div class="hero-card">
         <img
-          src="https://images.unsplash.com/photo-1600566753461-cd41811cb8eb?auto=format&fit=crop&w=900&q=80"
-          alt="Siswa SMK praktik industri"
+          :src="heroImg"
+          alt="Praktik Kerja Lab Komputer SMK Nurul Jadid"
         />
       </div>
     </div>
   </header>
 </template>
+
+<script setup>
+import heroImg from '../../../assets/hero-lab.jpg';
+</script>
+

@@ -77,7 +77,7 @@ const handleLogin = async () => {
     if (res.data && res.data.token) {
       localStorage.setItem('auth_token', res.data.token);
       localStorage.setItem('user_info', JSON.stringify(res.data.user || { name: username.value }));
-      router.push('/dashboard');
+      router.push('/admin/dashboard');
     }
   } catch (error) {
     console.error('Login gagal:', error);
