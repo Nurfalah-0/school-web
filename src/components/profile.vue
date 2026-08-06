@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import profileImg from '../assets/profile-penobatan.jpg';
+import profileImg from '../assets/profile-penobatan.webp';
 </script>
 
 <style scoped>

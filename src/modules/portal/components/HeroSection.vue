@@ -25,6 +25,6 @@
 </template>
 
 <script setup>
-import heroImg from '../../../assets/hero-lab.jpg';
+import heroImg from '../../../assets/hero-lab.webp';
 </script>
 

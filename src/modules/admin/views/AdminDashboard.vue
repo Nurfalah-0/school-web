@@ -4,10 +4,10 @@
     <header class="dashboard-header">
       <div class="header-inner">
         <div class="brand-area">
-          <router-link to="/" class="brand-logo">🏫 BKK SMK Admin</router-link>
+          <router-link to="/" class="brand-logo">SMK Admin</router-link>
         </div>
         <div class="user-area">
-          <span class="user-badge">Admin BKK</span>
+          <span class="user-badge">Admin SMK</span>
           <span class="user-name">{{ user.name || 'Administrator' }}</span>
           <router-link to="/" class="nav-btn text-btn">Lihat Portal ↗</router-link>
           <button @click="handleLogout" class="nav-btn logout-btn">Keluar</button>
@@ -27,6 +27,9 @@
           <button @click="fetchData" class="refresh-btn" :disabled="isLoading">
             🔄 {{ isLoading ? 'Memuat...' : 'Refresh Data' }}
           </button>
+        </div>
+        <div v-if="errorMessage" class="dashboard-alert">
+          ⚠️ {{ errorMessage }}
         </div>
 
         <!-- Metrics & Stats Cards -->
@@ -165,9 +168,10 @@ import { getRegistrations, updateRegistrationStatus } from '../../../api/endpoin
 
 const router = useRouter();
 
-const user = ref({ name: 'Administrator BKK' });
+const user = ref({ name: 'Administrator' });
 const registrations = ref([]);
 const isLoading = ref(false);
+const errorMessage = ref('');
 const searchQuery = ref('');
 const filterProgram = ref('');
 const filterStatus = ref('');
@@ -192,24 +196,33 @@ const filteredRegistrations = computed(() => {
 
 const fetchData = async () => {
   isLoading.value = true;
+  errorMessage.value = '';
   try {
     const res = await getRegistrations();
-    registrations.value = res.data || [];
+    if (Array.isArray(res.data)) {
+      registrations.value = res.data;
+    } else if (Array.isArray(res.data?.data)) {
+      registrations.value = res.data.data;
+    } else {
+      registrations.value = [];
+    }
   } catch (error) {
     console.error('Gagal mengambil data pendaftaran:', error);
+    errorMessage.value = 'Gagal memuat data pendaftaran. Silakan coba lagi nanti.';
   } finally {
     isLoading.value = false;
   }
 };
 
 const changeStatus = async (id, newStatus) => {
+  errorMessage.value = '';
   try {
     await updateRegistrationStatus(id, newStatus);
-    const item = registrations.value.find(r => r.id === id);
+    const item = registrations.value.find(r => r.id === id || r.id == id);
     if (item) item.status = newStatus;
   } catch (error) {
     console.error('Gagal memperbarui status:', error);
-    alert('Gagal memperbarui status pendaftaran.');
+    errorMessage.value = 'Gagal memperbarui status pendaftaran. Silakan coba lagi.';
   }
 };
 
@@ -220,6 +233,12 @@ const handleLogout = () => {
 };
 
 onMounted(() => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    router.push('/login');
+    return;
+  }
+
   const storedUser = localStorage.getItem('user_info');
   if (storedUser) {
     try {
@@ -339,6 +358,15 @@ onMounted(() => {
   color: #64748b;
   font-size: 0.9rem;
   margin: 0;
+}
+
+.dashboard-alert {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #fef3f3;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  border-radius: 12px;
 }
 
 .refresh-btn {
