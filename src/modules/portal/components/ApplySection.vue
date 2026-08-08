@@ -46,10 +46,18 @@
               </select>
             </label>
           </div>
-          <label class="upload-box">
+          <label class="upload-box" @click.prevent="triggerUpload">
             <span>Klik atau seret CV / Portofolio</span>
             <small>PDF / JPG / PNG maksimal 5 MB</small>
+            <input
+              ref="fileInput"
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              class="file-input"
+              @change="handleFileChange"
+            />
           </label>
+          <p v-if="fileName" class="file-summary">File terpilih: {{ fileName }}</p>
           <button type="submit" class="button-primary" :disabled="isSubmitting" style="width: 100%;">
             {{ isSubmitting ? 'Mengirim Data...' : 'Kirim Lamaran' }}
           </button>
@@ -60,6 +68,8 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
+
 const props = defineProps({
   registrationPoints: {
     type: Array,
@@ -86,4 +96,28 @@ const props = defineProps({
     default: ''
   }
 });
+
+const fileInput = ref(null);
+const fileName = ref('');
+
+const triggerUpload = () => {
+  fileInput.value?.click();
+};
+
+const handleFileChange = (event) => {
+  const file = event.target.files?.[0];
+  fileName.value = file ? file.name : '';
+};
 </script>
+
+<style scoped>
+.file-input {
+  display: none;
+}
+
+.file-summary {
+  margin: 0 0 1rem;
+  color: #374151;
+  font-size: 0.95rem;
+}
+</style>

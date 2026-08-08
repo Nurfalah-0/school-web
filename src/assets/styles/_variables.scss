@@ -7,3 +7,16 @@ $muted: #5a5f74;
 $border: #e6e8f3;
 $shadow: 0 24px 50px rgba(4, 45, 134, 0.12);
 $radius: 24px;
+
+// Typography scale
+$font-sans: 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+$font-display: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto;
+
+$h1-size: 64px;
+$h1-line: 80px;
+
+// Layout
+$container-max: 1256px;
+$hero-left-width: 576px;
+$hero-visual-height: 600px;
+$hero-stat-width: 360px;

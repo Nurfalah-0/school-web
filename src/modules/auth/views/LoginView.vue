@@ -1,9 +1,16 @@
 <template>
   <div class="login-wrapper">
     <div class="login-card">
+      <div class="login-brand">
+        <img :src="logo" alt="Logo SMK" class="login-logo" />
+        <div>
+          <strong>SMK Nurul Jadid</strong>
+          <p>Portal Admin</p>
+        </div>
+      </div>
       <div class="login-header">
         <router-link to="/" class="back-link">← Kembali ke Beranda</router-link>
-        <h2>Portal Login Admin</h2>
+        <h2>Masuk ke Dashboard</h2>
         <p>Masuk untuk mengelola data pendaftaran PKL &amp; kemitraan BKK SMK.</p>
       </div>
 
@@ -58,6 +65,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import logo from '../../../assets/logo.webp';
 import { loginUser } from '../../../api/endpoints';
 
 const router = useRouter();

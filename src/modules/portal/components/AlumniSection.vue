@@ -1,5 +1,5 @@
 <template>
-  <section class="alumni-section" id="tracer">
+  <section class="alumni-section" id="alumni">
     <div class="container section-block alumni-block">
       <div class="alumni-copy">
         <h2>Tracer Alumni &amp; Penyerapan Lulusan</h2>

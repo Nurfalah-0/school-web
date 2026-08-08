@@ -34,11 +34,26 @@ import AlumniSection from '../components/AlumniSection.vue';
 import FooterSection from '../components/FooterSection.vue';
 
 const partners = [
-  { name: 'PT. Integra' },
-  { name: 'Gajah Tunggal' },
-  { name: 'Bank BRI' },
-  { name: 'Astra' },
-  { name: 'BCA' }
+  {
+    name: 'PT. Integra',
+    logo: 'https://upload.wikimedia.org/wikipedia/id/7/79/Logo_PT_Integra.png'
+  },
+  {
+    name: 'Gajah Tunggal',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Gajah_Tunggal_logo.svg/1200px-Gajah_Tunggal_logo.svg.png'
+  },
+  {
+    name: 'Bank BRI',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Logo_BRI.svg/1200px-Logo_BRI.svg.png'
+  },
+  {
+    name: 'Astra',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Astra_International_logo.svg/1200px-Astra_International_logo.svg.png'
+  },
+  {
+    name: 'BCA',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/BCA_logo.svg/1200px-BCA_logo.svg.png'
+  }
 ];
 
 const highlights = [

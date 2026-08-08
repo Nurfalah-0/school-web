@@ -4,8 +4,14 @@
     <header class="dashboard-header">
       <div class="header-inner">
         <div class="brand-area">
-          <router-link to="/" class="brand-logo">SMK Admin</router-link>
-        </div>
+        <router-link to="/" class="brand-logo">
+          <img :src="logo" alt="Logo SMK" class="dashboard-logo" />
+          <div>
+            <span>SMK Nurul Jadid</span>
+            <small>Dashboard Admin</small>
+          </div>
+        </router-link>
+      </div>
         <div class="user-area">
           <span class="user-badge">Admin SMK</span>
           <span class="user-name">{{ user.name || 'Administrator' }}</span>
@@ -164,6 +170,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import logo from '../../../assets/logo.webp';
 import { getRegistrations, updateRegistrationStatus } from '../../../api/endpoints';
 
 const router = useRouter();
@@ -275,10 +282,26 @@ onMounted(() => {
 }
 
 .brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
   color: #ffffff;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
   text-decoration: none;
+}
+
+.dashboard-logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  object-fit: cover;
+}
+
+.brand-logo small {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .user-area {
