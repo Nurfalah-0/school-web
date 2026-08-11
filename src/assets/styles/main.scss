@@ -8,6 +8,10 @@
   background: linear-gradient(180deg, #fdf8ff 0%, #f7f7fd 100%);
 }
 
+:root {
+  --nav-height: 72px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -46,22 +50,27 @@ select {
 .page-shell {
   position: relative;
   overflow-x: hidden;
+  padding-top: var(--nav-height);
 }
 
 .top-nav {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 20;
-  background: rgba(252, 248, 255, 0.85);
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  z-index: 999;
+  background: rgba(252, 248, 255, 0.95);
   backdrop-filter: blur(16px);
-  box-shadow: 0 24px 80px rgba(4, 45, 134, 0.08);
+  box-shadow: 0 12px 40px rgba(4, 45, 134, 0.08);
 }
 
 .nav-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
+  height: 100%;
+  padding: 0;
   gap: 1rem;
 }
 
@@ -158,7 +167,7 @@ select {
 }
 
 .hero-copy .hero-highlight {
-  display: block;
+  display: inline;
 }
 
 .hero-copy p {

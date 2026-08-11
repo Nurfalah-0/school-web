@@ -148,45 +148,4 @@ const isMenuOpen = ref(false);
     display: none;
   }
 }
-
-</style>
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-@media (max-width: 1100px) {
-  .nav-links {
-    display: none;
-  }
-
-  .nav-toggle {
-    display: inline-flex;
-  }
-}
-
-@media (max-width: 760px) {
-  .nav-links.open {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin: 0.75rem auto;
-    width: min(95%, 420px);
-    flex-direction: column;
-    gap: 0.9rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(16px);
-    border-radius: 24px;
-    border: 1px solid rgba(4, 45, 134, 0.12);
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .nav-actions {
-    display: none;
-  }
-}
 </style>
