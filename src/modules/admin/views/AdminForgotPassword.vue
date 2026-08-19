@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { Mail } from 'lucide-vue-next'
 import { adminForgotPassword } from '@/api/endpoints'
 
@@ -48,6 +48,16 @@ const isLoading = ref(false)
 const message = ref('')
 const messageType = ref('success')
 const errors = reactive({ email: '' })
+
+onMounted(() => {
+  document.body.style.overflow = 'hidden'
+  document.documentElement.style.overflow = 'hidden'
+})
+
+onUnmounted(() => {
+  document.body.style.overflow = ''
+  document.documentElement.style.overflow = ''
+})
 
 function validate() {
   errors.email = ''
