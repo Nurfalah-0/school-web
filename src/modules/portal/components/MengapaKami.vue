@@ -5,26 +5,10 @@
       <div class="mengapa-kami-grid">
         <div v-for="card in cards" :key="card.title" class="mengapa-kami-card">
           <div class="mengapa-kami-icon" :style="{ background: card.iconBg, color: card.iconColor }">
-            <svg v-if="card.icon === 'badge'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mengapa-kami-svg">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-            <svg v-else-if="card.icon === 'robot'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mengapa-kami-svg">
-              <rect x="3" y="11" width="18" height="10" rx="2"/>
-              <circle cx="12" cy="5" r="2"/>
-              <path d="M12 7v4"/>
-              <line x1="8" y1="16" x2="8" y2="16"/>
-              <line x1="16" y1="16" x2="16" y2="16"/>
-            </svg>
-            <svg v-else-if="card.icon === 'handshake'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mengapa-kami-svg">
-              <path d="M20.5 17.5L12 12l-8.5 5.5 1.5-2.5L12 9.5l7 5.5 1.5 2.5zM4 19h16v2H4z"/>
-              <path d="M18 13l2.5-2.5L22 13l-1.5 1.5L18 13zM6 13l-2.5-2.5L2 13l1.5 1.5L6 13z"/>
-            </svg>
-            <svg v-else-if="card.icon === 'building'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mengapa-kami-svg">
-              <path d="M4 21V10l8-6 8 6v11H4z"/>
-              <path d="M10 21v-6h4v6"/>
-              <path d="M9 10h6"/>
-              <path d="M8 6h8"/>
-            </svg>
+            <Award v-if="card.icon === 'award'" :size="24" color="#ffffff" />
+            <Bot v-else-if="card.icon === 'bot'" :size="24" color="#ffffff" />
+            <Handshake v-else-if="card.icon === 'handshake'" :size="24" color="#ffffff" />
+            <Heart v-else-if="card.icon === 'heart'" :size="24" color="#ffffff" />
           </div>
           <h3 class="mengapa-kami-card-title">{{ card.title }}</h3>
           <p class="mengapa-kami-card-text">{{ card.text }}</p>
@@ -35,6 +19,8 @@
 </template>
 
 <script setup>
+import { Award, Bot, Handshake, Heart } from 'lucide-vue-next';
+
 defineProps({
   title: {
     type: String,
@@ -44,32 +30,32 @@ defineProps({
     type: Array,
     default: () => [
       {
-        icon: 'badge',
+        icon: 'award',
         title: 'Akreditasi A',
         text: 'Standar mutu pendidikan terjamin dengan pengakuan nasional tertinggi untuk semua program keahlian.',
-        iconBg: '#f3e8ff',
-        iconColor: '#7e22ce'
+        iconBg: '#7e22ce',
+        iconColor: '#ffffff'
       },
       {
-        icon: 'robot',
+        icon: 'bot',
         title: 'Teaching Factory',
         text: 'Belajar langsung dengan simulasi industri nyata di dalam lingkungan sekolah yang modern.',
-        iconBg: '#ccfbf1',
-        iconColor: '#0f766e'
+        iconBg: '#0f766e',
+        iconColor: '#ffffff'
       },
       {
         icon: 'handshake',
         title: 'Mitra Industri',
         text: 'Jejaring luas dengan perusahaan nasional dan internasional untuk penempatan magang dan kerja.',
-        iconBg: '#ffedd5',
-        iconColor: '#c2410c'
+        iconBg: '#c2410c',
+        iconColor: '#ffffff'
       },
       {
-        icon: 'building',
+        icon: 'heart',
         title: 'Karakter Santri',
         text: 'Membentuk pribadi yang jujur, amanah, dan berakhlak mulia sebagai landasan profesionalisme.',
-        iconBg: '#f3e8ff',
-        iconColor: '#7e22ce'
+        iconBg: '#7e22ce',
+        iconColor: '#ffffff'
       }
     ]
   }
@@ -136,11 +122,6 @@ defineProps({
   place-items: center;
   border-radius: 1rem;
   flex-shrink: 0;
-}
-
-.mengapa-kami-svg {
-  width: 1.5rem;
-  height: 1.5rem;
 }
 
 .mengapa-kami-card-title {

@@ -7,33 +7,35 @@
       </div>
 
       <div class="prestasi-scroll">
-        <div v-for="item in prestasi" :key="item.judul" class="prestasi-card">
+        <router-link
+          v-for="item in prestasi"
+          :key="item.slug"
+          :to="`/prestasi/${item.slug}`"
+          class="prestasi-card"
+        >
           <div class="prestasi-card-top">
-            <span class="prestasi-icon" :style="{ background: item.iconBg }">
-              <svg v-if="item.icon === 'medal'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="prestasi-svg">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
-              <svg v-else-if="item.icon === 'ribbon'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="prestasi-svg">
-                <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/>
-              </svg>
-              <svg v-else-if="item.icon === 'star'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="prestasi-svg">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
-              <svg v-else-if="item.icon === 'trophy'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="prestasi-svg">
-                <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.42 1.72 4.44 4 4.9V15c0 1.66 1.34 3 3 3h1v2H8v2h8v-2h-4v-2h1c1.66 0 3-1.34 3-3v-2.1c2.28-.46 4-2.48 4-4.9V7c0-1.1-.9-2-2-2zM5 9V7h2v2.83c-.84-.44-2-1.15-2-2.83V7h2v2c0 1.31.84 2.44 2 2.83zM19 9c0 1.31-.84 2.44-2 2.83V7h2v2c0 1.68-1.16 3.39-2 2.83z"/>
-              </svg>
+            <span class="prestasi-icon" :style="{ background: iconBg(item.kategoriBadgeColor) }">
+              <component :is="iconFor(item)" :size="20" color="#ffffff" />
             </span>
             <span class="prestasi-year">{{ item.tahun }}</span>
           </div>
           <h3 class="prestasi-name">{{ item.judul }}</h3>
-          <p class="prestasi-text">{{ item.deskripsi }}</p>
-        </div>
+          <p class="prestasi-text">{{ item.deskripsiSingkat }}</p>
+        </router-link>
+      </div>
+
+      <div class="prestasi-footer">
+        <router-link to="/prestasi" class="prestasi-cta">Lihat Semua</router-link>
       </div>
     </div>
   </section>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { getAllPrestasi } from '@/data/prestasi'
+import { BookOpen, Trophy, Palette, Heart } from 'lucide-vue-next'
+
 defineProps({
   title: {
     type: String,
@@ -42,41 +44,27 @@ defineProps({
   subtitle: {
     type: String,
     default: 'Siswa kami secara konsisten meraih penghargaan di tingkat regional hingga nasional.'
-  },
-  prestasi: {
-    type: Array,
-    default: () => [
-      {
-        icon: 'medal',
-        iconBg: '#fef3c7',
-        tahun: '2023',
-        judul: 'Juara 1 LKS Nasional',
-        deskripsi: 'Bidang Web Technology yang diselenggarakan di Jawa Timur.'
-      },
-      {
-        icon: 'ribbon',
-        iconBg: '#f3e8ff',
-        tahun: '2023',
-        judul: 'Top 10 Startup Inovasi',
-        deskripsi: 'Kompetisi Kreativitas Siswa Vokasi tingkat Kementerian Pendidikan.'
-      },
-      {
-        icon: 'star',
-        iconBg: '#ccfbf1',
-        tahun: '2022',
-        judul: 'Medali Emas O2SN',
-        deskripsi: 'Cabang Pencak Silat kategori tanding tingkat Provinsi.'
-      },
-      {
-        icon: 'trophy',
-        iconBg: '#fef3c7',
-        tahun: '2022',
-        judul: 'Juara 2 Robotik',
-        deskripsi: 'Inovasi Robot Penyelamat, kompetisi antar SMK se-Jawa Timur.'
-      }
-    ]
   }
-});
+})
+
+const prestasi = computed(() => getAllPrestasi().slice(0, 4))
+
+function iconBg(colorKey) {
+  const colors = {
+    blue: '#1e40af',
+    amber: '#92400e',
+    rose: '#9f1239',
+    purple: '#6b21a8'
+  }
+  return colors[colorKey] || '#1e40af'
+}
+
+function iconFor(item) {
+  if (item.kategori === 'akademik') return BookOpen
+  if (item.kategori === 'olahraga') return Trophy
+  if (item.kategori === 'seni-budaya') return Palette
+  return Heart
+}
 </script>
 
 <style lang="scss" scoped>
@@ -139,6 +127,13 @@ defineProps({
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease;
+}
+
+.prestasi-card:hover {
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
 .prestasi-card-top {
@@ -153,12 +148,7 @@ defineProps({
   display: grid;
   place-items: center;
   border-radius: 0.75rem;
-  color: #0f172a;
-}
-
-.prestasi-svg {
-  width: 1.5rem;
-  height: 1.5rem;
+  color: #ffffff;
 }
 
 .prestasi-year {
@@ -173,6 +163,11 @@ defineProps({
   font-size: 1.15rem;
   color: #0f172a;
   margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .prestasi-text {
@@ -180,6 +175,33 @@ defineProps({
   color: #334155;
   line-height: 1.65;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.prestasi-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+.prestasi-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.85rem 2rem;
+  border-radius: 9999px;
+  background: #1e3a8a;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.prestasi-cta:hover {
+  background: #16264d;
 }
 
 @media (min-width: 768px) {

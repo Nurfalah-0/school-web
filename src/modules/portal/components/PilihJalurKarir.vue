@@ -6,22 +6,24 @@
           <span class="pilih-jalur-label">{{ label }}</span>
           <h2 class="pilih-jalur-title">{{ title }}</h2>
         </div>
-        <a class="pilih-jalur-btn" :href="seeAllLink">{{ seeAllText }}</a>
+        <router-link to="/jurusan" class="pilih-jalur-btn">{{ seeAllText }}</router-link>
       </div>
 
       <div class="pilih-jalur-grid">
-        <div v-for="card in programs" :key="card.nama" class="pilih-jalur-card">
+        <div v-for="card in programs" :key="card.slug" class="pilih-jalur-card">
           <div class="pilih-jalur-img-wrap">
-            <img :src="card.image" :alt="`Siswa praktik jurusan ${card.nama}`" class="pilih-jalur-img" />
-            <span v-if="card.badge" class="pilih-jalur-badge" :style="{ background: card.badgeColor }">{{ card.badge }}</span>
+            <img :src="card.gambarHero" :alt="`Siswa praktik jurusan ${card.nama}`" class="pilih-jalur-img" loading="lazy" />
+            <span class="pilih-jalur-badge">{{ card.kategori }}</span>
           </div>
           <div class="pilih-jalur-body">
             <div class="pilih-jalur-card-header">
-              <span class="pilih-jalur-icon" v-html="card.icon"></span>
+              <span class="pilih-jalur-icon">
+                <component :is="iconMap[card.icon]" :size="20" color="#042d86" />
+              </span>
               <h3 class="pilih-jalur-name">{{ card.nama }}</h3>
             </div>
             <p class="pilih-jalur-text">{{ card.deskripsi }}</p>
-            <a class="pilih-jalur-detail" :href="card.link">Detail Jurusan</a>
+            <router-link :to="`/jurusan/${card.slug}`" class="pilih-jalur-detail">Detail Jurusan</router-link>
           </div>
         </div>
       </div>
@@ -30,6 +32,17 @@
 </template>
 
 <script setup>
+import { CodeXml, Briefcase, Network, Palette, Calculator } from 'lucide-vue-next'
+import { jurusanList } from '@/data/jurusan'
+
+const iconMap = {
+  CodeXml,
+  Briefcase,
+  Network,
+  Palette,
+  Calculator
+}
+
 defineProps({
   label: {
     type: String,
@@ -43,43 +56,11 @@ defineProps({
     type: String,
     default: 'Lihat Semua Jurusan'
   },
-  seeAllLink: {
-    type: String,
-    default: '#pendaftaran'
-  },
   programs: {
     type: Array,
-    default: () => [
-      {
-        badge: 'Populer',
-        badgeColor: '#042d86',
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>',
-        nama: 'RPL',
-        deskripsi: 'Pengembangan Perangkat Lunak & Gim. Belajar coding, UI/UX, dan data science dengan kurikulum industri.',
-        image: 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=800&q=80',
-        link: '#pendaftaran'
-      },
-      {
-        badge: 'Center of Excellence',
-        badgeColor: '#b45309',
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg>',
-        nama: 'MPLB',
-        deskripsi: 'Manajemen Perkantoran & Layanan Bisnis. Menguasai tata kelola bisnis digital dan administrasi modern.',
-        image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80',
-        link: '#pendaftaran'
-      },
-      {
-        badge: null,
-        badgeColor: null,
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><circle cx="12" cy="20" r="1"></circle></svg>',
-        nama: 'TKJ',
-        deskripsi: 'Teknik Jaringan Komputer & Telekomunikasi. Menjadi ahli infrastruktur IT, cloud, dan cyber security.',
-        image: 'https://images.unsplash.com/photo-1558494949-ef526b0042a0?w=800&q=80',
-        link: '#pendaftaran'
-      }
-    ]
+    default: () => jurusanList.slice(0, 3)
   }
-});
+})
 </script>
 
 <style lang="scss" scoped>
@@ -189,10 +170,12 @@ defineProps({
   left: 1rem;
   padding: 0.35rem 0.9rem;
   border-radius: 9999px;
+  background: rgba(4, 45, 134, 0.9);
   color: #ffffff;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+  backdrop-filter: blur(4px);
 }
 
 .pilih-jalur-body {

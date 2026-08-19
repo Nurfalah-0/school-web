@@ -99,7 +99,7 @@ const props = defineProps({
     default: () => [
       { label: 'Tentang Kami', href: '#profil' },
       { label: 'Program Keahlian', href: '#lowongan' },
-      { label: 'Pendaftaran (PPDB)', href: '#pendaftaran' },
+      { label: 'Pendaftaran (PPDB)', href: '/ppdb' },
       { label: 'Fasilitas Sekolah', href: '#profil' }
     ]
   },

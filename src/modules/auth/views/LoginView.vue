@@ -15,7 +15,7 @@
       </div>
 
       <div v-if="errorMessage" class="login-alert">
-        <span>⚠️</span> {{ errorMessage }}
+        <AlertTriangle :size="18" color="#991b1b" /> {{ errorMessage }}
       </div>
 
       <form @submit.prevent="handleLogin" class="login-form">
@@ -45,7 +45,8 @@
               class="toggle-pwd"
               @click="showPassword = !showPassword"
             >
-              {{ showPassword ? '🙈' : '👁️' }}
+              <Eye v-if="!showPassword" :size="18" color="#64748b" />
+              <EyeOff v-else :size="18" color="#64748b" />
             </button>
           </div>
         </div>
@@ -67,6 +68,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import logo from '../../../assets/logo.webp';
 import { loginUser } from '../../../api/endpoints';
+import { AlertTriangle, Eye, EyeOff } from 'lucide-vue-next';
 
 const router = useRouter();
 

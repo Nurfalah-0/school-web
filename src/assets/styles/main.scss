@@ -9,7 +9,7 @@
 }
 
 :root {
-  --nav-height: 72px;
+  --nav-height: 60px;
 }
 
 * {
@@ -50,19 +50,6 @@ select {
 .page-shell {
   position: relative;
   overflow-x: hidden;
-  padding-top: var(--nav-height);
-}
-
-.top-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--nav-height);
-  z-index: 999;
-  background: rgba(252, 248, 255, 0.95);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 12px 40px rgba(4, 45, 134, 0.08);
 }
 
 .nav-inner {

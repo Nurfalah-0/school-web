@@ -11,18 +11,28 @@
       </div>
     </transition>
 
-    <MainLayout />
+    <MainLayout v-if="!isBlankLayout" />
+    <router-view v-if="isBlankLayout" v-slot="{ Component }">
+      <transition name="page-fade" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
+    <ChatbotWidget v-if="!isBlankLayout" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import MainLayout from './shared/layouts/MainLayout.vue';
+import ChatbotWidget from './modules/chatbot/components/ChatbotWidget.vue';
 
+const route = useRoute();
 const isLoading = ref(false);
 let loadingTimer = null;
 const router = useRouter();
+
+const isBlankLayout = computed(() => route.meta.blankLayout === true);
 
 const showLoading = () => {
   clearTimeout(loadingTimer);
@@ -53,7 +63,7 @@ router.onError(() => {
 <style scoped>
 #app {
   min-height: 100vh;
-  position: relative;
+  background: #f8f7fb;
 }
 
 .page-loading {

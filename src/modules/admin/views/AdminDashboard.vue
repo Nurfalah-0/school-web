@@ -31,38 +31,38 @@
             <p>Verifikasi data pendaftaran siswa dan pengelolaan status kemitraan.</p>
           </div>
           <button @click="fetchData" class="refresh-btn" :disabled="isLoading">
-            🔄 {{ isLoading ? 'Memuat...' : 'Refresh Data' }}
+            <RefreshCw :size="18" color="#ffffff" /> {{ isLoading ? 'Memuat...' : 'Refresh Data' }}
           </button>
         </div>
         <div v-if="errorMessage" class="dashboard-alert">
-          ⚠️ {{ errorMessage }}
+          <AlertTriangle :size="18" color="#991b1b" /> {{ errorMessage }}
         </div>
 
         <!-- Metrics & Stats Cards -->
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-icon bg-blue">📋</div>
+            <div class="stat-icon bg-blue"><ClipboardList :size="24" color="#ffffff" /></div>
             <div class="stat-info">
               <span class="stat-label">Total Pendaftar</span>
               <strong class="stat-val">{{ registrations.length }}</strong>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon bg-amber">⌛</div>
+            <div class="stat-icon bg-amber"><Loader2 :size="24" color="#ffffff" /></div>
             <div class="stat-info">
               <span class="stat-label">Menunggu Verifikasi</span>
               <strong class="stat-val">{{ pendingCount }}</strong>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon bg-green">✅</div>
+            <div class="stat-icon bg-green"><CheckCircle :size="24" color="#ffffff" /></div>
             <div class="stat-info">
               <span class="stat-label">Disetujui</span>
               <strong class="stat-val">{{ approvedCount }}</strong>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon bg-purple">🏢</div>
+            <div class="stat-icon bg-purple"><Building2 :size="24" color="#ffffff" /></div>
             <div class="stat-info">
               <span class="stat-label">Mitra Industri</span>
               <strong class="stat-val">12 Mitra</strong>
@@ -172,6 +172,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import logo from '../../../assets/logo.webp';
 import { getRegistrations, updateRegistrationStatus } from '../../../api/endpoints';
+import { RefreshCw, AlertTriangle, ClipboardList, Loader2, CheckCircle, Building2 } from 'lucide-vue-next';
 
 const router = useRouter();
 

@@ -19,16 +19,16 @@
       </button>
 
       <div :class="['nav-links', { open: isMenuOpen }]">
-        <a href="#profil" @click="isMenuOpen = false">Profil</a>
+        <a href="/" @click="isMenuOpen = false">Profil</a>
         <a href="#lowongan" @click="isMenuOpen = false">Jurusan</a>
         <a href="#alumni" @click="isMenuOpen = false">Prestasi</a>
         <a href="#tracer" @click="isMenuOpen = false">TEFA</a>
-        <a href="#pendaftaran" @click="isMenuOpen = false">PPDB</a>
+        <router-link to="/ppdb" @click="isMenuOpen = false">PPDB</router-link>
         <a href="#kontak" @click="isMenuOpen = false">Kontak</a>
       </div>
 
       <div class="nav-actions">
-        <a class="nav-cta" href="#pendaftaran">Daftar PPDB</a>
+        <router-link class="nav-cta" to="/ppdb">Daftar PPDB</router-link>
       </div>
     </div>
   </nav>

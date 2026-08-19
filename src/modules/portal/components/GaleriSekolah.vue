@@ -1,52 +1,58 @@
 <template>
   <section class="galeri-sekolah">
     <div class="galeri-inner">
-      <h2 class="galeri-title">{{ title }}</h2>
+      <div class="galeri-header">
+        <h2 class="galeri-title">Galeri Sekolah</h2>
+        <router-link to="/galeri" class="galeri-link">Semua Galeri</router-link>
+      </div>
+
       <div class="galeri-grid">
         <div
-          v-for="item in galeri"
-          :key="item.alt"
+          v-for="(item, idx) in galeri"
+          :key="item.id"
           class="galeri-item"
-          :style="{ height: item.height }"
+          :class="[item.heightClass]"
         >
           <img :src="item.src" :alt="item.alt" class="galeri-img" loading="lazy" />
         </div>
+      </div>
+
+      <div class="galeri-cta">
+        <router-link to="/galeri" class="galeri-cta-btn">Lihat Galeri Lengkap</router-link>
       </div>
     </div>
   </section>
 </template>
 
 <script setup>
+import { computed } from 'vue';
+import { getFeaturedGaleri } from '@/data/galeri';
+
+defineOptions({
+  name: 'GaleriSekolah'
+});
+
 defineProps({
   title: {
     type: String,
     default: 'Galeri Sekolah'
-  },
-  galeri: {
-    type: Array,
-    default: () => [
-      {
-        src: 'https://images.unsplash.com/photo-1523240794352-6c418994d2f7?w=600&q=80',
-        alt: 'Area taman kampus SMK Nurul Jadid',
-        height: '20rem'
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&q=80',
-        alt: 'Lab robotik dan 3D printing SMK Nurul Jadid',
-        height: '26.25rem'
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1507842217122-3f45c7f39214?w=600&q=80',
-        alt: 'Perpustakaan SMK Nurul Jadid',
-        height: '26.25rem'
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe89?w=600&q=80',
-        alt: 'Gedung SMK Nurul Jadid di malam hari',
-        height: '20rem'
-      }
-    ]
   }
+});
+
+const galeri = computed(() => {
+  const featured = getFeaturedGaleri(4);
+  const heightMap = [
+    'item-height-1',
+    'item-height-2',
+    'item-height-3',
+    'item-height-4'
+  ];
+  return featured.map((item, idx) => ({
+    id: item.id,
+    src: item.gambar,
+    alt: item.judul,
+    heightClass: heightMap[idx] || 'item-height-1'
+  }));
 });
 </script>
 
@@ -68,63 +74,94 @@ defineProps({
   overflow: hidden;
 }
 
-.galeri-inner::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 8rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(248, 250, 252, 1) 100%);
-  pointer-events: none;
+.galeri-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
 }
 
 .galeri-title {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-weight: 800;
-  font-size: clamp(1.9rem, 3vw, 2.7rem);
+  font-weight: 900;
+  font-size: clamp(1.9rem, 4vw, 3rem);
   color: #0f172a;
-  text-align: center;
-  margin: 0 0 3rem;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.galeri-link {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #1e40af;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.galeri-link:hover {
+  color: #1e3a8a;
+  text-decoration: underline;
 }
 
 .galeri-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+  align-items: end;
 }
 
-@media (min-width: 640px) {
+@media (max-width: 1023px) {
   .galeri-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .galeri-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .galeri-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .galeri-item {
-    height: 16rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .galeri-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1.5rem;
-    align-items: center;
+    height: 16rem !important;
   }
 }
 
 .galeri-item {
-  border-radius: 1.5rem;
   overflow: hidden;
+  border-radius: 2rem;
   background: #f8fafc;
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: opacity 0.3s ease, box-shadow 0.3s ease;
   position: relative;
 }
 
 .galeri-item:hover {
-  transform: translateY(-6px);
+  opacity: 0.9;
   box-shadow: 0 26px 55px rgba(15, 23, 42, 0.16);
+}
+
+.item-height-1 {
+  height: 320px;
+}
+
+.item-height-2 {
+  height: 400px;
+}
+
+.item-height-3 {
+  height: 360px;
+}
+
+.item-height-4 {
+  height: 280px;
 }
 
 .galeri-img {
@@ -141,5 +178,32 @@ defineProps({
   background: linear-gradient(180deg, rgba(248, 250, 252, 0.2), rgba(21, 21, 48, 0.08));
   opacity: 0.4;
   pointer-events: none;
+}
+
+.galeri-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.galeri-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  border-radius: 9999px;
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.galeri-cta-btn:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
 }
 </style>

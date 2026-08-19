@@ -3,37 +3,40 @@
     <div class="berita-inner">
       <div class="berita-header">
         <h2 class="berita-title">{{ title }}</h2>
-        <a class="berita-link" :href="seeAllLink">{{ seeAllText }}</a>
+        <router-link to="/berita" class="berita-link">{{ seeAllText }}</router-link>
       </div>
 
       <div class="berita-grid">
-        <!-- Kolom Kiri: Berita Utama -->
         <div class="berita-featured">
-          <a :href="beritaUtama.link" class="berita-featured-link">
+          <router-link v-if="beritaUtama" :to="`/berita/${beritaUtama.slug}`" class="berita-featured-link">
             <div class="berita-featured-img-wrap">
-              <img :src="beritaUtama.gambar" :alt="beritaUtama.judul" class="berita-featured-img" />
-              <span class="berita-featured-badge">{{ beritaUtama.badge }}</span>
+              <img :src="beritaUtama.gambarUtama" :alt="beritaUtama.judul" class="berita-featured-img" />
+              <span class="berita-featured-badge">UTAMA</span>
             </div>
             <div class="berita-featured-body">
-              <span class="berita-featured-date">{{ beritaUtama.tanggal }}</span>
+              <span class="berita-featured-date">{{ beritaUtama.tanggalDisplay }}</span>
               <h3 class="berita-featured-title">{{ beritaUtama.judul }}</h3>
-              <p class="berita-featured-text">{{ beritaUtama.deskripsi }}</p>
+              <p class="berita-featured-text">{{ excerpt(beritaUtama) }}</p>
             </div>
-          </a>
+          </router-link>
         </div>
 
-        <!-- Kolom Kanan: Daftar Berita Kecil -->
         <div class="berita-list">
-          <a v-for="item in daftarBerita" :key="item.judul" :href="item.link" class="berita-list-item">
+          <router-link
+            v-for="item in daftarBerita"
+            :key="item.slug"
+            :to="`/berita/${item.slug}`"
+            class="berita-list-item"
+          >
             <div class="berita-list-thumb">
-              <img :src="item.gambar" :alt="item.judul" class="berita-list-img" />
+              <img :src="item.gambarUtama" :alt="item.judul" class="berita-list-img" />
             </div>
             <div class="berita-list-body">
-              <span class="berita-list-kategori" :style="{ color: item.kategoriColor }">{{ item.kategori }}</span>
+              <span class="berita-list-kategori" :style="{ color: kategoriColor(item.kategori) }">{{ item.kategori }}</span>
               <h4 class="berita-list-title">{{ item.judul }}</h4>
-              <span class="berita-list-date">{{ item.tanggal }}</span>
+              <span class="berita-list-date">{{ item.tanggalDisplay }}</span>
             </div>
-          </a>
+          </router-link>
         </div>
       </div>
     </div>
@@ -41,6 +44,9 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { getBeritaUtama, getBeritaTerbaru, kategoriColorMap } from '@/data/berita'
+
 defineProps({
   title: {
     type: String,
@@ -49,62 +55,32 @@ defineProps({
   seeAllText: {
     type: String,
     default: 'Semua Berita'
-  },
-  seeAllLink: {
-    type: String,
-    default: '#berita'
-  },
-  beritaUtama: {
-    type: Object,
-    default: () => ({
-      gambar: 'https://images.unsplash.com/photo-1523050854058-8df90110a6f2?w=800&q=80',
-      badge: 'UTAMA',
-      tanggal: '12 Mei 2024',
-      judul: 'Peresmian Gedung Inovasi Digital SMK Nurul Jadid oleh Gubernur',
-      deskripsi: 'Pembangunan gedung ini bertujuan untuk memperkuat fasilitas pembelajaran berbasis AI dan Internet of Things bagi siswa...',
-      link: '#berita'
-    })
-  },
-  daftarBerita: {
-    type: Array,
-    default: () => [
-      {
-        gambar: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&q=80',
-        kategori: 'PRESTASI',
-        kategoriColor: '#b45309',
-        judul: 'Siswa RPL Borong Medali di LKS Tingkat Provinsi',
-        tanggal: '10 Mei 2024',
-        link: '#berita'
-      },
-      {
-        gambar: 'https://images.unsplash.com/photo-1544531586-fde5298cdd40?w=400&q=80',
-        kategori: 'KEGIATAN',
-        kategoriColor: '#042d86',
-        judul: 'Guru Tamu: Memahami Roadmap Karir di Industri 4.0',
-        tanggal: '08 Mei 2024',
-        link: '#berita'
-      },
-      {
-        gambar: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=400&q=80',
-        kategori: 'SOSIAL',
-        kategoriColor: '#0369a1',
-        judul: 'Nurul Jadid Berbagi: Program Pengabdian Masyarakat',
-        tanggal: '05 Mei 2024',
-        link: '#berita'
-      }
-    ]
   }
-});
+})
+
+const beritaUtama = computed(() => getBeritaUtama())
+const daftarBerita = computed(() => getBeritaTerbaru(3))
+
+function excerpt(artikel) {
+  const txt = artikel.konten.find(b => b.tipe === 'paragraf')?.teks || ''
+  return txt.length > 140 ? txt.slice(0, 140).trim() + '...' : txt
+}
+
+function kategoriColor(kategori) {
+  return kategoriColorMap[kategori]?.bg || '#042d86'
+}
 </script>
 
 <style lang="scss" scoped>
+@use '../../../assets/styles/variables' as *;
+
 .berita-kegiatan {
   background: #ffffff;
   padding: 5rem 0;
 }
 
 .berita-inner {
-  width: min(1200px, calc(100% - 48px));
+  width: min($container-max, calc(100% - 48px));
   margin: 0 auto;
 }
 

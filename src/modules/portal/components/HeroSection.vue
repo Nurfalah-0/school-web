@@ -14,7 +14,7 @@
         </p>
 
         <div class="hero-actions">
-          <a class="button-primary" href="#pendaftaran">Daftar PPDB Sekarang</a>
+          <router-link class="button-primary" to="/ppdb">Daftar PPDB Sekarang</router-link>
           <a class="button-secondary" href="#profil">Lihat Profil</a>
         </div>
       </div>
@@ -26,7 +26,7 @@
           </div>
 
           <div class="hero-stat-card hero-stat-top">
-            <div class="hero-stat-icon bg-teal">👥</div>
+            <div class="hero-stat-icon bg-teal"><Users :size="24" color="#ffffff" /></div>
             <div class="hero-stat-text">
               <strong>1200+</strong>
               <p>Siswa Aktif</p>
@@ -34,7 +34,7 @@
           </div>
 
           <div class="hero-stat-card hero-stat-bottom">
-            <div class="hero-stat-icon bg-amber">🏆</div>
+            <div class="hero-stat-icon bg-amber"><Trophy :size="24" color="#ffffff" /></div>
             <div class="hero-stat-text">
               <strong>85%</strong>
               <p>Lulusan Bekerja</p>
@@ -48,6 +48,7 @@
 
 <script setup>
 import heroImg from '../../../assets/hero-lab.webp';
+import { Users, Trophy } from 'lucide-vue-next';
 </script>
 
 <style lang="scss" scoped>
@@ -207,13 +208,13 @@ import heroImg from '../../../assets/hero-lab.webp';
 }
 
 .hero-stat-icon.bg-teal {
-  background: #cae8e8;
-  color: #0f172a;
+  background: #0f766e;
+  color: #ffffff;
 }
 
 .hero-stat-icon.bg-amber {
-  background: #fef3c7;
-  color: #92400e;
+  background: #b45309;
+  color: #ffffff;
 }
 
 .hero-stat-text {

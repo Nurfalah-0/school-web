@@ -1,6 +1,5 @@
 <template>
   <div class="page-shell">
-    <TopNav />
     <HeroSection />
     <ProfilSekolah />
     <MengapaKami />
@@ -17,7 +16,6 @@
 </template>
 
 <script setup>
-import TopNav from '../components/TopNav.vue';
 import HeroSection from '../components/HeroSection.vue';
 import ProfilSekolah from '../components/ProfilSekolah.vue';
 import MengapaKami from '../components/MengapaKami.vue';

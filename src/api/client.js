@@ -13,4 +13,19 @@ client.interceptors.request.use(config => {
   return config;
 });
 
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('admin_token')
+      sessionStorage.removeItem('admin_token')
+      localStorage.removeItem('user_info')
+      if (window.location.pathname.startsWith('/admin')) {
+        window.location.href = '/admin/login'
+      }
+    }
+    return Promise.reject(error)
+  }
+);
+
 export default client;
