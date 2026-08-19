@@ -141,7 +141,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Mail, Lock, Eye, EyeOff, HelpCircle, BookOpen } from 'lucide-vue-next'
 import { adminLogin } from '@/api/endpoints'
@@ -162,6 +162,8 @@ let rateLimitedUntil = Number(sessionStorage.getItem('admin_login_limited_until'
 const isRateLimited = ref(rateLimitedUntil > Date.now())
 
 onMounted(() => {
+  document.body.style.overflow = 'hidden'
+  document.documentElement.style.overflow = 'hidden'
   const savedEmail = localStorage.getItem('admin_remember_email')
   if (savedEmail) email.value = savedEmail
   if (isRateLimited.value) {
@@ -173,6 +175,11 @@ onMounted(() => {
       }
     }, 1000)
   }
+})
+
+onUnmounted(() => {
+  document.body.style.overflow = ''
+  document.documentElement.style.overflow = ''
 })
 
 function validate() {
@@ -342,7 +349,7 @@ async function handleLogin() {
 .admin-hero-panel {
   position: relative;
   height: 100%;
-  overflow-y: auto;
+  overflow: hidden;
   background-image: url('https://images.unsplash.com/photo-1497215842964-222b430dc094?w=1600&q=80');
   background-size: cover;
   background-position: center;
@@ -369,11 +376,11 @@ async function handleLogin() {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 2rem;
+  padding: 1.5rem;
   z-index: 3;
   color: #ffffff;
   overflow: hidden;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .admin-hero-badge {
@@ -402,7 +409,7 @@ async function handleLogin() {
 .admin-hero-title {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   font-weight: 900;
-  font-size: clamp(1.75rem, 3.5vw, 3rem);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
   line-height: 1.02;
   margin: 0;
   color: #ffffff;
@@ -414,8 +421,8 @@ async function handleLogin() {
 
 .admin-hero-desc {
   margin-top: 0;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 0.9rem;
+  line-height: 1.5;
   color: rgba(191, 219, 254, 0.9);
   max-width: 100%;
   font-weight: 500;
@@ -425,7 +432,7 @@ async function handleLogin() {
 .admin-hero-indicators {
   display: flex;
   gap: 0.5rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   flex-shrink: 0;
 }
 
@@ -450,7 +457,7 @@ async function handleLogin() {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(2.5rem, 6vh, 5rem) 2rem;
+  padding: clamp(2rem, 5vh, 4rem) 1.5rem;
   overflow: hidden;
   background: #f8f7fb;
 }
@@ -460,7 +467,7 @@ async function handleLogin() {
   border-radius: 1.25rem;
   padding: 1.5rem;
   width: 100%;
-  max-width: 400px;
+  max-width: 380px;
   box-shadow: 0 20px 48px rgba(15, 23, 42, 0.08);
 }
 

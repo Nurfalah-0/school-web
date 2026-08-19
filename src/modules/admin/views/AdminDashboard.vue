@@ -235,25 +235,24 @@ const changeStatus = async (id, newStatus) => {
 };
 
 const handleLogout = () => {
-  localStorage.removeItem('auth_token');
-  localStorage.removeItem('user_info');
+  localStorage.removeItem('admin_token');
+  localStorage.removeItem('admin_email');
+  localStorage.removeItem('admin_remember_email');
+  sessionStorage.removeItem('admin_token');
+  sessionStorage.removeItem('admin_email');
   router.push('/login');
 };
 
 onMounted(() => {
-  const token = localStorage.getItem('auth_token');
+  const token = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
   if (!token) {
     router.push('/login');
     return;
   }
 
-  const storedUser = localStorage.getItem('user_info');
-  if (storedUser) {
-    try {
-      user.value = JSON.parse(storedUser);
-    } catch (e) {
-      // fallback
-    }
+  const storedEmail = localStorage.getItem('admin_email') || sessionStorage.getItem('admin_email');
+  if (storedEmail) {
+    user.value = { name: 'Administrator', email: storedEmail };
   }
   fetchData();
 });

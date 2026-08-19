@@ -16,10 +16,6 @@
           <img :src="item.src" :alt="item.alt" class="galeri-img" loading="lazy" />
         </div>
       </div>
-
-      <div class="galeri-cta">
-        <router-link to="/galeri" class="galeri-cta-btn">Lihat Galeri Lengkap</router-link>
-      </div>
     </div>
   </section>
 </template>
@@ -178,32 +174,5 @@ const galeri = computed(() => {
   background: linear-gradient(180deg, rgba(248, 250, 252, 0.2), rgba(21, 21, 48, 0.08));
   opacity: 0.4;
   pointer-events: none;
-}
-
-.galeri-cta {
-  display: flex;
-  justify-content: center;
-  margin-top: 2rem;
-  position: relative;
-  z-index: 1;
-}
-
-.galeri-cta-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 2rem;
-  border-radius: 9999px;
-  background: #0f172a;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 1rem;
-  text-decoration: none;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.galeri-cta-btn:hover {
-  background: #1e293b;
-  transform: translateY(-2px);
 }
 </style>
