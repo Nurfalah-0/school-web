@@ -3,7 +3,7 @@
     <div class="statistik-inner">
       <div class="statistik-grid">
         <div v-for="item in stats" :key="item.label" class="statistik-item">
-          <div class="statistik-number">{{ animatedValues[item.label] || 0 }}</div>
+          <div class="statistik-number" :data-label="item.label">{{ animatedValues[item.label] || 0 }}</div>
           <div class="statistik-label">{{ item.label }}</div>
         </div>
       </div>
@@ -77,9 +77,19 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+@keyframes statFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 .statistik-sekolah {
   background: #28469E;
   padding: 5rem 0;
+  overflow: hidden;
 }
 
 .statistik-inner {
@@ -112,7 +122,13 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  animation: statFloat 4s ease-in-out infinite;
 }
+
+.statistik-item:nth-child(1) { animation-delay: 0s; }
+.statistik-item:nth-child(2) { animation-delay: 0.5s; }
+.statistik-item:nth-child(3) { animation-delay: 1s; }
+.statistik-item:nth-child(4) { animation-delay: 1.5s; }
 
 .statistik-number {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;

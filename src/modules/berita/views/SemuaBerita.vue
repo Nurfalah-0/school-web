@@ -1,46 +1,54 @@
 <template>
   <section class="semua-berita-page">
-    <div class="semua-berita-inner">
-      <div class="semua-berita-header">
-        <span class="semua-berita-label">INFORMASI & KEGIATAN</span>
-        <h1 class="semua-berita-title">Semua Berita</h1>
-        <p class="semua-berita-desc">Dapatkan informasi terbaru seputar kegiatan, prestasi, dan pengumuman SMK Nurul Jadid.</p>
-      </div>
-
-      <div class="semua-berita-filters">
-        <button
-          v-for="kat in kategoriList"
-          :key="kat.value"
-          :class="['filter-pill', { active: kategoriAktif === kat.value }]"
-          type="button"
-          @click="kategoriAktif = kat.value"
-        >
-          {{ kat.label }}
-        </button>
-      </div>
-
-      <div class="semua-berita-grid">
-        <div v-for="item in filteredBerita" :key="item.slug" class="semua-berita-card">
-          <router-link :to="`/berita/${item.slug}`" class="semua-berita-card-link">
-            <div class="semua-berita-img-wrap">
-              <img :src="item.gambarUtama" :alt="item.judul" class="semua-berita-img" loading="lazy" />
-              <span class="semua-berita-badge" :style="{ background: kategoriColor(item.kategori) }">
-                {{ item.kategori }}
-              </span>
-            </div>
-            <div class="semua-berita-body">
-              <span class="semua-berita-date">{{ item.tanggalDisplay }}</span>
-              <h3 class="semua-berita-name">{{ item.judul }}</h3>
-              <p class="semua-berita-excerpt">{{ excerpt(item) }}</p>
-            </div>
-          </router-link>
+    <AnimateOnScroll animation="fadeInDown">
+      <div class="semua-berita-inner">
+        <div class="semua-berita-header">
+          <span class="semua-berita-label">INFORMASI & KEGIATAN</span>
+          <h1 class="semua-berita-title">Semua Berita</h1>
+          <p class="semua-berita-desc">Dapatkan informasi terbaru seputar kegiatan, prestasi, dan pengumuman SMK Nurul Jadid.</p>
         </div>
-      </div>
 
-      <div v-if="filteredBerita.length === 0" class="semua-berita-empty">
-        <p>Belum ada berita di kategori ini.</p>
+        <AnimateOnScroll animation="fadeInUp" :delay="100">
+          <div class="semua-berita-filters">
+            <button
+              v-for="kat in kategoriList"
+              :key="kat.value"
+              :class="['filter-pill', { active: kategoriAktif === kat.value }]"
+              type="button"
+              @click="kategoriAktif = kat.value"
+            >
+              {{ kat.label }}
+            </button>
+          </div>
+        </AnimateOnScroll>
+
+        <AnimateOnScroll animation="fadeInUp" :delay="200">
+          <div class="semua-berita-grid">
+            <div v-for="item in filteredBerita" :key="item.slug" class="semua-berita-card">
+              <router-link :to="`/berita/${item.slug}`" class="semua-berita-card-link">
+                <div class="semua-berita-img-wrap">
+                  <img :src="item.gambarUtama" :alt="item.judul" class="semua-berita-img" loading="lazy" />
+                  <span class="semua-berita-badge" :style="{ background: kategoriColor(item.kategori) }">
+                    {{ item.kategori }}
+                  </span>
+                </div>
+                <div class="semua-berita-body">
+                  <span class="semua-berita-date">{{ item.tanggalDisplay }}</span>
+                  <h3 class="semua-berita-name">{{ item.judul }}</h3>
+                  <p class="semua-berita-excerpt">{{ excerpt(item) }}</p>
+                </div>
+              </router-link>
+            </div>
+          </div>
+        </AnimateOnScroll>
+
+        <AnimateOnScroll animation="fadeInUp" :delay="300">
+          <div v-if="filteredBerita.length === 0" class="semua-berita-empty">
+            <p>Belum ada berita di kategori ini.</p>
+          </div>
+        </AnimateOnScroll>
       </div>
-    </div>
+    </AnimateOnScroll>
   </section>
 </template>
 
@@ -54,6 +62,7 @@ import {
   getBeritaByTag,
   kategoriColorMap
 } from '@/data/berita'
+import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const route = useRoute()
 const router = useRouter()

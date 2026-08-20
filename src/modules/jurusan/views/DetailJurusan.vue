@@ -1,14 +1,24 @@
 <template>
   <div class="detail-jurusan-page">
-    <div v-if="jurusanAktif" class="detail-jurusan-layout">
-      <div class="detail-jurusan-main">
-        <JurusanHero :jurusan="jurusanAktif" />
-        <KeunggulanProgram :keunggulan="jurusanAktif.keunggulan" />
+    <AnimateOnScroll animation="fadeInDown" v-if="jurusanAktif">
+      <div class="detail-jurusan-layout">
+        <div class="detail-jurusan-main">
+          <JurusanHero :jurusan="jurusanAktif" />
+          <AnimateOnScroll animation="fadeInUp" :delay="150">
+            <KeunggulanProgram :keunggulan="jurusanAktif.keunggulan" />
+          </AnimateOnScroll>
+        </div>
+        <AnimateOnScroll animation="fadeInRight" :delay="200">
+          <SidebarJurusan :jurusan-lainnya="jurusanLainnya" :current-slug="route.params.slug" />
+        </AnimateOnScroll>
       </div>
-      <SidebarJurusan :jurusan-lainnya="jurusanLainnya" :current-slug="route.params.slug" />
-    </div>
-    <JalurKurikulum v-if="jurusanAktif" :kurikulum="jurusanAktif.kurikulum" />
-    <FooterSection />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="250" v-if="jurusanAktif">
+      <JalurKurikulum :kurikulum="jurusanAktif.kurikulum" />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="300">
+      <FooterSection />
+    </AnimateOnScroll>
 
     <div v-if="!jurusanAktif" class="detail-jurusan-empty">
       <h1>Jurusan tidak ditemukan</h1>
@@ -26,6 +36,7 @@ import KeunggulanProgram from '../components/KeunggulanProgram.vue'
 import SidebarJurusan from '../components/SidebarJurusan.vue'
 import JalurKurikulum from '../components/JalurKurikulum.vue'
 import FooterSection from '../../portal/components/FooterSection.vue'
+import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const route = useRoute()
 

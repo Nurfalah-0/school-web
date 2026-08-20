@@ -1,10 +1,20 @@
 <template>
   <div class="prestasi-page">
-    <PrestasiHero :featured="featured" />
-    <FilterPrestasi :aktif="kategoriAktif" @update:kategori="ubahFilter" />
-    <GridPrestasi :items="daftarPrestasi" />
-    <CtaKirimPrestasi />
-    <FooterSection />
+    <AnimateOnScroll animation="fadeInDown">
+      <PrestasiHero :featured="featured" />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="100">
+      <FilterPrestasi :aktif="kategoriAktif" @update:kategori="ubahFilter" />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="200">
+      <GridPrestasi :items="daftarPrestasi" />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="300">
+      <CtaKirimPrestasi />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="400">
+      <FooterSection />
+    </AnimateOnScroll>
   </div>
 </template>
 
@@ -17,6 +27,7 @@ import FilterPrestasi from '../components/FilterPrestasi.vue'
 import GridPrestasi from '../components/GridPrestasi.vue'
 import CtaKirimPrestasi from '../components/CtaKirimPrestasi.vue'
 import FooterSection from '../../portal/components/FooterSection.vue'
+import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const route = useRoute()
 const router = useRouter()

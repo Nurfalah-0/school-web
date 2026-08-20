@@ -1,5 +1,8 @@
 3<template>
   <section class="form-section">
+    <div class="form-deco form-deco-left" aria-hidden="true"></div>
+    <div class="form-deco form-deco-right" aria-hidden="true"></div>
+
     <div class="form-inner">
       <div class="form-card-main">
         <h2 class="form-main-title">Formulir Pendaftaran</h2>
@@ -192,11 +195,40 @@ const handleSubmit = async () => {
 
 <style lang="scss" scoped>
 .form-section {
+  position: relative;
+  overflow: hidden;
   background: linear-gradient(180deg, #f7fafc 0%, #eef7ff 100%);
   padding: 5rem 0 6rem;
 }
 
+.form-deco {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.95;
+}
+
+.form-deco-left {
+  left: -8rem;
+  bottom: -5rem;
+  width: 32rem;
+  height: 26rem;
+  background: rgba(148, 163, 184, 0.18);
+  clip-path: polygon(0 100%, 79% 28%, 100% 48%, 100% 100%);
+}
+
+.form-deco-right {
+  right: -6rem;
+  top: 2rem;
+  width: 20rem;
+  height: 18rem;
+  background: rgba(167, 139, 250, 0.12);
+  clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%);
+}
+
 .form-inner {
+  position: relative;
+  z-index: 1;
   width: min(1200px, calc(100% - 48px));
   margin: 0 auto;
   display: grid;

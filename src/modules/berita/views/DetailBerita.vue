@@ -1,25 +1,35 @@
 <template>
-  <div class="detail-berita-page" v-if="artikelAktif">
+  <AnimateOnScroll animation="fadeInDown" v-if="artikelAktif">
     <div class="detail-berita-layout">
       <div class="detail-berita-main">
         <Breadcrumb :items="breadcrumbItems" />
         <ArtikelHeader :artikel="artikelAktif" />
-        <div class="detail-berita-img-wrap">
-          <img :src="artikelAktif.gambarUtama" :alt="artikelAktif.judul" class="detail-berita-img" />
-        </div>
-        <KontenArtikel :konten="artikelAktif.konten" />
-        <TagsShareBar :tags="artikelAktif.tags" />
+        <AnimateOnScroll animation="scaleIn" :delay="100">
+          <div class="detail-berita-img-wrap">
+            <img :src="artikelAktif.gambarUtama" :alt="artikelAktif.judul" class="detail-berita-img" />
+          </div>
+        </AnimateOnScroll>
+        <AnimateOnScroll animation="fadeInUp" :delay="200">
+          <KontenArtikel :konten="artikelAktif.konten" />
+        </AnimateOnScroll>
+        <AnimateOnScroll animation="fadeInUp" :delay="250">
+          <TagsShareBar :tags="artikelAktif.tags" />
+        </AnimateOnScroll>
       </div>
-      <aside class="detail-berita-sidebar">
-        <BeritaLainnya :items="beritaLainnya" />
-        <div class="sidebar-spacer"></div>
-        <CtaPpdb />
-      </aside>
+      <AnimateOnScroll animation="fadeInRight" :delay="300">
+        <aside class="detail-berita-sidebar">
+          <BeritaLainnya :items="beritaLainnya" />
+          <div class="sidebar-spacer"></div>
+          <CtaPpdb />
+        </aside>
+      </AnimateOnScroll>
     </div>
+  </AnimateOnScroll>
+  <AnimateOnScroll animation="fadeInUp" :delay="350" v-if="artikelAktif">
     <FooterSection />
-  </div>
+  </AnimateOnScroll>
 
-  <div v-else class="detail-berita-empty">
+  <div v-if="!artikelAktif" class="detail-berita-empty">
     <p class="detail-berita-empty-text">Artikel tidak ditemukan.</p>
     <router-link to="/berita" class="detail-berita-back">Kembali ke Semua Berita</router-link>
   </div>
@@ -36,6 +46,7 @@ import TagsShareBar from '../components/TagsShareBar.vue'
 import BeritaLainnya from '../components/BeritaLainnya.vue'
 import CtaPpdb from '../components/CtaPpdb.vue'
 import FooterSection from '../../portal/components/FooterSection.vue'
+import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const route = useRoute()
 

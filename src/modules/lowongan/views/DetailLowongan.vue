@@ -1,77 +1,93 @@
 <template>
   <div class="detail-lowongan-page" v-if="lowongan">
-    <div class="detail-lowongan-layout">
-      <div class="detail-lowongan-main">
-        <Breadcrumb :items="breadcrumbItems" />
-        <div class="detail-lowongan-header">
-          <div class="detail-lowongan-icon" :style="{ background: iconBg(lowongan.kategori) }">
-            <component :is="iconComponent(lowongan.icon)" :size="32" :color="iconColor(lowongan.kategori)" />
-          </div>
-          <div class="detail-lowongan-info">
-            <div class="detail-lowongan-pills">
-              <span v-if="lowongan.status === 'Baru'" class="detail-lowongan-pill detail-lowongan-pill-new">Baru</span>
-              <span class="detail-lowongan-pill detail-lowongan-pill-category">{{ lowongan.kategoriLabel }}</span>
-              <span class="detail-lowongan-pill">{{ lowongan.tipePekerjaanLabel }}</span>
+    <AnimateOnScroll animation="fadeInDown">
+      <div class="detail-lowongan-layout">
+        <div class="detail-lowongan-main">
+          <Breadcrumb :items="breadcrumbItems" />
+          <div class="detail-lowongan-header">
+            <div class="detail-lowongan-icon" :style="{ background: iconBg(lowongan.kategori) }">
+              <component :is="iconComponent(lowongan.icon)" :size="32" :color="iconColor(lowongan.kategori)" />
             </div>
-            <h1 class="detail-lowongan-title">{{ lowongan.posisi }}</h1>
-            <p class="detail-lowongan-company">{{ lowongan.perusahaan }}</p>
+            <div class="detail-lowongan-info">
+              <div class="detail-lowongan-pills">
+                <span v-if="lowongan.status === 'Baru'" class="detail-lowongan-pill detail-lowongan-pill-new">Baru</span>
+                <span class="detail-lowongan-pill detail-lowongan-pill-category">{{ lowongan.kategoriLabel }}</span>
+                <span class="detail-lowongan-pill">{{ lowongan.tipePekerjaanLabel }}</span>
+              </div>
+              <h1 class="detail-lowongan-title">{{ lowongan.posisi }}</h1>
+              <p class="detail-lowongan-company">{{ lowongan.perusahaan }}</p>
+            </div>
           </div>
-        </div>
 
-        <div class="detail-lowongan-meta">
-          <span class="detail-lowongan-meta-item">
-            <MapPin :size="16" color="#64748b" />
-            {{ lowongan.lokasi }}
-          </span>
-          <span class="detail-lowongan-meta-item">
-            <Clock :size="16" color="#64748b" />
-            {{ lowongan.deadlineLabel }}
-          </span>
-        </div>
+          <AnimateOnScroll animation="fadeInUp" :delay="100">
+            <div class="detail-lowongan-meta">
+              <span class="detail-lowongan-meta-item">
+                <MapPin :size="16" color="#64748b" />
+                {{ lowongan.lokasi }}
+              </span>
+              <span class="detail-lowongan-meta-item">
+                <Clock :size="16" color="#64748b" />
+                {{ lowongan.deadlineLabel }}
+              </span>
+            </div>
+          </AnimateOnScroll>
 
-        <div class="detail-lowongan-section">
-          <h2 class="detail-lowongan-section-title">Deskripsi</h2>
-          <p class="detail-lowongan-text">{{ lowongan.deskripsiLengkap || lowongan.deskripsiSingkat }}</p>
-        </div>
+          <AnimateOnScroll animation="fadeInUp" :delay="150">
+            <div class="detail-lowongan-section">
+              <h2 class="detail-lowongan-section-title">Deskripsi</h2>
+              <p class="detail-lowongan-text">{{ lowongan.deskripsiLengkap || lowongan.deskripsiSingkat }}</p>
+            </div>
+          </AnimateOnScroll>
 
-        <div class="detail-lowongan-section">
-          <h2 class="detail-lowongan-section-title">Kualifikasi</h2>
-          <ul class="detail-lowongan-list">
-            <li v-for="(item, idx) in lowongan.kualifikasi" :key="idx" class="detail-lowongan-list-item">
-              <Check :size="16" color="#047857" />
-              {{ item }}
-            </li>
-          </ul>
-        </div>
+          <AnimateOnScroll animation="fadeInUp" :delay="200">
+            <div class="detail-lowongan-section">
+              <h2 class="detail-lowongan-section-title">Kualifikasi</h2>
+              <ul class="detail-lowongan-list">
+                <li v-for="(item, idx) in lowongan.kualifikasi" :key="idx" class="detail-lowongan-list-item">
+                  <Check :size="16" color="#047857" />
+                  {{ item }}
+                </li>
+              </ul>
+            </div>
+          </AnimateOnScroll>
 
-        <div class="detail-lowongan-section">
-          <h2 class="detail-lowongan-section-title">Benefit</h2>
-          <ul class="detail-lowongan-list">
-            <li v-for="(item, idx) in lowongan.benefit" :key="idx" class="detail-lowongan-list-item">
-              <Check :size="16" color="#047857" />
-              {{ item }}
-            </li>
-          </ul>
-        </div>
+          <AnimateOnScroll animation="fadeInUp" :delay="250">
+            <div class="detail-lowongan-section">
+              <h2 class="detail-lowongan-section-title">Benefit</h2>
+              <ul class="detail-lowongan-list">
+                <li v-for="(item, idx) in lowongan.benefit" :key="idx" class="detail-lowongan-list-item">
+                  <Check :size="16" color="#047857" />
+                  {{ item }}
+                </li>
+              </ul>
+            </div>
+          </AnimateOnScroll>
 
-        <div class="detail-lowongan-cta">
-          <button type="button" class="detail-lowongan-btn" @click="openModal">
-            {{ lowongan.ctaLabel }}
-            <ArrowRight :size="18" color="#ffffff" />
-          </button>
-        </div>
+          <AnimateOnScroll animation="fadeInUp" :delay="300">
+            <div class="detail-lowongan-cta">
+              <button type="button" class="detail-lowongan-btn" @click="openModal">
+                {{ lowongan.ctaLabel }}
+                <ArrowRight :size="18" color="#ffffff" />
+              </button>
+            </div>
+          </AnimateOnScroll>
 
-        <ModalLamaran v-model:open="isModalOpen" :posisi="lowongan.posisi" />
+          <ModalLamaran v-model:open="isModalOpen" :posisi="lowongan.posisi" />
+        </div>
+        <AnimateOnScroll animation="fadeInRight" :delay="200">
+          <aside class="detail-lowongan-sidebar">
+            <LowonganLainnya :current-slug="slug" />
+          </aside>
+        </AnimateOnScroll>
       </div>
-      <aside class="detail-lowongan-sidebar">
-        <LowonganLainnya :current-slug="slug" />
-      </aside>
-    </div>
-    <FooterSection
-      :quickLinks="bkkQuickLinks"
-      :contactInfo="bkkContactInfo"
-      :newsletterDesc="'Dapatkan info terbaru seputar lowongan kerja dan kegiatan BKK.'"
-    />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="350">
+      <FooterSection
+        :quickLinks="bkkQuickLinks"
+        :contactInfo="bkkContactInfo"
+        :newsletterDesc="'Dapatkan info terbaru seputar lowongan kerja dan kegiatan BKK.'"
+      />
+    </AnimateOnScroll>
   </div>
 
   <div v-else class="detail-lowongan-empty">
@@ -89,6 +105,7 @@ import LowonganLainnya from '../components/LowonganLainnya.vue'
 import ModalLamaran from '../components/ModalLamaran.vue'
 import FooterSection from '../../portal/components/FooterSection.vue'
 import { MapPin, Clock, Check, ArrowRight, CodeXml, Car, Palette, Landmark } from 'lucide-vue-next'
+import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const route = useRoute()
 const slug = computed(() => route.params.slug)

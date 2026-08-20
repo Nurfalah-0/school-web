@@ -24,7 +24,7 @@
                 class="produk-cart-btn"
                 type="button"
                 aria-label="Tambah ke keranjang"
-                @click="$emit('pilih-produk', item)"
+                @click="$emit('tambah-keranjang', item)"
               >
                 <ShoppingCart :size="16" color="#ffffff" />
               </button>
@@ -48,7 +48,7 @@ const props = defineProps({
   }
 })
 
-defineEmits(['pilih-produk'])
+defineEmits(['tambah-keranjang'])
 
 const produkList = [
   {

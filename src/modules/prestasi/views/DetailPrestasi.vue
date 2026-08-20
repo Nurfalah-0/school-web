@@ -1,24 +1,36 @@
 <template>
   <div class="detail-prestasi-page" v-if="prestasi">
-    <div class="detail-prestasi-layout">
-      <div class="detail-prestasi-main">
-        <Breadcrumb :items="breadcrumbItems" />
-        <ArtikelHeader :artikel="prestasi" />
-        <div class="detail-prestasi-img-wrap">
-          <img v-if="prestasi.gambar" :src="prestasi.gambar" :alt="prestasi.judul" class="detail-prestasi-img" />
-          <div v-else class="detail-prestasi-img detail-prestasi-placeholder">
-            <Medal :size="64" color="#6366f1" />
-          </div>
+    <AnimateOnScroll animation="fadeInDown">
+      <div class="detail-prestasi-layout">
+        <div class="detail-prestasi-main">
+          <Breadcrumb :items="breadcrumbItems" />
+          <ArtikelHeader :artikel="prestasi" />
+          <AnimateOnScroll animation="scaleIn" :delay="100">
+            <div class="detail-prestasi-img-wrap">
+              <img v-if="prestasi.gambar" :src="prestasi.gambar" :alt="prestasi.judul" class="detail-prestasi-img" />
+              <div v-else class="detail-prestasi-img detail-prestasi-placeholder">
+                <Medal :size="64" color="#6366f1" />
+              </div>
+            </div>
+          </AnimateOnScroll>
+          <AnimateOnScroll animation="fadeInUp" :delay="200">
+            <KontenArtikel :konten="kontenArtikel" />
+          </AnimateOnScroll>
+          <AnimateOnScroll animation="fadeInUp" :delay="250">
+            <TagsShareBar :tags="[prestasi.kategoriLabel]" />
+          </AnimateOnScroll>
         </div>
-        <KontenArtikel :konten="kontenArtikel" />
-        <TagsShareBar :tags="[prestasi.kategoriLabel]" />
+        <AnimateOnScroll animation="fadeInRight" :delay="300">
+          <aside class="detail-prestasi-sidebar">
+            <PrestasiLainnya :current-slug="slug" />
+            <CtaPpdb />
+          </aside>
+        </AnimateOnScroll>
       </div>
-      <aside class="detail-prestasi-sidebar">
-        <PrestasiLainnya :current-slug="slug" />
-        <CtaPpdb />
-      </aside>
-    </div>
-    <FooterSection />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="350">
+      <FooterSection />
+    </AnimateOnScroll>
   </div>
 
   <div v-else class="detail-prestasi-empty">
@@ -39,6 +51,7 @@ import PrestasiLainnya from '../components/PrestasiLainnya.vue'
 import CtaPpdb from '../../berita/components/CtaPpdb.vue'
 import FooterSection from '../../portal/components/FooterSection.vue'
 import { Medal } from 'lucide-vue-next'
+import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const route = useRoute()
 const slug = computed(() => route.params.slug)
