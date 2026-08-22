@@ -18,7 +18,7 @@
     <AnimateOnScroll animation="fadeInUp" :delay="300">
       <TeachingFactory />
     </AnimateOnScroll>
-    <AnimateOnScroll animation="fadeInUp" :delay="350">
+    <AnimateOnScroll animation="scaleIn" :delay="350">
       <StatistikSekolah />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="400">

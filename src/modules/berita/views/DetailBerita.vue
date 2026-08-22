@@ -1,37 +1,39 @@
 <template>
-  <AnimateOnScroll animation="fadeInDown" v-if="artikelAktif">
-    <div class="detail-berita-layout">
-      <div class="detail-berita-main">
-        <Breadcrumb :items="breadcrumbItems" />
-        <ArtikelHeader :artikel="artikelAktif" />
-        <AnimateOnScroll animation="scaleIn" :delay="100">
-          <div class="detail-berita-img-wrap">
-            <img :src="artikelAktif.gambarUtama" :alt="artikelAktif.judul" class="detail-berita-img" />
-          </div>
-        </AnimateOnScroll>
-        <AnimateOnScroll animation="fadeInUp" :delay="200">
-          <KontenArtikel :konten="artikelAktif.konten" />
-        </AnimateOnScroll>
-        <AnimateOnScroll animation="fadeInUp" :delay="250">
-          <TagsShareBar :tags="artikelAktif.tags" />
+  <div class="detail-berita-page">
+    <AnimateOnScroll animation="fadeInDown" v-if="artikelAktif">
+      <div class="detail-berita-layout">
+        <div class="detail-berita-main">
+          <Breadcrumb :items="breadcrumbItems" />
+          <ArtikelHeader :artikel="artikelAktif" />
+          <AnimateOnScroll animation="scaleIn" :delay="100">
+            <div class="detail-berita-img-wrap">
+              <img :src="artikelAktif.gambarUtama" :alt="artikelAktif.judul" class="detail-berita-img" />
+            </div>
+          </AnimateOnScroll>
+          <AnimateOnScroll animation="fadeInUp" :delay="200">
+            <KontenArtikel :konten="artikelAktif.konten" />
+          </AnimateOnScroll>
+          <AnimateOnScroll animation="fadeInUp" :delay="250">
+            <TagsShareBar :tags="artikelAktif.tags" />
+          </AnimateOnScroll>
+        </div>
+        <AnimateOnScroll animation="fadeInRight" :delay="300">
+          <aside class="detail-berita-sidebar">
+            <BeritaLainnya :items="beritaLainnya" />
+            <div class="sidebar-spacer"></div>
+            <CtaPpdb />
+          </aside>
         </AnimateOnScroll>
       </div>
-      <AnimateOnScroll animation="fadeInRight" :delay="300">
-        <aside class="detail-berita-sidebar">
-          <BeritaLainnya :items="beritaLainnya" />
-          <div class="sidebar-spacer"></div>
-          <CtaPpdb />
-        </aside>
-      </AnimateOnScroll>
-    </div>
-  </AnimateOnScroll>
-  <AnimateOnScroll animation="fadeInUp" :delay="350" v-if="artikelAktif">
-    <FooterSection />
-  </AnimateOnScroll>
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="350" v-if="artikelAktif">
+      <FooterSection />
+    </AnimateOnScroll>
 
-  <div v-if="!artikelAktif" class="detail-berita-empty">
-    <p class="detail-berita-empty-text">Artikel tidak ditemukan.</p>
-    <router-link to="/berita" class="detail-berita-back">Kembali ke Semua Berita</router-link>
+    <div v-if="!artikelAktif" class="detail-berita-empty">
+      <p class="detail-berita-empty-text">Artikel tidak ditemukan.</p>
+      <router-link to="/berita" class="detail-berita-back">Kembali ke Semua Berita</router-link>
+    </div>
   </div>
 </template>
 

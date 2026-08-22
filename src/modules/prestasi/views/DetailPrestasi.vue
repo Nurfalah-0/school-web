@@ -1,41 +1,43 @@
 <template>
-  <div class="detail-prestasi-page" v-if="prestasi">
-    <AnimateOnScroll animation="fadeInDown">
-      <div class="detail-prestasi-layout">
-        <div class="detail-prestasi-main">
-          <Breadcrumb :items="breadcrumbItems" />
-          <ArtikelHeader :artikel="prestasi" />
-          <AnimateOnScroll animation="scaleIn" :delay="100">
-            <div class="detail-prestasi-img-wrap">
-              <img v-if="prestasi.gambar" :src="prestasi.gambar" :alt="prestasi.judul" class="detail-prestasi-img" />
-              <div v-else class="detail-prestasi-img detail-prestasi-placeholder">
-                <Medal :size="64" color="#6366f1" />
+  <div class="detail-prestasi-page">
+    <div v-if="prestasi">
+      <AnimateOnScroll animation="fadeInDown">
+        <div class="detail-prestasi-layout">
+          <div class="detail-prestasi-main">
+            <Breadcrumb :items="breadcrumbItems" />
+            <ArtikelHeader :artikel="prestasi" />
+            <AnimateOnScroll animation="scaleIn" :delay="100">
+              <div class="detail-prestasi-img-wrap">
+                <img v-if="prestasi.gambar" :src="prestasi.gambar" :alt="prestasi.judul" class="detail-prestasi-img" />
+                <div v-else class="detail-prestasi-img detail-prestasi-placeholder">
+                  <Medal :size="64" color="#6366f1" />
+                </div>
               </div>
-            </div>
-          </AnimateOnScroll>
-          <AnimateOnScroll animation="fadeInUp" :delay="200">
-            <KontenArtikel :konten="kontenArtikel" />
-          </AnimateOnScroll>
-          <AnimateOnScroll animation="fadeInUp" :delay="250">
-            <TagsShareBar :tags="[prestasi.kategoriLabel]" />
+            </AnimateOnScroll>
+            <AnimateOnScroll animation="fadeInUp" :delay="200">
+              <KontenArtikel :konten="kontenArtikel" />
+            </AnimateOnScroll>
+            <AnimateOnScroll animation="fadeInUp" :delay="250">
+              <TagsShareBar :tags="[prestasi.kategoriLabel]" />
+            </AnimateOnScroll>
+          </div>
+          <AnimateOnScroll animation="fadeInRight" :delay="300">
+            <aside class="detail-prestasi-sidebar">
+              <PrestasiLainnya :current-slug="slug" />
+              <CtaPpdb />
+            </aside>
           </AnimateOnScroll>
         </div>
-        <AnimateOnScroll animation="fadeInRight" :delay="300">
-          <aside class="detail-prestasi-sidebar">
-            <PrestasiLainnya :current-slug="slug" />
-            <CtaPpdb />
-          </aside>
-        </AnimateOnScroll>
-      </div>
-    </AnimateOnScroll>
-    <AnimateOnScroll animation="fadeInUp" :delay="350">
-      <FooterSection />
-    </AnimateOnScroll>
-  </div>
+      </AnimateOnScroll>
+      <AnimateOnScroll animation="fadeInUp" :delay="350">
+        <FooterSection />
+      </AnimateOnScroll>
+    </div>
 
-  <div v-else class="detail-prestasi-empty">
-    <p class="detail-prestasi-empty-text">Prestasi tidak ditemukan.</p>
-    <router-link to="/prestasi" class="detail-prestasi-back">Kembali ke Prestasi</router-link>
+    <div v-else class="detail-prestasi-empty">
+      <p class="detail-prestasi-empty-text">Prestasi tidak ditemukan.</p>
+      <router-link to="/prestasi" class="detail-prestasi-back">Kembali ke Prestasi</router-link>
+    </div>
   </div>
 </template>
 
