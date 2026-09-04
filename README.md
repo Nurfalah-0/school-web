@@ -4,13 +4,9 @@ Website sekolah menggunakan Vue.js untuk frontend dan Laravel untuk backend.
 
 ## Jalankan proyek
 
-1. Buka terminal di folder proyek.
-2. Jalankan `npm install` untuk dependency root.
-3. Jalankan `npm run install:frontend` untuk dependency Vue.
-4. Pastikan Composer sudah terpasang, lalu jalankan `cd backend && composer install`.
-5. Jalankan `php artisan key:generate` dari folder `backend`.
-6. Gunakan database `db_smknuruljadid` yang sudah ada di phpMyAdmin.
-7. Jalankan `cd .. && npm run dev` untuk menjalankan frontend dan backend.
+1. Buka terminal di folder `C:\\Users\\HP\\school-web`
+2. Jalankan `npm install`
+3. Jalankan `npm run dev`
 
 Frontend akan tersedia di `http://localhost:5173` dan backend Laravel di `http://localhost:8000`.
 
