@@ -398,7 +398,7 @@ onMounted(load);
 
 .eyebrow {
   margin: 0 0 6px;
-  color: #0284c7;
+  color: #1e3a8a;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -448,8 +448,8 @@ h2 {
   transition: all 0.15s ease;
 }
 
-.button.primary { background: #0284c7; color: #fff; }
-.button.primary:hover { background: #0369a1; }
+.button.primary { background: #1e3a8a; color: #fff; }
+.button.primary:hover { background: #16264d; }
 .button.secondary { background: #e2e8f0; color: #334155; }
 .button.secondary:hover { background: #cbd5e1; }
 .button.danger { background: #fee2e2; color: #b91c1c; }
@@ -484,15 +484,15 @@ h2 {
   transition: all 0.15s ease;
 }
 
-.domain-button:hover { color: #0284c7; }
+.domain-button:hover { color: #1e3a8a; }
 .domain-button.active {
-  border-color: #0284c7;
-  color: #0284c7;
+  border-color: #1e3a8a;
+  color: #1e3a8a;
 }
 
 .domain-button .badge {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: #e0e7ff;
+  color: #1e3a8a;
   border-radius: 9999px;
   padding: 2px 7px;
   font-size: 11px;

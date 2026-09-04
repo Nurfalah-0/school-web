@@ -1442,7 +1442,7 @@ onMounted(() => {
 
 .eyebrow {
   margin: 0 0 6px;
-  color: #0284c7;
+  color: #1e3a8a;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -1492,8 +1492,8 @@ h2 {
   transition: all 0.15s ease;
 }
 
-.button.primary { background: #0284c7; color: #fff; }
-.button.primary:hover { background: #0369a1; }
+.button.primary { background: #1e3a8a; color: #fff; }
+.button.primary:hover { background: #16264d; }
 .button.secondary { background: #e2e8f0; color: #334155; }
 .button.secondary:hover { background: #cbd5e1; }
 .button.success { background: #10b981; color: #fff; }
@@ -1532,10 +1532,10 @@ h2 {
   transition: all 0.15s ease;
 }
 
-.tab:hover { color: #0284c7; }
+.tab:hover { color: #1e3a8a; }
 .tab.active {
-  border-color: #0284c7;
-  color: #0284c7;
+  border-color: #1e3a8a;
+  color: #1e3a8a;
 }
 
 .tab-badge {
@@ -1547,8 +1547,8 @@ h2 {
 }
 
 .tab.active .tab-badge {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: #e0e7ff;
+  color: #1e3a8a;
 }
 
 /* Panel */
@@ -1661,9 +1661,10 @@ input, textarea, select {
   font-size: 14px;
 }
 
-input:focus, textarea:focus, select:focus {
-  outline: 2px solid #bae6fd;
-  border-color: #0284c7;
+input:focus, textarea:focus, select:focus, .search-input:focus, .filter-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .field-with-counter textarea {

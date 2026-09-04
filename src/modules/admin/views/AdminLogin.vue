@@ -61,17 +61,35 @@
           </div>
 
           <form class="admin-form" @submit.prevent="handleLogin">
+            <!-- Preset Quick Login Pills -->
+            <div class="preset-accounts-box">
+              <span class="preset-title">Pilih Akun Demo / Cepat:</span>
+              <div class="preset-chips">
+                <button
+                  v-for="acc in presetAccounts"
+                  :key="acc.email"
+                  type="button"
+                  class="preset-chip"
+                  :class="{ active: email === acc.email }"
+                  @click="selectPreset(acc)"
+                >
+                  {{ acc.label }}
+                </button>
+              </div>
+            </div>
+
             <div class="form-group">
-              <label class="form-label" for="email">Administrator (Username atau Email)</label>
+              <label class="form-label" for="email">Email Administrator</label>
               <div class="input-wrap">
                 <Mail :size="20" color="#64748b" />
                 <input
                   id="email"
                   v-model="email"
-                  type="text"
+                  type="email"
                   class="form-input"
-                  placeholder="admin"
+                  placeholder="admin@smknuruljadid.sch.id"
                   autocomplete="username"
+                  required
                 />
               </div>
               <p v-if="errors.email" class="form-error">{{ errors.email }}</p>
@@ -86,8 +104,9 @@
                   v-model="password"
                   :type="showPassword ? 'text' : 'password'"
                   class="form-input"
-                  placeholder="Enter your password"
+                  placeholder="Masukkan password"
                   autocomplete="current-password"
+                  required
                 />
                 <button
                   type="button"
@@ -126,7 +145,7 @@
                   ? "Signing In..."
                   : isRateLimited
                     ? "Coba lagi nanti"
-                    : "Sign In"
+                    : "Sign In ke Dashboard"
               }}</span>
             </button>
           </form>
@@ -173,6 +192,22 @@ import { loginUser } from "@/api/endpoints";
 import logoSrc from "@/assets/logo.webp";
 
 const router = useRouter();
+
+const presetAccounts = [
+  { label: 'Superadmin', email: 'superadmin@smknuruljadid.sch.id' },
+  { label: 'Admin Sekolah', email: 'admin@smknuruljadid.sch.id' },
+  { label: 'Tata Usaha', email: 'tu@smknuruljadid.sch.id' },
+  { label: 'Admin PPDB', email: 'ppdb@smknuruljadid.sch.id' },
+  { label: 'Admin BKK', email: 'bkk@smknuruljadid.sch.id' },
+];
+
+function selectPreset(acc) {
+  email.value = acc.email;
+  password.value = 'password123';
+  errors.email = '';
+  errors.password = '';
+  globalError.value = '';
+}
 
 const email = ref("");
 const password = ref("");
@@ -553,6 +588,53 @@ async function handleLogin() {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+.preset-accounts-box {
+  background: #f1f5f9;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.preset-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.preset-chip {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 9999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: #e0e7ff;
+    border-color: #818cf8;
+    color: #1e3a8a;
+  }
+
+  &.active {
+    background: #1e3a8a;
+    border-color: #1e3a8a;
+    color: #ffffff;
+  }
 }
 
 .form-group {
