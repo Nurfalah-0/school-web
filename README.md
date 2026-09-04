@@ -4,7 +4,7 @@ Website sekolah menggunakan Vue.js untuk frontend dan Laravel untuk backend.
 
 ## Jalankan proyek
 
-1. Buka terminal di folder `C:\\Users\\HP\\school-web`
+1. Buka folder school-web
 2. Jalankan `npm install`
 3. Jalankan `npm run dev`
 
