@@ -1,0 +1,28 @@
+{
+  "name": "smk-sekolah-web",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "convert:webp": "node scripts/convert-assets-to-webp.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.117.1",
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "lucide-vue-next": "^1.0.0",
+    "pinia": "^2.2.8",
+    "vue": "^3.4.0",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.3.0",
+    "sass-embedded": "^1.100.0",
+    "sharp": "^0.35.3",
+    "vite": "^5.4.0"
+  }
+}
