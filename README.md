@@ -4,11 +4,9 @@ Website sekolah menggunakan Vue.js untuk frontend dan Laravel untuk backend.
 
 ## Jalankan proyek
 
-1. Buka terminal di folder hasil clone.
-2. Pastikan Node.js, PHP, Composer, dan MySQL sudah terpasang.
-3. Jalankan `bash setup.sh` untuk memasang semua dependency dan menyiapkan Laravel.
-4. Pastikan `DB_PASSWORD` di `backend/.env` sesuai password MySQL lokal.
-5. Jalankan `npm run dev` untuk menjalankan frontend dan backend.
+1. Buka terminal di folder `C:\\Users\\HP\\school-web`
+2. Jalankan `npm install`
+3. Jalankan `npm run dev`
 
 Frontend akan tersedia di `http://localhost:5173` dan backend Laravel di `http://localhost:8000`.
 
