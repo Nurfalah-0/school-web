@@ -8,7 +8,6 @@ Website sekolah menggunakan Vue.js untuk frontend dan Laravel untuk backend.
 3. Jalankan `bash setup.sh` untuk memasang semua dependency dan menyiapkan Laravel.
 4. Pastikan `DB_PASSWORD` di `backend/.env` sesuai password MySQL lokal.
 5. Jalankan `npm run dev` untuk menjalankan frontend dan backend.
-6. Buka terminal di folder `C:\\Users\\HP\\school-web`
 7. Jalankan `npm install`
 8. Jalankan `npm run dev`
 
