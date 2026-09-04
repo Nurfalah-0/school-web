@@ -105,7 +105,7 @@ export function useChatbot() {
 
       addBotMessage(data.message)
     } catch (error) {
-      addBotMessage('Maaf, sedang ada gangguan koneksi. Silakan coba lagi atau hubungi kami di WhatsApp +62 812-5907-5405.')
+      addBotMessage('Maaf, sedang ada gangguan koneksi. Silakan coba lagi atau hubungi kami di WhatsApp +62 823-3558-5491.')
     } finally {
       isTyping.value = false
     }

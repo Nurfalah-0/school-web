@@ -27,7 +27,7 @@ const pageData = computed(() => {
   const pages = {
     '/support': {
       title: 'Support',
-      content: '<p>Untuk mendapatkan bantuan, Anda dapat menghubungi kami melalui WhatsApp di <strong>+62 812-5907-5405</strong> atau email di <strong>smknurja.paiton@gmail.com</strong>. Tim kami siap membantu Anda Senin - Jumat, 08.00 - 16.00 WIB.</p>'
+      content: '<p>Untuk mendapatkan bantuan, Anda dapat menghubungi kami melalui WhatsApp di <strong>+62 823-3558-5491</strong> atau email di <strong>smknurja.paiton@gmail.com</strong>. Tim kami siap membantu Anda Senin - Jumat, 08.00 - 16.00 WIB.</p>'
     },
     '/portal-guide': {
       title: 'Portal Guide',
@@ -35,7 +35,7 @@ const pageData = computed(() => {
     },
     '/admin/contact': {
       title: 'Contact Admin',
-      content: '<p>Hubungi tim administrasi SMK Nurul Jadid untuk pertanyaan seputar pendaftaran, kemitraan industri, atau informasi umum.</p><p><strong>WhatsApp:</strong> +62 812-5907-5405<br><strong>Email:</strong> smknurja.paiton@gmail.com<br><strong>Alamat:</strong> Jl. KH. Zaini Mun\'im, Paiton, Probolinggo, Jawa Timur</p>'
+      content: '<p>Hubungi tim administrasi SMK Nurul Jadid untuk pertanyaan seputar pendaftaran, kemitraan industri, atau informasi umum.</p><p><strong>WhatsApp:</strong> +62 823-3558-5491<br><strong>Email:</strong> smknurja.paiton@gmail.com<br><strong>Alamat:</strong> Jl. KH. Zaini Mun\'im, Paiton, Probolinggo, Jawa Timur</p>'
     },
     '/privacy': {
       title: 'Privacy Policy',
