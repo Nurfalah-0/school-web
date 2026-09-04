@@ -1,23 +1,31 @@
 <template>
   <div class="lowongan-page">
-    <LowonganHero v-model:search="searchQuery" @search="resetPagination" />
-    <div class="lowongan-layout">
-      <FilterLowongan
-        v-model:kategori="kategoriFilter"
-        v-model:tipe="tipeFilter"
-        :counts="getKategoriCounts()"
-        @change="resetPagination"
-      />
-      <div class="lowongan-main">
-        <GridLowongan :items="dataDitampilkan" @load-more="loadMore" />
+    <AnimateOnScroll animation="fadeInDown">
+      <LowonganHero v-model:search="searchQuery" @search="resetPagination" />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="100">
+      <div class="lowongan-layout">
+        <FilterLowongan
+          v-model:kategori="kategoriFilter"
+          v-model:tipe="tipeFilter"
+          :counts="getKategoriCounts()"
+          @change="resetPagination"
+        />
+        <div class="lowongan-main">
+          <GridLowongan :items="dataDitampilkan" @load-more="loadMore" />
+        </div>
       </div>
-    </div>
-    <CtaRekrutmen />
-    <FooterSection
-      :quickLinks="bkkQuickLinks"
-      :contactInfo="bkkContactInfo"
-      :newsletterDesc="'Dapatkan info terbaru seputar lowongan kerja dan kegiatan BKK.'"
-    />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="200">
+      <CtaRekrutmen />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="300">
+      <FooterSection
+        :quickLinks="bkkQuickLinks"
+        :contactInfo="bkkContactInfo"
+        :newsletterDesc="'Dapatkan info terbaru seputar lowongan kerja dan kegiatan BKK.'"
+      />
+    </AnimateOnScroll>
   </div>
 </template>
 
@@ -31,6 +39,7 @@ import FilterLowongan from '../components/FilterLowongan.vue'
 import GridLowongan from '../components/GridLowongan.vue'
 import CtaRekrutmen from '../components/CtaRekrutmen.vue'
 import FooterSection from '../../portal/components/FooterSection.vue'
+import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const route = useRoute()
 

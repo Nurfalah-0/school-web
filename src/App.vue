@@ -120,3 +120,177 @@ router.onError(() => {
   }
 }
 </style>
+
+<style>
+/* Global scroll animation utilities */
+.animate-on-scroll {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.animate-on-scroll--fadeInUp {
+  transform: translateY(30px);
+}
+
+.animate-on-scroll--fadeInDown {
+  transform: translateY(-30px);
+}
+
+.animate-on-scroll--fadeInLeft {
+  transform: translateX(-30px);
+}
+
+.animate-on-scroll--fadeInRight {
+  transform: translateX(30px);
+}
+
+.animate-on-scroll--scaleIn {
+  transform: scale(0.95);
+}
+
+.animate-on-scroll--fadeIn {
+  transform: none;
+}
+
+.animate-on-scroll.animate-in {
+  animation-duration: 0.55s;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.animate-on-scroll--fadeInUp.animate-in {
+  animation-name: animateFadeInUp;
+}
+
+.animate-on-scroll--fadeInDown.animate-in {
+  animation-name: animateFadeInDown;
+}
+
+.animate-on-scroll--fadeInLeft.animate-in {
+  animation-name: animateFadeInLeft;
+}
+
+.animate-on-scroll--fadeInRight.animate-in {
+  animation-name: animateFadeInRight;
+}
+
+.animate-on-scroll--scaleIn.animate-in {
+  animation-name: animateScaleIn;
+}
+
+.animate-on-scroll--fadeIn.animate-in {
+  animation-name: animateFadeIn;
+}
+
+.animate-on-scroll--delay.animate-in {
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes animateFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes animateFadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes animateFadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes animateFadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes animateScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes animateFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Global hover micro-interactions */
+.card-hover {
+  transition: transform 0.25s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.25s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+}
+
+.btn-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s ease;
+}
+
+.btn-hover:active {
+  transform: scale(0.97);
+}
+
+.img-zoom {
+  overflow: hidden;
+}
+
+.img-zoom img {
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.img-zoom:hover img {
+  transform: scale(1.05);
+}
+
+/* Floating animation for chat button */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.chat-bot {
+  animation: float 3s ease-in-out infinite;
+}
+</style>

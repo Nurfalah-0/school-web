@@ -1,10 +1,16 @@
 <template>
   <div class="static-page">
-    <div class="static-inner">
-      <h1 class="static-title">{{ pageData.title }}</h1>
-      <div class="static-body" v-html="pageData.content"></div>
-    </div>
-    <FooterSection />
+    <AnimateOnScroll animation="fadeInDown">
+      <div class="static-inner">
+        <h1 class="static-title">{{ pageData.title }}</h1>
+        <AnimateOnScroll animation="fadeInUp" :delay="150">
+          <div class="static-body" v-html="pageData.content"></div>
+        </AnimateOnScroll>
+      </div>
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="250">
+      <FooterSection />
+    </AnimateOnScroll>
   </div>
 </template>
 
@@ -12,6 +18,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import FooterSection from '../../portal/components/FooterSection.vue';
+import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue';
 
 const route = useRoute();
 

@@ -1,4 +1,65 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node / Frontend Build
 node_modules/
 dist/
+dist-ssr/
+*.local
+
+# Editor & OS files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+Thumbs.db
+
+# Environment variables
 .env
-.vscode/
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+!.env.example
+
+# Laravel Backend (backend_Lomba)
+backend_Lomba/.env
+backend_Lomba/.env.backup
+backend_Lomba/.env.production
+backend_Lomba/vendor/
+backend_Lomba/node_modules/
+backend_Lomba/public/storage
+backend_Lomba/public/hot
+backend_Lomba/public/build
+backend_Lomba/storage/*.key
+backend_Lomba/storage/logs/*
+!backend_Lomba/storage/logs/.gitignore
+backend_Lomba/storage/framework/cache/*
+!backend_Lomba/storage/framework/cache/.gitignore
+backend_Lomba/storage/framework/sessions/*
+!backend_Lomba/storage/framework/sessions/.gitignore
+backend_Lomba/storage/framework/views/*
+!backend_Lomba/storage/framework/views/.gitignore
+backend_Lomba/storage/app/public/*
+!backend_Lomba/storage/app/public/.gitignore
+backend_Lomba/database/*.sqlite
+backend_Lomba/database/*.sqlite-journal
+backend_Lomba/bootstrap/cache/*.php
+!backend_Lomba/bootstrap/cache/.gitignore
+backend_Lomba/auth.json
+Homestead.json
+Homestead.yaml
+.phpactor.json
+.phpunit.result.cache
+.phpunit.cache

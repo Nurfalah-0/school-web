@@ -62,16 +62,16 @@
 
           <form class="admin-form" @submit.prevent="handleLogin">
             <div class="form-group">
-              <label class="form-label" for="email">Administrator Email</label>
+              <label class="form-label" for="email">Administrator (Username atau Email)</label>
               <div class="input-wrap">
                 <Mail :size="20" color="#64748b" />
                 <input
                   id="email"
                   v-model="email"
-                  type="email"
+                  type="text"
                   class="form-input"
-                  placeholder="admin@smknuruljadid.edu"
-                  autocomplete="email"
+                  placeholder="admin"
+                  autocomplete="username"
                 />
               </div>
               <p v-if="errors.email" class="form-error">{{ errors.email }}</p>
@@ -244,6 +244,7 @@ async function handleLogin() {
 
     const storage = rememberMe.value ? localStorage : sessionStorage;
     storage.setItem("auth_token", token);
+    storage.setItem("admin_token", token);
     storage.setItem("admin_email", email.value.trim());
     if (rememberMe.value)
       localStorage.setItem("admin_remember_email", email.value.trim());

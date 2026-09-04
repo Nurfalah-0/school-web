@@ -22,11 +22,11 @@
             Hasil karya kurikulum berbasis industri.
           </p>
           <div class="tefa-hero-actions">
-            <a href="#produk" class="tefa-btn-primary">
+            <button type="button" class="tefa-btn-primary" @click="scrollTo('#produk')">
               Jelajahi Produk
               <ArrowRight :size="18" />
-            </a>
-            <a href="#portofolio" class="tefa-btn-secondary">Portofolio Jasa</a>
+            </button>
+            <button type="button" class="tefa-btn-secondary" @click="scrollTo('#portofolio')">Portofolio Jasa</button>
           </div>
         </div>
 
@@ -79,6 +79,13 @@ let timer = null
 
 const nextSlide = () => {
   currentSlide.value = (currentSlide.value + 1) % totalSlides
+}
+
+function scrollTo(hash) {
+  const el = document.querySelector(hash)
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 }
 
 onMounted(() => {

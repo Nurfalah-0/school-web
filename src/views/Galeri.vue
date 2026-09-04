@@ -1,13 +1,21 @@
 <template>
   <div class="galeri-page">
-    <GaleriHero />
-    <FilterGaleri
-      :aktif="kategoriAktif"
-      @update:kategori="ubahFilter"
-      @update:search="ubahSearch"
-    />
-    <GridGaleri :items="dataDitampilkan" @open="bukaLightbox" />
-    <LoadMoreButton v-if="visibleCount < hasilFilter.length" @click="visibleCount += 9" />
+    <AnimateOnScroll animation="fadeInDown">
+      <GaleriHero />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="100">
+      <FilterGaleri
+        :aktif="kategoriAktif"
+        @update:kategori="ubahFilter"
+        @update:search="ubahSearch"
+      />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="200">
+      <GridGaleri :items="dataDitampilkan" @open="bukaLightbox" />
+    </AnimateOnScroll>
+    <AnimateOnScroll animation="fadeInUp" :delay="300">
+      <LoadMoreButton v-if="visibleCount < hasilFilter.length" @click="visibleCount += 9" />
+    </AnimateOnScroll>
 
     <LightboxGaleri
       v-if="lightboxIndex !== null"
@@ -21,7 +29,9 @@
       @next="fotoBerikutnya"
     />
 
-    <FooterSection />
+    <AnimateOnScroll animation="fadeInUp" :delay="400">
+      <FooterSection />
+    </AnimateOnScroll>
   </div>
 </template>
 
@@ -36,6 +46,7 @@ import GridGaleri from '@/components/galeri/GridGaleri.vue';
 import LightboxGaleri from '@/components/galeri/LightboxGaleri.vue';
 import LoadMoreButton from '@/components/galeri/LoadMoreButton.vue';
 import FooterSection from '@/modules/portal/components/FooterSection.vue';
+import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue';
 
 const route = useRoute();
 const router = useRouter();

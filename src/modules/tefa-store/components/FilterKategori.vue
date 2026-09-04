@@ -6,7 +6,8 @@
         <button
           v-if="modelValue !== 'Semua Produk'"
           class="filter-reset-btn"
-          @click="$emit('update:modelValue', 'Semua Produk')"
+          type="button"
+          @click="$emit('update:modelValue', 'Semua Produk'); $emit('reset-filter')"
         >
           Reset Filter (Tampilkan Semua)
         </button>
@@ -45,7 +46,7 @@ defineProps({
   }
 })
 
-defineEmits(['update:modelValue'])
+defineEmits(['update:modelValue', 'reset-filter'])
 
 const kategoriList = [
   { label: 'Semua Produk', value: 'Semua Produk', icon: ShoppingBag },

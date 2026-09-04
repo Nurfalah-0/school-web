@@ -48,8 +48,8 @@
               <button
                 class="produk-cart-btn"
                 type="button"
-                aria-label="Lihat & Pesan Produk"
-                @click.stop="$emit('pilih-produk', item)"
+                aria-label="Tambah ke keranjang"
+                @click.stop="$emit('tambah-keranjang', item)"
               >
                 <ShoppingCart :size="16" color="#ffffff" />
               </button>
@@ -81,7 +81,7 @@ const props = defineProps({
   }
 })
 
-defineEmits(['pilih-produk'])
+defineEmits(['tambah-keranjang'])
 
 function onImgError(e) {
   e.target.src = 'https://placehold.co/600x600/1e3a8a/ffffff?text=Produk+TEFA'

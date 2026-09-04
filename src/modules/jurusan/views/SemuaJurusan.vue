@@ -1,32 +1,36 @@
 <template>
   <section class="semua-jurusan-page">
-    <div class="semua-jurusan-inner">
-      <div class="semua-jurusan-header">
-        <span class="semua-jurusan-label">PROGRAM KEAHLIAN</span>
-        <h1 class="semua-jurusan-title">Semua Jurusan</h1>
-        <p class="semua-jurusan-desc">Pilih program keahlian yang sesuai dengan passion dan tujuan karirmu.</p>
-      </div>
-      <div class="semua-jurusan-grid">
-        <div v-for="item in jurusanList" :key="item.slug" class="semua-jurusan-card">
-          <div class="semua-jurusan-img-wrap">
-            <img :src="item.gambarHero" :alt="item.nama" class="semua-jurusan-img" loading="lazy" />
-            <span class="semua-jurusan-badge">{{ item.kategori }}</span>
-          </div>
-          <div class="semua-jurusan-body">
-            <div class="semua-jurusan-card-header">
-              <span class="semua-jurusan-icon">
-                <component :is="iconMap[item.icon]" :size="20" color="#042d86" />
-              </span>
-              <h3 class="semua-jurusan-name">{{ item.nama }}</h3>
-            </div>
-            <p class="semua-jurusan-text">{{ item.deskripsi }}</p>
-            <router-link :to="`/jurusan/${item.slug}`" class="semua-jurusan-detail">
-              Detail Jurusan
-            </router-link>
-          </div>
+    <AnimateOnScroll animation="fadeInDown">
+      <div class="semua-jurusan-inner">
+        <div class="semua-jurusan-header">
+          <span class="semua-jurusan-label">PROGRAM KEAHLIAN</span>
+          <h1 class="semua-jurusan-title">Semua Jurusan</h1>
+          <p class="semua-jurusan-desc">Pilih program keahlian yang sesuai dengan passion dan tujuan karirmu.</p>
         </div>
+        <AnimateOnScroll animation="fadeInUp" :delay="100">
+          <div class="semua-jurusan-grid">
+            <div v-for="item in jurusanList" :key="item.slug" class="semua-jurusan-card">
+              <div class="semua-jurusan-img-wrap">
+                <img :src="item.gambarHero" :alt="item.nama" class="semua-jurusan-img" loading="lazy" />
+                <span class="semua-jurusan-badge">{{ item.kategori }}</span>
+              </div>
+              <div class="semua-jurusan-body">
+                <div class="semua-jurusan-card-header">
+                  <span class="semua-jurusan-icon">
+                    <component :is="iconMap[item.icon]" :size="20" color="#042d86" />
+                  </span>
+                  <h3 class="semua-jurusan-name">{{ item.nama }}</h3>
+                </div>
+                <p class="semua-jurusan-text">{{ item.deskripsi }}</p>
+                <router-link :to="`/jurusan/${item.slug}`" class="semua-jurusan-detail">
+                  Detail Jurusan
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </AnimateOnScroll>
       </div>
-    </div>
+    </AnimateOnScroll>
   </section>
 </template>
 
@@ -34,6 +38,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { CodeXml, Briefcase, Network, Palette, Calculator } from 'lucide-vue-next'
 import { getMajors } from '@/api/endpoints'
+import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const iconMap = {
   CodeXml,
