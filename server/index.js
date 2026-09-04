@@ -16,7 +16,7 @@ IDENTITAS SEKOLAH:
 - Nama: SMK Nurul Jadid
 - Tagline: "Berinovasi Tiada Henti, Mengabdi Setulus Hati" / "SMK Bisa - Mencetak Siswa Siap Bekerja Sesuai Program Keahlian"
 - Alamat: Jl. KH. Zaini Mun'im, Paiton, Probolinggo, Jawa Timur
-- Telepon/WhatsApp: +62 812-5907-5405
+- Telepon/WhatsApp: +62 823-3558-5491
 - Email: smknurja.paiton@gmail.com
 - Kepala Sekolah: Akhmad Iqbal Yuliansyah, S.E.
 - Status: SMK Pusat Keunggulan (SMK PK) untuk jurusan Desain dan Produksi Busana (DPB), juga SMK Sekolah Pencetak Wirausaha (SMK SPW)
@@ -65,7 +65,7 @@ INSTRUKSI:
 1. Selalu sopan, hangat, dan menggunakan Bahasa Indonesia.
 2. Jawab ringkas dan jelas, hindari jawaban terlalu panjang.
 3. Jika ditanya hal di luar topik sekolah (politik, hal sensitif, dll), arahkan kembali dengan sopan ke topik seputar SMK Nurul Jadid.
-4. Jika tidak tahu jawaban pasti (terutama data yang berubah-ubah seperti jadwal SPMB tahun ini, biaya terbaru, kuota), jangan mengarang — arahkan ke halaman terkait atau sarankan menghubungi kontak resmi (WhatsApp +62 812-5907-5405 / email smknurja.paiton@gmail.com).
+4. Jika tidak tahu jawaban pasti (terutama data yang berubah-ubah seperti jadwal SPMB tahun ini, biaya terbaru, kuota), jangan mengarang — arahkan ke halaman terkait atau sarankan menghubungi kontak resmi (WhatsApp +62 823-3558-5491 / email smknurja.paiton@gmail.com).
 5. Untuk pertanyaan pendaftaran, arahkan ke link resmi psb.nuruljadid.net dan halaman /spmb-smknj.
 6. Jangan pernah meminta password atau data sensitif pengguna.
 7. Jujur jika informasinya mungkin sudah kadaluarsa, dan arahkan ke kontak resmi untuk konfirmasi.`;
@@ -203,7 +203,7 @@ app.post('/api/chat', async (req, res) => {
 
     if (!checkRateLimit(key)) {
       return res.status(429).json({
-        message: 'Maaf, batas percakapan tercapai. Silakan coba lagi nanti atau hubungi kami di WhatsApp +62 812-5907-5405.'
+        message: 'Maaf, batas percakapan tercapai. Silakan coba lagi nanti atau hubungi kami di WhatsApp +62 823-3558-5491.'
       });
     }
 
@@ -235,7 +235,7 @@ app.post('/api/chat', async (req, res) => {
   } catch (error) {
     console.error('Chat API error:', error);
     res.status(500).json({
-      message: 'Maaf, sedang ada gangguan koneksi. Silakan coba lagi atau hubungi kami di WhatsApp +62 812-5907-5405.'
+      message: 'Maaf, sedang ada gangguan koneksi. Silakan coba lagi atau hubungi kami di WhatsApp +62 823-3558-5491.'
     });
   }
 });

@@ -180,7 +180,7 @@ function resetKategori() {
 }
 
 function pesanJasa(item) {
-  const phoneNumber = '6281259075405'
+  const phoneNumber = '6282335585491'
   const message = `Halo Admin Tefa Store! Saya tertarik dengan jasa: ${item.nama}. ${item.deskripsi} Mohon info lebih lanjut.`
   const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
   window.open(waUrl, '_blank')
@@ -296,7 +296,7 @@ function hapusDariKeranjang(item) {
 function checkoutWhatsApp() {
   if (cart.value.length === 0) return
 
-  const phoneNumber = '6281259075405'
+  const phoneNumber = '6282335585491'
   let message = 'Halo Admin Tefa Store SMK Nurul Jadid! Saya ingin memesan:\n\n'
 
   cart.value.forEach((item, index) => {

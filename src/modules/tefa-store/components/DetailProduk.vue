@@ -266,7 +266,7 @@ const whatsappUrl = computed(() => {
   const text = encodeURIComponent(
     `Halo Admin TEFA SMK Nurul Jadid, saya berminat memesan:\n\n*Produk:* ${p.nama}\n*Jumlah:* ${quantity.value} pcs\n*Varian:* ${ukuranTerpilih.value}\n*Total Estimasi:* ${formatRupiah(totalEstimasi.value)}\n\nMohon info ketersediaan dan cara pembayarannya. Terima kasih!`
   )
-  return `https://wa.me/6281234567890?text=${text}`
+  return `https://wa.me/6282335585491?text=${text}`
 })
 
 function pesanSekarang() {

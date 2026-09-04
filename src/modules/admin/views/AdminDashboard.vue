@@ -162,20 +162,47 @@
             <div class="section-header">
               <div>
                 <h2 class="section-title">Data Pendaftaran PPDB Masuk</h2>
-                <p class="section-subtitle" style="margin: 0; color: #64748b; font-size: 0.875rem;">Verifikasi dan perbarui status pendaftaran calon siswa baru.</p>
+                <p class="section-subtitle">Verifikasi dan perbarui status pendaftaran calon siswa baru.</p>
               </div>
-              <div class="table-filters" style="display: flex; gap: 8px;">
-                <select v-model="filterStatus" class="filter-select" style="padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; font-size: 0.875rem;">
-                  <option value="">Semua Status</option>
-                  <option value="Menunggu">Menunggu</option>
-                  <option value="Disetujui">Disetujui</option>
-                  <option value="Ditolak">Ditolak</option>
-                </select>
+              <div class="table-filter-pills">
+                <button
+                  type="button"
+                  class="filter-pill-btn"
+                  :class="{ active: filterStatus === '' }"
+                  @click="filterStatus = ''"
+                >
+                  Semua <span class="pill-count">{{ registrations.length }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="filter-pill-btn"
+                  :class="{ active: filterStatus === 'Menunggu' }"
+                  @click="filterStatus = 'Menunggu'"
+                >
+                  Menunggu <span class="pill-count count-warning">{{ pendingCount }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="filter-pill-btn"
+                  :class="{ active: filterStatus === 'Disetujui' }"
+                  @click="filterStatus = 'Disetujui'"
+                >
+                  Disetujui <span class="pill-count count-success">{{ approvedCount }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="filter-pill-btn"
+                  :class="{ active: filterStatus === 'Ditolak' }"
+                  @click="filterStatus = 'Ditolak'"
+                >
+                  Ditolak <span class="pill-count count-danger">{{ rejectedCount }}</span>
+                </button>
               </div>
             </div>
 
-            <div v-if="errorMessage" class="error-banner" style="margin: 1rem 0; padding: 0.75rem 1rem; background: #fee2e2; color: #991b1b; border-radius: 8px;">
-              {{ errorMessage }}
+            <div v-if="errorMessage" class="error-banner">
+              <AlertTriangle :size="18" />
+              <span>{{ errorMessage }}</span>
             </div>
 
             <div class="table-responsive">
@@ -183,17 +210,18 @@
                 <thead>
                   <tr>
                     <th>Tanggal</th>
-                    <th>Nama Siswa</th>
+                    <th>Nama Calon Siswa</th>
                     <th>NISN</th>
-                    <th>Program Jurusan</th>
+                    <th>Pilihan Jurusan</th>
                     <th>Status</th>
-                    <th>Aksi Verifikasi</th>
+                    <th>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="filteredRegistrations.length === 0">
-                    <td colspan="6" class="empty-state" style="text-align: center; padding: 2rem; color: #64748b;">
-                      Belum ada data pendaftar yang sesuai.
+                    <td colspan="6" class="empty-state">
+                      <FileText :size="32" color="#94a3b8" />
+                      <p>Belum ada data pendaftar yang sesuai kriteria.</p>
                     </td>
                   </tr>
                   <tr v-for="item in filteredRegistrations" :key="item.id">
@@ -201,31 +229,37 @@
                     <td>
                       <div class="student-info">
                         <strong>{{ item.nama || item.name }}</strong>
-                        <span class="text-sm text-gray" style="display: block; font-size: 0.8rem; color: #64748b;">{{ item.email || '-' }}</span>
+                        <span class="text-sm text-gray">{{ item.email || item.phone || '-' }}</span>
                       </div>
                     </td>
                     <td class="font-mono text-sm">{{ item.nisn || '-' }}</td>
                     <td>
-                      <span class="program-tag" style="padding: 4px 8px; background: #e0e7ff; color: #3730a3; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">
-                        {{ item.program || item.major || '-' }}
+                      <span class="program-tag">
+                        {{ item.program || item.major || item.jurusan || '-' }}
                       </span>
                     </td>
                     <td>
                       <span
                         class="status-badge"
                         :class="statusBadgeClass(item.status)"
-                        style="padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700;"
                       >
                         {{ displayStatusLabel(item.status) }}
                       </span>
                     </td>
                     <td>
-                      <div class="action-buttons" style="display: flex; gap: 6px;">
+                      <div class="action-buttons">
+                        <button
+                          @click="openDetail(item)"
+                          class="act-btn btn-detail"
+                          title="Lihat Detail Pendaftaran"
+                        >
+                          Detail
+                        </button>
                         <button
                           @click="changeStatus(item.id, 'Disetujui')"
                           class="act-btn btn-approve"
                           :disabled="isStatusApproved(item.status)"
-                          style="padding: 4px 10px; background: #16a34a; color: white; border: none; border-radius: 6px; font-size: 0.8rem; cursor: pointer;"
+                          title="Setujui Calon Siswa"
                         >
                           Setujui
                         </button>
@@ -233,7 +267,7 @@
                           @click="changeStatus(item.id, 'Ditolak')"
                           class="act-btn btn-reject"
                           :disabled="isStatusRejected(item.status)"
-                          style="padding: 4px 10px; background: #dc2626; color: white; border: none; border-radius: 6px; font-size: 0.8rem; cursor: pointer;"
+                          title="Tolak Calon Siswa"
                         >
                           Tolak
                         </button>
@@ -242,6 +276,78 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <!-- Student Detail Modal -->
+          <div v-if="selectedRegistration" class="modal-backdrop" @click="selectedRegistration = null">
+            <div class="modal-card" @click.stop>
+              <div class="modal-header">
+                <div>
+                  <span class="modal-badge">Detail Pendaftaran Siswa</span>
+                  <h3 class="modal-title">{{ selectedRegistration.nama || selectedRegistration.name }}</h3>
+                </div>
+                <button class="modal-close" @click="selectedRegistration = null">&times;</button>
+              </div>
+
+              <div class="modal-body">
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <span class="detail-label">NISN</span>
+                    <strong class="detail-val font-mono">{{ selectedRegistration.nisn || '-' }}</strong>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Status Verifikasi</span>
+                    <span class="status-badge" :class="statusBadgeClass(selectedRegistration.status)">
+                      {{ displayStatusLabel(selectedRegistration.status) }}
+                    </span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-val">{{ selectedRegistration.email || '-' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Nomor WhatsApp / HP</span>
+                    <span class="detail-val">{{ selectedRegistration.phone || selectedRegistration.no_hp || '-' }}</span>
+                  </div>
+                  <div class="detail-item full-width">
+                    <span class="detail-label">Pilihan Program / Jurusan</span>
+                    <strong class="detail-val text-brand">{{ selectedRegistration.program || selectedRegistration.major || '-' }}</strong>
+                  </div>
+                  <div class="detail-item full-width" v-if="selectedRegistration.alamat || selectedRegistration.address">
+                    <span class="detail-label">Alamat Calon Siswa</span>
+                    <span class="detail-val">{{ selectedRegistration.alamat || selectedRegistration.address }}</span>
+                  </div>
+                  <div class="detail-item full-width" v-if="selectedRegistration.asal_sekolah || selectedRegistration.school_origin">
+                    <span class="detail-label">Asal Sekolah (SMP/MTs)</span>
+                    <span class="detail-val">{{ selectedRegistration.asal_sekolah || selectedRegistration.school_origin }}</span>
+                  </div>
+                  <div class="detail-item" v-if="selectedRegistration.created_at">
+                    <span class="detail-label">Tanggal Masuk Pendaftaran</span>
+                    <span class="detail-val">{{ formatDisplayDate(selectedRegistration.created_at) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <div class="modal-actions-left">
+                  <button
+                    @click="changeStatusFromModal('Disetujui')"
+                    class="act-btn btn-approve modal-btn"
+                    :disabled="isStatusApproved(selectedRegistration.status)"
+                  >
+                    ✓ Setujui Pendaftaran
+                  </button>
+                  <button
+                    @click="changeStatusFromModal('Ditolak')"
+                    class="act-btn btn-reject modal-btn"
+                    :disabled="isStatusRejected(selectedRegistration.status)"
+                  >
+                    ✕ Tolak Pendaftaran
+                  </button>
+                </div>
+                <button class="button secondary" @click="selectedRegistration = null">Tutup</button>
+              </div>
             </div>
           </div>
 
@@ -336,6 +442,7 @@ const filterProgram = ref('');
 const filterStatus = ref('');
 const user = ref({ name: 'Administrator', email: 'admin@smknuruljadid.edu' });
 const registrations = ref([]);
+const selectedRegistration = ref(null);
 const industryCount = ref(0);
 const isLoading = ref(false);
 const errorMessage = ref('');
@@ -449,6 +556,17 @@ const formatDisplayDate = (dateStr) => {
 
 const pendingCount = computed(() => registrations.value.filter(r => isStatusPending(r.status)).length);
 const approvedCount = computed(() => registrations.value.filter(r => isStatusApproved(r.status)).length);
+const rejectedCount = computed(() => registrations.value.filter(r => isStatusRejected(r.status)).length);
+
+const openDetail = (item) => {
+  selectedRegistration.value = item;
+};
+
+const changeStatusFromModal = async (newStatus) => {
+  if (!selectedRegistration.value) return;
+  await changeStatus(selectedRegistration.value.id, newStatus);
+  selectedRegistration.value.status = newStatus;
+};
 
 const filteredRegistrations = computed(() => {
   return registrations.value.filter(item => {
@@ -1253,5 +1371,330 @@ onMounted(() => {
   .dashboard-body {
     padding: 16px;
   }
+}
+
+/* Filter Pills */
+.table-filter-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+
+  &.active {
+    background: #1e3a8a;
+    border-color: #1e3a8a;
+    color: #ffffff;
+
+    .pill-count {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+  }
+}
+
+.pill-count {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  background: #e2e8f0;
+  color: #475569;
+
+  &.count-warning {
+    background: #fef3c7;
+    color: #b45309;
+  }
+  &.count-success {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  &.count-danger {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.act-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.btn-detail {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  &:hover:not(:disabled) {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+}
+
+.btn-approve {
+  background: #16a34a;
+  color: #ffffff;
+  &:hover:not(:disabled) {
+    background: #15803d;
+  }
+}
+
+.btn-reject {
+  background: #ef4444;
+  color: #ffffff;
+  &:hover:not(:disabled) {
+    background: #dc2626;
+  }
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badge-pending {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.badge-approved {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.student-info strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.program-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #eef2ff;
+  color: #3730a3;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 16px;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spin-anim {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-card {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.modal-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #2563eb;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #94a3b8;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+
+  &:hover {
+    color: #0f172a;
+  }
+}
+
+.modal-body {
+  padding: 24px;
+  flex: 1;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+}
+
+.detail-val {
+  font-size: 0.9375rem;
+  color: #0f172a;
+}
+
+.text-brand {
+  color: #1e3a8a;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.modal-actions-left {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-btn {
+  padding: 8px 16px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }
 </style>

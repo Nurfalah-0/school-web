@@ -42,8 +42,8 @@ class ChatbotController extends Controller
      * School context prompts
      */
     private $contextPrompts = [
-        'general' => 'Anda adalah asisten virtual untuk SMK Nurul Jadid. Anda membantu menjawab pertanyaan tentang sekolah, program studi, PPDB, kegiatan sekolah, dan informasi umum lainnya. Jawab dengan ramah dan informatif.',
-        'ppdb' => 'Anda adalah asisten khusus PPDB SMK Nurul Jadid. Anda membantu calon siswa dan orang tua dengan informasi tentang pendaftaran, persyaratan, jalur masuk, jadwal, dan biaya pendidikan.',
+        'general' => 'Anda adalah asisten virtual untuk SMK Nurul Jadid. Anda membantu menjawab pertanyaan tentang sekolah, program studi, PPDB, kegiatan sekolah, dan informasi umum lainnya. Jika butuh kontak langsung atau konfirmasi, hubungi WhatsApp resmi +6282335585491 atau email smknurja.paiton@gmail.com. Jawab dengan ramah dan informatif.',
+        'ppdb' => 'Anda adalah asisten khusus PPDB SMK Nurul Jadid. Anda membantu calon siswa dan orang tua dengan informasi tentang pendaftaran, persyaratan, jalur masuk, jadwal, dan biaya pendidikan. Untuk konfirmasi atau pertanyaan langsung, arahkan ke WhatsApp resmi +6282335585491.',
         'academic' => 'Anda adalah asisten akademik SMK Nurul Jadid. Anda membantu dengan informasi tentang kurikulum, jadwal pelajaran, ujian, nilai, dan kegiatan akademik lainnya.',
         'bkk' => 'Anda adalah asisten Bursa Kerja Khusus SMK Nurul Jadid. Anda membantu dengan informasi tentang lowongan kerja, pelatihan, magang, dan karir setelah lulus.',
         'student' => 'Anda adalah asisten untuk siswa SMK Nurul Jadid. Anda membantu dengan informasi tentang kegiatan siswa, ekstrakurikuler, prestasi, dan kehidupan sekolah.',
@@ -668,7 +668,20 @@ class ChatbotController extends Controller
 
     private function filterSensitiveInfo($text)
     {
-        // Filter informasi sensitif seperti nomor telepon, email, dll.
+        // Simpan kontak resmi sekolah agar tidak terfilter
+        $officialPlaceholders = [
+            '+6282335585491' => '__OFFICIAL_WA_1__',
+            '+62 823-3558-5491' => '__OFFICIAL_WA_2__',
+            '082335585491' => '__OFFICIAL_WA_3__',
+            'smknurja.paiton@gmail.com' => '__OFFICIAL_EMAIL_1__',
+            'info@smknuruljadid.sch.id' => '__OFFICIAL_EMAIL_2__',
+        ];
+
+        foreach ($officialPlaceholders as $real => $token) {
+            $text = str_replace($real, $token, $text);
+        }
+
+        // Filter informasi sensitif seperti nomor telepon pribadi, email, dll.
         $patterns = [
             // Phone numbers
             '/(\+62|62|0)\d{9,12}/' => '[NOMOR TELEPON]',
@@ -681,6 +694,11 @@ class ChatbotController extends Controller
 
         foreach ($patterns as $pattern => $replacement) {
             $text = preg_replace($pattern, $replacement, $text);
+        }
+
+        // Kembalikan kontak resmi
+        foreach ($officialPlaceholders as $real => $token) {
+            $text = str_replace($token, $real, $text);
         }
 
         return $text;
