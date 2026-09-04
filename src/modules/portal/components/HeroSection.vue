@@ -4,9 +4,11 @@
       <div class="hero-copy">
         <span class="hero-label">Enrollment Open 2024/2025</span>
         <h1 class="hero-title">
-          <span class="hero-accent">Mencetak</span> <span class="hero-highlight">Generasi</span>
+          <span class="hero-accent">Mencetak</span>
+          <span class="hero-highlight">Generasi</span>
           <br />
-          <span class="hero-accent">Unggul</span> <span class="hero-highlight">Masa Depan</span>
+          <span class="hero-accent">Unggul</span>
+          <span class="hero-highlight">Masa Depan</span>
         </h1>
         <p class="hero-description">
           Vokasi SMK Nurul Jadid hadir dengan kurikulum berbasis industri dan
@@ -14,7 +16,9 @@
         </p>
 
         <div class="hero-actions">
-          <router-link class="button-primary" to="/ppdb">Daftar PPDB Sekarang</router-link>
+          <router-link class="button-primary" to="/ppdb"
+            >Daftar PPDB Sekarang</router-link
+          >
           <a class="button-secondary" href="#profil">Lihat Profil</a>
         </div>
       </div>
@@ -22,11 +26,17 @@
       <div class="hero-visual">
         <div class="hero-card-wrap">
           <div class="hero-card">
-            <img :src="heroImg" alt="Siswa SMK Nurul Jadid" />
+            <img
+              :src="heroImg"
+              alt="Siswa SMK Nurul Jadid"
+              loading="lazy"
+            />
           </div>
 
           <div class="hero-stat-card hero-stat-top">
-            <div class="hero-stat-icon bg-teal"><Users :size="24" color="#ffffff" /></div>
+            <div class="hero-stat-icon bg-teal">
+              <Users :size="24" color="#ffffff" />
+            </div>
             <div class="hero-stat-text">
               <strong>1200+</strong>
               <p>Siswa Aktif</p>
@@ -34,7 +44,9 @@
           </div>
 
           <div class="hero-stat-card hero-stat-bottom">
-            <div class="hero-stat-icon bg-amber"><Trophy :size="24" color="#ffffff" /></div>
+            <div class="hero-stat-icon bg-amber">
+              <Trophy :size="24" color="#ffffff" />
+            </div>
             <div class="hero-stat-text">
               <strong>85%</strong>
               <p>Lulusan Bekerja</p>
@@ -47,12 +59,24 @@
 </template>
 
 <script setup>
-import heroImg from '../../../assets/hero-lab.webp';
-import { Users, Trophy } from 'lucide-vue-next';
+import { computed } from "vue";
+import { Users, Trophy } from "lucide-vue-next";
+import { useSiteImages } from "@/composables/useSiteImages";
+import fallbackImg from "../../../assets/hero-lab.webp";
+
+const { getImageByKey, images, loading } = useSiteImages();
+
+const heroImg = computed(() => {
+  const heroImage = getImageByKey("hero_banner");
+  if (heroImage?.image_url) {
+    return heroImage.image_url;
+  }
+  return fallbackImg;
+});
 </script>
 
 <style lang="scss" scoped>
-@use '../../../assets/styles/variables' as *;
+@use "../../../assets/styles/variables" as *;
 
 .hero-section {
   position: relative;
@@ -162,10 +186,14 @@ import { Users, Trophy } from 'lucide-vue-next';
 }
 
 .hero-card::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(4, 45, 134, 0) 0%, rgba(4, 45, 134, 0.15) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(4, 45, 134, 0) 0%,
+    rgba(4, 45, 134, 0.15) 100%
+  );
   pointer-events: none;
 }
 

@@ -16,6 +16,8 @@
           <span class="user-badge">Admin SMK</span>
           <span class="user-name">{{ user.name || 'Administrator' }}</span>
           <router-link to="/" class="nav-btn text-btn">Lihat Portal ↗</router-link>
+          <router-link to="/admin/manage" class="nav-btn text-btn">Kelola Admin</router-link>
+          <router-link to="/admin/content" class="nav-btn text-btn">Content Studio</router-link>
           <button @click="handleLogout" class="nav-btn logout-btn">Keluar</button>
         </div>
       </div>
@@ -27,8 +29,8 @@
         <!-- Title & Action Header -->
         <div class="page-title-bar">
           <div>
-            <h2>Dashboard Kelola Pendaftaran PKL</h2>
-            <p>Verifikasi data pendaftaran siswa dan pengelolaan status kemitraan.</p>
+            <h2>Dashboard Kelola Pendaftaran & Sekolah</h2>
+            <p>Verifikasi data pendaftaran PPDB siswa, status kemitraan, dan manajemen konten sekolah.</p>
           </div>
           <button @click="fetchData" class="refresh-btn" :disabled="isLoading">
             <RefreshCw :size="18" color="#ffffff" /> {{ isLoading ? 'Memuat...' : 'Refresh Data' }}
@@ -65,7 +67,7 @@
             <div class="stat-icon bg-purple"><Building2 :size="24" color="#ffffff" /></div>
             <div class="stat-info">
               <span class="stat-label">Mitra Industri</span>
-              <strong class="stat-val">12 Mitra</strong>
+              <strong class="stat-val">{{ industryCount }} Mitra</strong>
             </div>
           </div>
         </div>
@@ -116,27 +118,23 @@
                   </td>
                 </tr>
                 <tr v-for="item in filteredRegistrations" :key="item.id">
-                  <td class="text-sm text-gray">{{ item.createdAt }}</td>
+                  <td class="text-sm text-gray">{{ formatDisplayDate(item.created_at || item.createdAt) }}</td>
                   <td>
                     <div class="student-info">
-                      <strong>{{ item.name }}</strong>
-                      <span class="text-sm text-gray">{{ item.email }}</span>
+                      <strong>{{ item.nama || item.name }}</strong>
+                      <span class="text-sm text-gray">{{ item.email || '-' }}</span>
                     </div>
                   </td>
-                  <td class="font-mono text-sm">{{ item.nisn }}</td>
+                  <td class="font-mono text-sm">{{ item.nisn || '-' }}</td>
                   <td>
-                    <span class="program-tag">{{ item.program }}</span>
+                    <span class="program-tag">{{ item.program || '-' }}</span>
                   </td>
                   <td>
                     <span
                       class="status-badge"
-                      :class="{
-                        'badge-approved': item.status === 'Disetujui',
-                        'badge-pending': item.status === 'Menunggu',
-                        'badge-rejected': item.status === 'Ditolak'
-                      }"
+                      :class="statusBadgeClass(item.status)"
                     >
-                      {{ item.status }}
+                      {{ displayStatusLabel(item.status) }}
                     </span>
                   </td>
                   <td>
@@ -144,14 +142,14 @@
                       <button
                         @click="changeStatus(item.id, 'Disetujui')"
                         class="act-btn btn-approve"
-                        :disabled="item.status === 'Disetujui'"
+                        :disabled="isStatusApproved(item.status)"
                       >
                         Setujui
                       </button>
                       <button
                         @click="changeStatus(item.id, 'Ditolak')"
                         class="act-btn btn-reject"
-                        :disabled="item.status === 'Ditolak'"
+                        :disabled="isStatusRejected(item.status)"
                       >
                         Tolak
                       </button>
@@ -171,32 +169,59 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import logo from '../../../assets/logo.webp';
-import { getRegistrations, updateRegistrationStatus } from '../../../api/endpoints';
+import { getRegistrations, updateRegistrationStatus, getDashboardStats } from '../../../api/endpoints';
 import { RefreshCw, AlertTriangle, ClipboardList, Loader2, CheckCircle, Building2 } from 'lucide-vue-next';
 
 const router = useRouter();
 
 const user = ref({ name: 'Administrator' });
 const registrations = ref([]);
+const industryCount = ref(0);
 const isLoading = ref(false);
 const errorMessage = ref('');
 const searchQuery = ref('');
 const filterProgram = ref('');
 const filterStatus = ref('');
 
-const pendingCount = computed(() => registrations.value.filter(r => r.status === 'Menunggu').length);
-const approvedCount = computed(() => registrations.value.filter(r => r.status === 'Disetujui').length);
+const isStatusPending = (status) => status === 'Menunggu' || status === 'pending' || status === 'verifikasi';
+const isStatusApproved = (status) => status === 'Disetujui' || status === 'diterima' || status === 'approved';
+const isStatusRejected = (status) => status === 'Ditolak' || status === 'ditolak' || status === 'rejected';
+
+const displayStatusLabel = (status) => {
+  if (isStatusApproved(status)) return 'Disetujui';
+  if (isStatusRejected(status)) return 'Ditolak';
+  return 'Menunggu';
+};
+
+const statusBadgeClass = (status) => {
+  if (isStatusApproved(status)) return 'badge-approved';
+  if (isStatusRejected(status)) return 'badge-rejected';
+  return 'badge-pending';
+};
+
+const formatDisplayDate = (dateStr) => {
+  if (!dateStr) return '-';
+  try {
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch {
+    return dateStr;
+  }
+};
+
+const pendingCount = computed(() => registrations.value.filter(r => isStatusPending(r.status)).length);
+const approvedCount = computed(() => registrations.value.filter(r => isStatusApproved(r.status)).length);
 
 const filteredRegistrations = computed(() => {
   return registrations.value.filter(item => {
-    const matchSearch =
-      !searchQuery.value ||
-      item.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      item.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      item.nisn.includes(searchQuery.value);
+    const name = (item.nama || item.name || '').toLowerCase();
+    const email = (item.email || '').toLowerCase();
+    const nisn = (item.nisn || '');
+    const q = searchQuery.value.toLowerCase();
 
+    const matchSearch = !searchQuery.value || name.includes(q) || email.includes(q) || nisn.includes(q);
     const matchProgram = !filterProgram.value || item.program === filterProgram.value;
-    const matchStatus = !filterStatus.value || item.status === filterStatus.value;
+    const matchStatus = !filterStatus.value || displayStatusLabel(item.status) === filterStatus.value;
 
     return matchSearch && matchProgram && matchStatus;
   });
@@ -206,13 +231,29 @@ const fetchData = async () => {
   isLoading.value = true;
   errorMessage.value = '';
   try {
-    const res = await getRegistrations();
-    if (Array.isArray(res.data)) {
-      registrations.value = res.data;
-    } else if (Array.isArray(res.data?.data)) {
-      registrations.value = res.data.data;
-    } else {
-      registrations.value = [];
+    const [regRes, statsRes] = await Promise.allSettled([
+      getRegistrations(),
+      getDashboardStats()
+    ]);
+
+    if (regRes.status === 'fulfilled') {
+      const res = regRes.value;
+      if (Array.isArray(res.data)) {
+        registrations.value = res.data;
+      } else if (Array.isArray(res.data?.data?.data)) {
+        registrations.value = res.data.data.data;
+      } else if (Array.isArray(res.data?.data)) {
+        registrations.value = res.data.data;
+      } else {
+        registrations.value = [];
+      }
+    }
+
+    if (statsRes.status === 'fulfilled') {
+      const stats = statsRes.value?.data?.data;
+      if (stats) {
+        industryCount.value = stats.total_industry_partners ?? stats.industry_partners ?? 0;
+      }
     }
   } catch (error) {
     console.error('Gagal mengambil data pendaftaran:', error);
@@ -235,6 +276,8 @@ const changeStatus = async (id, newStatus) => {
 };
 
 const handleLogout = () => {
+  localStorage.removeItem('auth_token');
+  sessionStorage.removeItem('auth_token');
   localStorage.removeItem('admin_token');
   localStorage.removeItem('admin_email');
   localStorage.removeItem('admin_remember_email');
@@ -244,7 +287,7 @@ const handleLogout = () => {
 };
 
 onMounted(() => {
-  const token = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
+  const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
   if (!token) {
     router.push('/login');
     return;

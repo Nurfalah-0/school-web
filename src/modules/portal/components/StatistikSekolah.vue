@@ -2,8 +2,15 @@
   <section class="statistik-sekolah">
     <div class="statistik-inner">
       <div class="statistik-grid">
-        <div v-for="item in stats" :key="item.label" class="statistik-item">
-          <div class="statistik-number">{{ animatedValues[item.label] || 0 }}</div>
+        <div
+          v-for="item in props.stats"
+          :key="item.label"
+          class="statistik-item"
+          :data-label="item.label"
+        >
+          <div class="statistik-number">
+            {{ animatedValues[item.label] || 0 }}
+          </div>
           <div class="statistik-label">{{ item.label }}</div>
         </div>
       </div>
@@ -12,73 +19,106 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
+import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({
   stats: {
     type: Array,
     default: () => [
-      { angka: 1200, label: 'SISWA AKTIF' },
-      { angka: 85, label: 'GURU & STAFF' },
-      { angka: 4500, label: 'ALUMNI SUKSES' },
-      { angka: 50, label: 'PARTNER INDUSTRI' }
-    ]
-  }
+      { angka: 1200, label: "SISWA AKTIF" },
+      { angka: 85, label: "GURU & STAFF" },
+      { angka: 4500, label: "ALUMNI SUKSES" },
+      { angka: 50, label: "PARTNER INDUSTRI" },
+    ],
+  },
 });
 
 const animatedValues = reactive({});
 let observer = null;
+let animationFrameId = null;
 
 const animateCount = (entry) => {
-  if (entry.isIntersecting) {
-    const stat = props.stats.find(s => s.label === entry.target.dataset.label);
-    if (!stat) return;
+  if (!entry.isIntersecting) return;
 
-    const duration = 1800;
-    const startTime = performance.now();
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const label = entry.target.dataset.label;
+  const stat = props.stats.find((s) => s.label === label);
+  if (!stat) return;
 
-    if (prefersReducedMotion) {
-      animatedValues[stat.label] = stat.angka;
-      return;
-    }
+  const duration = 1800;
+  const startTime =
+    typeof performance !== "undefined" ? performance.now() : Date.now();
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
 
-    const step = (currentTime) => {
+  if (prefersReducedMotion) {
+    animatedValues[stat.label] = stat.angka;
+    return;
+  }
+
+  const step = (currentTime) => {
+    try {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       animatedValues[stat.label] = Math.floor(eased * stat.angka);
+
       if (progress < 1) {
-        requestAnimationFrame(step);
+        animationFrameId = requestAnimationFrame(step);
       } else {
         animatedValues[stat.label] = stat.angka;
       }
-    };
+    } catch (err) {
+      console.error("Animation error:", err);
+      animatedValues[stat.label] = stat.angka;
+    }
+  };
 
-    requestAnimationFrame(step);
+  animationFrameId = requestAnimationFrame(step);
+
+  if (observer) {
     observer.unobserve(entry.target);
   }
 };
 
 onMounted(() => {
-  observer = new IntersectionObserver((entries) => {
-    entries.forEach(animateCount);
-  }, { threshold: 0.3 });
+  try {
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(animateCount);
+      },
+      { threshold: 0.3 },
+    );
 
-  props.stats.forEach((stat) => {
-    const el = document.querySelector(`[data-label="${stat.label}"]`);
-    if (el) observer.observe(el);
-  });
+    props.stats.forEach((stat) => {
+      const el = document.querySelector(`[data-label="${stat.label}"]`);
+      if (el && observer) {
+        observer.observe(el);
+      }
+    });
+  } catch (err) {
+    console.error("Observer error:", err);
+    // Fallback: just show all values
+    props.stats.forEach((stat) => {
+      animatedValues[stat.label] = stat.angka;
+    });
+  }
 });
 
 onBeforeUnmount(() => {
-  if (observer) observer.disconnect();
+  if (observer) {
+    observer.disconnect();
+    observer = null;
+  }
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+  }
 });
 </script>
 
 <style lang="scss" scoped>
 .statistik-sekolah {
-  background: #28469E;
+  background: #28469e;
   padding: 5rem 0;
 }
 
@@ -115,7 +155,7 @@ onBeforeUnmount(() => {
 }
 
 .statistik-number {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 800;
   font-size: clamp(2.5rem, 3.5vw, 3.5rem);
   color: #ffffff;

@@ -6,8 +6,14 @@
         <p class="mitra-subtitle">{{ subtitle }}</p>
       </div>
       <div class="mitra-grid">
-        <div v-for="partner in partners" :key="partner.name" class="mitra-card">
-          <img :src="partner.logoSrc" :alt="partner.name" class="mitra-logo" loading="lazy" />
+        <div v-for="(partner, idx) in activePartners" :key="partner.name || idx" class="mitra-card">
+          <img
+            :src="partner.logoSrc"
+            :alt="partner.name"
+            class="mitra-logo"
+            loading="lazy"
+            @error="onLogoError"
+          />
         </div>
       </div>
     </div>
@@ -15,6 +21,10 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue';
+import { getPublicContent } from '@/api/endpoints';
+import { publicImage } from '@/modules/contentMapper';
+
 defineProps({
   title: {
     type: String,
@@ -23,19 +33,42 @@ defineProps({
   subtitle: {
     type: String,
     default: 'Bekerjasama dengan lebih dari 100+ perusahaan berskala nasional dan multinasional.'
-  },
-  partners: {
-    type: Array,
-    default: () => [
-      { name: 'PT. Integra', logoSrc: 'https://upload.wikimedia.org/wikipedia/id/7/79/Logo_PT_Integra.png' },
-      { name: 'Gajah Tunggal', logoSrc: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Gajah_Tunggal_logo.svg/1200px-Gajah_Tunggal_logo.svg.png' },
-      { name: 'Bank BRI', logoSrc: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Logo_BRI.svg/1200px-Logo_BRI.svg.png' },
-      { name: 'Astra', logoSrc: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Astra_International_logo.svg/1200px-Astra_International_logo.svg.png' },
-      { name: 'BCA', logoSrc: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/BCA_logo.svg/1200px-BCA_logo.svg.png' },
-      { name: 'Google Cloud', logoSrc: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Google_Cloud_logo.svg/1200px-Google_Cloud_logo.svg.png' }
-    ]
   }
 });
+
+const defaultPartners = [
+  { name: 'PT. Telkom Indonesia', logoSrc: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=300&q=80' },
+  { name: 'PT. Astra International', logoSrc: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=300&q=80' },
+  { name: 'Bank Rakyat Indonesia', logoSrc: 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=300&q=80' },
+  { name: 'PT. Komatsu Indonesia', logoSrc: 'https://images.unsplash.com/photo-1542744095-291d1f67b221?w=300&q=80' },
+  { name: 'PT. Indofood Sukses Makmur', logoSrc: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=300&q=80' },
+  { name: 'Google for Education Partner', logoSrc: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=300&q=80' }
+];
+
+const apiPartners = ref([]);
+
+onMounted(async () => {
+  try {
+    const res = await getPublicContent('partners');
+    const data = res.data?.data || [];
+    if (data.length > 0) {
+      apiPartners.value = data.map(p => ({
+        name: p.name || p.company_name,
+        logoSrc: publicImage(p.logo || p.image)
+      }));
+    }
+  } catch (err) {
+    // Graceful fallback
+  }
+});
+
+const activePartners = computed(() => {
+  return apiPartners.value.length > 0 ? apiPartners.value : defaultPartners;
+});
+
+function onLogoError(e) {
+  e.target.src = 'https://placehold.co/200x80/f8fafc/042d86?text=MITRA+INDUSTRI';
+}
 </script>
 
 <style lang="scss" scoped>
@@ -97,6 +130,12 @@ defineProps({
   align-items: center;
   justify-content: center;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+
+  &:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
 }
 
 .mitra-logo {

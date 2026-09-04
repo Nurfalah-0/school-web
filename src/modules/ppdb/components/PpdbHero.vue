@@ -41,8 +41,8 @@
         </div>
 
         <div class="ppdb-hero-actions">
-          <a class="ppdb-btn-primary" href="#pendaftaran">Daftar Sekarang</a>
-          <a class="ppdb-btn-secondary" href="#status">Cek Status</a>
+          <a class="ppdb-btn-primary" href="#pendaftaran" @click.prevent="scrollToSection('#pendaftaran')">Daftar Sekarang</a>
+          <a class="ppdb-btn-secondary" href="#status" @click.prevent="scrollToSection('#status')">Cek Status</a>
         </div>
       </div>
 
@@ -61,13 +61,22 @@
             </div>
           </div>
 
+          <div class="ppdb-hero-card">
+            <img
+              class="ppdb-hero-image"
+              :src="heroImg"
+              alt="Siswa Vokasi SMK"
+              loading="lazy"
+            />
+          </div>
+
           <div class="ppdb-hero-float-card ppdb-hero-float-card-bottom">
-            <div class="ppdb-float-icon-wrap">
+            <div class="ppdb-float-icon-wrap ppdb-float-icon-wrap-alt">
               <Users class="ppdb-float-icon" />
             </div>
             <div class="ppdb-float-text">
-              <span class="ppdb-float-label">Daya Tampung</span>
-              <strong>500+ Siswa</strong>
+              <span class="ppdb-float-label">Peluang Kerja</span>
+              <strong>94% Terserap</strong>
             </div>
           </div>
 
@@ -94,6 +103,17 @@ const props = defineProps({
 
 const countdown = ref({ days: 0, hours: 0, minutes: 0 });
 let timer = null;
+
+const scrollToSection = (selector) => {
+  const el = document.querySelector(selector);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const input = el.querySelector('input');
+    if (input) {
+      setTimeout(() => input.focus(), 600);
+    }
+  }
+};
 
 const updateCountdown = () => {
   const target = new Date(props.deadline).getTime();

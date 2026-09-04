@@ -38,8 +38,10 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { ArrowRight, CodeXml, Car, Palette, Landmark } from 'lucide-vue-next'
+import { getPublicContent } from '@/api/endpoints'
+import { mapVacancy } from '@/modules/contentMapper'
 import { getAllLowongan } from '@/data/lowongan'
 
 defineProps({
@@ -53,7 +55,26 @@ defineProps({
   }
 })
 
-const previewJobs = computed(() => getAllLowongan().slice(0, 3))
+const dbJobs = ref([])
+
+onMounted(async () => {
+  try {
+    const res = await getPublicContent('job_vacancies')
+    const fetched = (res.data?.data || []).map(mapVacancy)
+    if (fetched.length > 0) {
+      dbJobs.value = fetched
+    } else {
+      dbJobs.value = getAllLowongan()
+    }
+  } catch (err) {
+    dbJobs.value = getAllLowongan()
+  }
+})
+
+const previewJobs = computed(() => {
+  const list = dbJobs.value.length ? dbJobs.value : getAllLowongan()
+  return list.slice(0, 3)
+})
 
 function iconComponent(name) {
   const map = { CodeXml, Car, Palette, Landmark }

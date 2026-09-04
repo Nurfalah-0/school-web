@@ -3,18 +3,31 @@
     <div class="berita-inner">
       <div class="berita-header">
         <h2 class="berita-title">{{ title }}</h2>
-        <router-link to="/berita" class="berita-link">{{ seeAllText }}</router-link>
+        <router-link to="/berita" class="berita-link">{{
+          seeAllText
+        }}</router-link>
       </div>
 
       <div class="berita-grid">
         <div class="berita-featured">
-          <router-link v-if="beritaUtama" :to="`/berita/${beritaUtama.slug}`" class="berita-featured-link">
+          <router-link
+            v-if="beritaUtama"
+            :to="`/berita/${beritaUtama.slug}`"
+            class="berita-featured-link"
+          >
             <div class="berita-featured-img-wrap">
-              <img :src="beritaUtama.gambarUtama" :alt="beritaUtama.judul" class="berita-featured-img" />
+              <img
+                :src="beritaUtama.gambarUtama"
+                :alt="beritaUtama.judul"
+                class="berita-featured-img"
+                loading="lazy"
+              />
               <span class="berita-featured-badge">UTAMA</span>
             </div>
             <div class="berita-featured-body">
-              <span class="berita-featured-date">{{ beritaUtama.tanggalDisplay }}</span>
+              <span class="berita-featured-date">{{
+                beritaUtama.tanggalDisplay
+              }}</span>
               <h3 class="berita-featured-title">{{ beritaUtama.judul }}</h3>
               <p class="berita-featured-text">{{ excerpt(beritaUtama) }}</p>
             </div>
@@ -29,10 +42,19 @@
             class="berita-list-item"
           >
             <div class="berita-list-thumb">
-              <img :src="item.gambarUtama" :alt="item.judul" class="berita-list-img" />
+              <img
+                :src="item.gambarUtama"
+                :alt="item.judul"
+                class="berita-list-img"
+                loading="lazy"
+              />
             </div>
             <div class="berita-list-body">
-              <span class="berita-list-kategori" :style="{ color: kategoriColor(item.kategori) }">{{ item.kategori }}</span>
+              <span
+                class="berita-list-kategori"
+                :style="{ color: kategoriColor(item.kategori) }"
+                >{{ item.kategori }}</span
+              >
               <h4 class="berita-list-title">{{ item.judul }}</h4>
               <span class="berita-list-date">{{ item.tanggalDisplay }}</span>
             </div>
@@ -44,35 +66,53 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { getBeritaUtama, getBeritaTerbaru, kategoriColorMap } from '@/data/berita'
+import { computed, onMounted, ref } from "vue";
+import { getNews } from "@/api/endpoints";
+import { mapNews } from "../../berita/services/newsMapper";
 
 defineProps({
   title: {
     type: String,
-    default: 'Berita & Kegiatan'
+    default: "Berita & Kegiatan",
   },
   seeAllText: {
     type: String,
-    default: 'Semua Berita'
-  }
-})
+    default: "Semua Berita",
+  },
+});
 
-const beritaUtama = computed(() => getBeritaUtama())
-const daftarBerita = computed(() => getBeritaTerbaru(3))
+const beritaDatabase = ref([]);
+const beritaUtama = computed(() => beritaDatabase.value[0] || null);
+const daftarBerita = computed(() => beritaDatabase.value.slice(1, 4));
+
+onMounted(async () => {
+  try {
+    const response = await getNews(1, 4);
+    const articles = response.data?.data?.data || response.data?.data || [];
+    beritaDatabase.value = articles.map(mapNews);
+  } catch {
+    beritaDatabase.value = [];
+  }
+});
 
 function excerpt(artikel) {
-  const txt = artikel.konten.find(b => b.tipe === 'paragraf')?.teks || ''
-  return txt.length > 140 ? txt.slice(0, 140).trim() + '...' : txt
+  const txt = artikel.konten.find((b) => b.tipe === "paragraf")?.teks || "";
+  return txt.length > 140 ? txt.slice(0, 140).trim() + "..." : txt;
 }
 
 function kategoriColor(kategori) {
-  return kategoriColorMap[kategori]?.bg || '#042d86'
+  const colors = ["#1e3a8a", "#0f766e", "#b45309", "#7c3aed", "#be123c"];
+  const index =
+    [...(kategori || "")].reduce(
+      (sum, letter) => sum + letter.charCodeAt(0),
+      0,
+    ) % colors.length;
+  return colors[index];
 }
 </script>
 
 <style lang="scss" scoped>
-@use '../../../assets/styles/variables' as *;
+@use "../../../assets/styles/variables" as *;
 
 .berita-kegiatan {
   background: #ffffff;
@@ -94,7 +134,7 @@ function kategoriColor(kategori) {
 }
 
 .berita-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 800;
   font-size: clamp(1.8rem, 3vw, 3rem);
   color: #0f172a;
@@ -181,7 +221,7 @@ function kategoriColor(kategori) {
 }
 
 .berita-featured-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 800;
   font-size: clamp(1.3rem, 2vw, 1.75rem);
   color: #0f172a;
@@ -240,7 +280,7 @@ function kategoriColor(kategori) {
 }
 
 .berita-list-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 700;
   font-size: 1rem;
   color: #0f172a;

@@ -41,7 +41,7 @@ function isAdminLoginRoute(to) {
 }
 
 function getAdminToken() {
-  return localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token')
+  return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token')
 }
 
 router.beforeEach((to, from, next) => {

@@ -1,7 +1,11 @@
 <template>
   <div class="galeri-page">
     <GaleriHero />
-    <FilterGaleri :aktif="kategoriAktif" @update:kategori="ubahFilter" />
+    <FilterGaleri
+      :aktif="kategoriAktif"
+      @update:kategori="ubahFilter"
+      @update:search="ubahSearch"
+    />
     <GridGaleri :items="dataDitampilkan" @open="bukaLightbox" />
     <LoadMoreButton v-if="visibleCount < hasilFilter.length" @click="visibleCount += 9" />
 
@@ -10,6 +14,8 @@
       :item="hasilFilter[lightboxIndex]"
       :has-prev="lightboxIndex > 0"
       :has-next="lightboxIndex < hasilFilter.length - 1"
+      :current-index="lightboxIndex"
+      :total="hasilFilter.length"
       @close="tutupLightbox"
       @prev="fotoSebelumnya"
       @next="fotoBerikutnya"
@@ -22,7 +28,8 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { getAllGaleri, getKategoriList } from '@/data/galeri';
+import { getPublicContent } from '@/api/endpoints';
+import { mapGallery } from '@/modules/contentMapper';
 import GaleriHero from '@/components/galeri/GaleriHero.vue';
 import FilterGaleri from '@/components/galeri/FilterGaleri.vue';
 import GridGaleri from '@/components/galeri/GridGaleri.vue';
@@ -34,14 +41,26 @@ const route = useRoute();
 const router = useRouter();
 
 const kategoriAktif = ref(route.query.kategori || 'semua');
+const searchQuery = ref('');
 const visibleCount = ref(9);
 const lightboxIndex = ref(null);
+const galeriItems = ref([]);
 
 const hasilFilter = computed(() => {
-  const semua = getAllGaleri();
-  return kategoriAktif.value === 'semua'
-    ? semua
-    : semua.filter(g => g.kategori === kategoriAktif.value);
+  let items = galeriItems.value;
+
+  // Filter kategori
+  if (kategoriAktif.value !== 'semua') {
+    items = items.filter(g => g.kategori === kategoriAktif.value);
+  }
+
+  // Filter search
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.trim().toLowerCase();
+    items = items.filter(g => g.judul?.toLowerCase().includes(q));
+  }
+
+  return items;
 });
 
 const dataDitampilkan = computed(() => hasilFilter.value.slice(0, visibleCount.value));
@@ -50,6 +69,11 @@ function ubahFilter(kategori) {
   kategoriAktif.value = kategori;
   visibleCount.value = 9;
   router.replace({ query: kategori === 'semua' ? {} : { kategori } });
+}
+
+function ubahSearch(q) {
+  searchQuery.value = q;
+  visibleCount.value = 9;
 }
 
 function bukaLightbox(item) {
@@ -66,6 +90,15 @@ function fotoSebelumnya() {
 
 watch(() => route.query.kategori, (val) => {
   kategoriAktif.value = val || 'semua';
+});
+
+onMounted(async () => {
+  try {
+    const response = await getPublicContent('galleries');
+    galeriItems.value = (response.data?.data || []).map(mapGallery);
+  } catch (e) {
+    galeriItems.value = [];
+  }
 });
 </script>
 

@@ -1,14 +1,14 @@
-3<template>
-  <section class="form-section">
+<template>
+  <section class="form-section" id="pendaftaran">
     <div class="form-inner">
-      <div class="form-card-main">
+      <div class="form-card-main" id="formulir">
         <h2 class="form-main-title">Formulir Pendaftaran</h2>
 
         <form @submit.prevent="handleSubmit" class="form-form">
           <div class="form-row">
             <label class="form-group">
               <span>NAMA LENGKAP SESUAI IJAZAH</span>
-              <input v-model="form.nama" type="text" placeholder="Nama Lengkap" required />
+              <input ref="namaInput" v-model="form.nama" type="text" placeholder="Nama Lengkap" required />
             </label>
 
             <label class="form-group">
@@ -17,14 +17,24 @@
             </label>
           </div>
 
+          <div class="form-row">
+            <label class="form-group">
+              <span>EMAIL AKTIF</span>
+              <input v-model="form.email" type="email" placeholder="contoh@email.com" />
+            </label>
+
+            <label class="form-group">
+              <span>NO. TELEPON / WHATSAPP</span>
+              <input v-model="form.phone" type="tel" placeholder="08xxxxxxxxxx" />
+            </label>
+          </div>
+
           <label class="form-group">
             <span>Pilihan Jurusan Utama</span>
             <div class="select-wrap">
               <select v-model="form.jurusan" required>
                 <option value="" disabled>Pilih Program Keahlian</option>
-                <option value="Teknologi Informatika">Teknologi Informatika</option>
-                <option value="Teknik Otomotif">Teknik Otomotif</option>
-                <option value="Bisnis dan Manajemen">Bisnis dan Manajemen</option>
+                <option v-for="m in majorOptions" :key="m" :value="m">{{ m }}</option>
               </select>
               <ChevronDown class="select-icon" />
             </div>
@@ -32,39 +42,56 @@
 
           <label class="form-group">
             <span>ALAMAT RUMAH LENGKAP</span>
-            <textarea v-model="form.alamat" rows="4" placeholder="Alamat lengkap" required></textarea>
+            <textarea v-model="form.alamat" rows="3" placeholder="Alamat lengkap" required></textarea>
           </label>
 
           <label class="form-group">
-            <span>UPLOAD BERKAS (PDF/JPG, MAX 2MB)</span>
+            <span>UPLOAD BERKAS (PDF/JPG/PNG, MAX 2MB)</span>
             <div class="form-upload" @click.prevent="triggerUpload">
               <CloudUpload class="form-upload-icon" />
               <span v-if="!fileName">Tarik file ke sini atau pilih dari perangkat</span>
               <span v-else class="form-file-name">{{ fileName }}</span>
             </div>
-            <small class="form-upload-hint">*Ijazah/SKL, Kartu Keluarga, Akta Kelahiran*</small>
+            <small class="form-upload-hint">*Ijazah/SKL, Kartu Keluarga, atau Akta Kelahiran*</small>
             <input ref="fileInput" type="file" accept=".pdf,.jpg,.jpeg,.png" class="file-input" @change="handleFileChange" />
           </label>
 
           <button type="submit" class="form-submit" :disabled="isSubmitting">
-            {{ isSubmitting ? 'Mengirim...' : 'Kirim Pendaftaran' }}
+            {{ isSubmitting ? 'Mengirim Pendaftaran...' : 'Kirim Pendaftaran' }}
           </button>
           <p v-if="submitMessage" :class="['form-message', submitMessageType]">{{ submitMessage }}</p>
         </form>
       </div>
 
       <div class="form-side">
-        <div class="form-status-card">
+        <div class="form-status-card" id="status">
           <h3 class="form-status-title">Cek Status Pendaftaran</h3>
 
-          <div class="form-search">
-            <input v-model="searchNo" type="text" placeholder="Masukkan No. Pendaftaran" />
-            <button class="form-search-btn" type="button" aria-label="Cari">
+          <form @submit.prevent="handleSearchStatus" class="form-search">
+            <input v-model="searchNo" type="text" placeholder="Masukkan No. Pendaftaran / NISN" required />
+            <button class="form-search-btn" type="submit" :disabled="isSearching" aria-label="Cari">
               <Search :size="18" />
             </button>
-          </div>
+          </form>
 
-          <div class="form-status-list">
+          <!-- Search Result Display -->
+          <div v-if="searchResult" class="search-result-box">
+            <div class="result-header">
+              <strong>{{ searchResult.nama }}</strong>
+              <span class="result-badge" :class="resultBadgeClass">
+                {{ searchResult.status_label || searchResult.status }}
+              </span>
+            </div>
+            <div class="result-details">
+              <p><span>No. Daftar:</span> <code>{{ searchResult.no_pendaftaran }}</code></p>
+              <p><span>Jurusan:</span> {{ searchResult.program }}</p>
+              <p v-if="searchResult.tanggal_daftar"><span>Tgl Daftar:</span> {{ searchResult.tanggal_daftar }}</p>
+              <p v-if="searchResult.catatan_admin" class="result-note"><span>Catatan:</span> {{ searchResult.catatan_admin }}</p>
+            </div>
+          </div>
+          <p v-else-if="searchError" class="search-error-msg">{{ searchError }}</p>
+
+          <div v-if="!searchResult" class="form-status-list">
             <div v-for="item in statusList" :key="item.label" class="form-status-item">
               <div class="form-status-row">
                 <div class="form-status-main">
@@ -95,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import {
   BadgeCheck,
   ChevronDown,
@@ -105,22 +132,38 @@ import {
   ShieldCheck,
   UserRound
 } from 'lucide-vue-next';
+import { applyPpdb, checkPpdbStatus, getMajors } from '../../../api/endpoints';
 
 const emit = defineEmits(['submit-pendaftaran']);
+
+const majorOptions = ref([
+  'Pengembangan Perangkat Lunak & Gim (PPLG)',
+  'Manajemen Perkantoran & Layanan Bisnis (MPLB)',
+  'Teknik Jaringan Komputer & Telekomunikasi (TJKT)',
+  'Desain Komunikasi Visual (DKV)',
+  'Teknik Kendaraan Ringan (TKR)'
+]);
 
 const form = reactive({
   nama: '',
   nisn: '',
+  email: '',
+  phone: '',
   jurusan: '',
   alamat: ''
 });
 
 const fileInput = ref(null);
+const fileObject = ref(null);
 const fileName = ref('');
 const isSubmitting = ref(false);
-const searchNo = ref('');
 const submitMessage = ref('');
 const submitMessageType = ref('success');
+
+const searchNo = ref('');
+const isSearching = ref(false);
+const searchResult = ref(null);
+const searchError = ref('');
 
 const statusList = ref([
   {
@@ -152,42 +195,110 @@ const statusList = ref([
   }
 ]);
 
+const resultBadgeClass = computed(() => {
+  const s = (searchResult.value?.status || '').toLowerCase();
+  if (s === 'diterima' || s === 'approved') return 'badge-success';
+  if (s === 'ditolak' || s === 'rejected') return 'badge-danger';
+  return 'badge-warning';
+});
+
 const triggerUpload = () => {
   fileInput.value?.click();
 };
 
 const handleFileChange = (event) => {
   const file = event.target.files?.[0];
-  fileName.value = file ? file.name : '';
+  if (file) {
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Ukuran file maksimal 2MB');
+      event.target.value = '';
+      return;
+    }
+    fileObject.value = file;
+    fileName.value = file.name;
+  } else {
+    fileObject.value = null;
+    fileName.value = '';
+  }
 };
 
 const handleSubmit = async () => {
   isSubmitting.value = true;
   submitMessage.value = '';
   try {
-    const res = await fetch('/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: form.nama,
-        nisn: form.nisn,
-        program: form.jurusan,
-        email: `${form.nama}@example.com`
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Gagal mengirim');
-    submitMessage.value = data.message || 'Pendaftaran berhasil dikirim!';
+    const formData = new FormData();
+    formData.append('nama', form.nama);
+    formData.append('nisn', form.nisn);
+    if (form.email) formData.append('email', form.email);
+    if (form.phone) formData.append('phone', form.phone);
+    formData.append('program', form.jurusan);
+    formData.append('alamat', form.alamat);
+    if (fileObject.value) {
+      formData.append('berkas', fileObject.value);
+    }
+
+    const res = await applyPpdb(formData);
+    const data = res.data;
+    const noPendaftaran = data.no_pendaftaran || data.data?.no_pendaftaran;
+    submitMessage.value = data.message || `Pendaftaran berhasil! No. Pendaftaran Anda: ${noPendaftaran}`;
     submitMessageType.value = 'success';
-    emit('submit-pendaftaran', { ...form, file: fileName.value });
+    emit('submit-pendaftaran', { ...form, no_pendaftaran: noPendaftaran, file: fileName.value });
+
+    // Reset form
+    form.nama = '';
+    form.nisn = '';
+    form.email = '';
+    form.phone = '';
+    form.jurusan = '';
+    form.alamat = '';
+    fileObject.value = null;
     fileName.value = '';
+    if (fileInput.value) fileInput.value.value = '';
   } catch (err) {
-    submitMessage.value = err.message || 'Gagal mengirim pendaftaran.';
+    const validationErrors = Object.values(err.response?.data?.errors || {}).flat().join(' ');
+    submitMessage.value = validationErrors || err.response?.data?.message || err.message || 'Gagal mengirim pendaftaran.';
     submitMessageType.value = 'error';
   } finally {
     isSubmitting.value = false;
   }
 };
+
+const handleSearchStatus = async () => {
+  if (!searchNo.value.trim()) return;
+  isSearching.value = true;
+  searchError.value = '';
+  searchResult.value = null;
+  try {
+    const res = await checkPpdbStatus(encodeURIComponent(searchNo.value.trim()));
+    searchResult.value = res.data?.data || null;
+    if (!searchResult.value) {
+      searchError.value = 'Data pendaftaran tidak ditemukan.';
+    }
+  } catch (err) {
+    searchError.value = err.response?.data?.message || 'Nomor pendaftaran atau NISN tidak ditemukan.';
+  } finally {
+    isSearching.value = false;
+  }
+};
+
+onMounted(async () => {
+  try {
+    const res = await getMajors();
+    const list = res.data?.data || [];
+    if (list.length > 0) {
+      majorOptions.value = list.map(m => m.name || m.nama);
+    }
+  } catch (e) {
+    // keep default fallback majors
+  }
+
+  const hash = window.location.hash;
+  if (hash === '#pendaftaran' || hash === '#formulir') {
+    setTimeout(() => {
+      namaInput.value?.focus();
+    }, 400);
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -439,6 +550,87 @@ const handleSubmit = async () => {
   background: linear-gradient(135deg, #0c3ea5 0%, #082b70 100%);
   color: #ffffff;
   cursor: pointer;
+}
+
+.search-result-box {
+  margin-top: 1rem;
+  background: #ffffff;
+  border-radius: 1.2rem;
+  padding: 1.2rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.result-badge {
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-warning {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badge-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.result-details p {
+  margin: 0.35rem 0;
+  font-size: 0.88rem;
+  color: #334155;
+  display: flex;
+  justify-content: space-between;
+}
+
+.result-details p span {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.result-details code {
+  background: #f1f5f9;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 600;
+  color: #042d86;
+}
+
+.result-note {
+  margin-top: 0.5rem !important;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #e2e8f0;
+  font-style: italic;
+}
+
+.search-error-msg {
+  margin-top: 0.8rem;
+  padding: 0.75rem 1rem;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .form-status-list {

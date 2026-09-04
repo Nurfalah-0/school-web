@@ -11,7 +11,7 @@
       <div class="login-header">
         <router-link to="/" class="back-link">← Kembali ke Beranda</router-link>
         <h2>Masuk ke Dashboard</h2>
-        <p>Masuk untuk mengelola data pendaftaran PKL &amp; kemitraan BKK SMK.</p>
+        <p>Masuk untuk mengelola data pendaftaran dan kemitraan SMK.</p>
       </div>
 
       <div v-if="errorMessage" class="login-alert">
@@ -20,12 +20,12 @@
 
       <form @submit.prevent="handleLogin" class="login-form">
         <div class="form-group">
-          <label for="username">Username / Email</label>
+          <label for="email">Email</label>
           <input
-            id="username"
-            v-model="username"
-            type="text"
-            placeholder="Masukkan username (mis: admin)"
+            id="email"
+            v-model="email"
+            type="email"
+            placeholder="Contoh: superadmin@smknuruljadid.sch.id"
             required
           />
         </div>
@@ -52,11 +52,20 @@
         </div>
 
         <div class="demo-info">
-          <p><strong>Info Akses Demo:</strong> Username: <code>admin</code> | Password: <code>admin123</code></p>
+          <p><strong>Pilih Akun Demo (Login Cepat):</strong></p>
+          <div class="quick-logins">
+            <button type="button" @click="setDemoAccount('superadmin')" class="demo-btn">Superadmin</button>
+            <button type="button" @click="setDemoAccount('admin')" class="demo-btn">Admin Sekolah</button>
+            <button type="button" @click="setDemoAccount('tu')" class="demo-btn">TU Sekolah</button>
+          </div>
         </div>
 
-        <button type="submit" class="button-primary login-btn" :disabled="isLoading">
-          {{ isLoading ? 'Memproses...' : 'Masuk ke Dashboard' }}
+        <button
+          type="submit"
+          class="button-primary login-btn"
+          :disabled="isLoading"
+        >
+          {{ isLoading ? "Memproses..." : "Masuk ke Dashboard" }}
         </button>
       </form>
     </div>
@@ -64,34 +73,63 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import logo from '../../../assets/logo.webp';
-import { loginUser } from '../../../api/endpoints';
-import { AlertTriangle, Eye, EyeOff } from 'lucide-vue-next';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import logo from "../../../assets/logo.webp";
+import { loginUser } from "../../../api/endpoints";
+import { AlertTriangle, Eye, EyeOff } from "lucide-vue-next";
 
 const router = useRouter();
 
-const username = ref('admin');
-const password = ref('admin123');
+const email = ref("superadmin@smknuruljadid.sch.id");
+const password = ref("password123");
 const showPassword = ref(false);
 const isLoading = ref(false);
-const errorMessage = ref('');
+const errorMessage = ref("");
+
+const setDemoAccount = (role) => {
+  if (role === 'superadmin') {
+    email.value = "superadmin@smknuruljadid.sch.id";
+  } else if (role === 'admin') {
+    email.value = "admin@smknuruljadid.sch.id";
+  } else if (role === 'tu') {
+    email.value = "tu@smknuruljadid.sch.id";
+  }
+  password.value = "password123";
+};
 
 const handleLogin = async () => {
   isLoading.value = true;
-  errorMessage.value = '';
+  errorMessage.value = "";
 
   try {
-    const res = await loginUser({ username: username.value, password: password.value });
-    if (res.data && res.data.token) {
-      localStorage.setItem('auth_token', res.data.token);
-      localStorage.setItem('user_info', JSON.stringify(res.data.user || { name: username.value }));
-      router.push('/admin/dashboard');
+    // Call backend API
+    const res = await loginUser({
+      email: email.value,
+      password: password.value,
+    });
+
+    if (res.data?.access_token) {
+      // Store token
+      localStorage.setItem("auth_token", res.data.access_token);
+
+      // Store user info
+      if (res.data.user) {
+        localStorage.setItem("user_info", JSON.stringify(res.data.user));
+      }
+
+      // Redirect to dashboard
+      router.push("/admin/dashboard");
+    } else {
+      errorMessage.value = "Response tidak valid dari server";
     }
   } catch (error) {
-    console.error('Login gagal:', error);
-    errorMessage.value = error.response?.data?.message || 'Gagal masuk. Periksa username dan password Anda.';
+    console.error("Login gagal:", error);
+    const errorMsg =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      "Email atau password salah. Silakan coba lagi.";
+    errorMessage.value = errorMsg;
   } finally {
     isLoading.value = false;
   }
@@ -115,7 +153,34 @@ const handleLogin = async () => {
   max-width: 440px;
   border-radius: 16px;
   padding: 2.5rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.2),
+    0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.login-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+}
+
+.login-brand strong {
+  display: block;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.login-brand p {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin: 0;
 }
 
 .back-link {
@@ -183,7 +248,9 @@ const handleLogin = async () => {
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   font-size: 0.95rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   box-sizing: border-box;
 }
 
@@ -210,20 +277,24 @@ const handleLogin = async () => {
 }
 
 .demo-info {
-  background: #f8fafc;
-  border: 1px dashed #cbd5e1;
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
   padding: 0.75rem;
   border-radius: 8px;
   font-size: 0.825rem;
-  color: #475569;
+  color: #166534;
+}
+
+.demo-info p {
+  margin: 0.25rem 0;
 }
 
 .demo-info code {
-  background: #e2e8f0;
+  background: #e7f5ff;
   padding: 0.15rem 0.4rem;
   border-radius: 4px;
   font-weight: 600;
-  color: #0f172a;
+  color: #1e40af;
 }
 
 .login-btn {
@@ -247,5 +318,29 @@ const handleLogin = async () => {
 .login-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.quick-logins {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.demo-btn {
+  background: #e7f5ff;
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.demo-btn:hover {
+  background: #bae6fd;
+  color: #0c4a6e;
 }
 </style>

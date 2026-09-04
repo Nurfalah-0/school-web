@@ -31,7 +31,6 @@
 
 <script setup>
 import { Calendar } from 'lucide-vue-next'
-import { kategoriColorMap } from '@/data/berita'
 
 defineProps({
   items: {
@@ -41,7 +40,9 @@ defineProps({
 })
 
 function kategoriColor(kategori) {
-  return kategoriColorMap[kategori]?.bg || '#042d86'
+  const colors = ['#1e3a8a', '#0f766e', '#b45309', '#7c3aed', '#be123c']
+  const index = [...(kategori || '')].reduce((sum, letter) => sum + letter.charCodeAt(0), 0) % colors.length
+  return colors[index]
 }
 </script>
 

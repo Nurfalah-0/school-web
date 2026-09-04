@@ -55,8 +55,8 @@ const props = defineProps({
     default: () => []
   },
   counts: {
-    type: Array,
-    default: () => []
+    type: [Array, Object],
+    default: () => ({})
   }
 })
 
@@ -82,8 +82,15 @@ function reset() {
 }
 
 function getCount(value) {
-  const found = props.counts.find(item => item.value === value)
-  return found ? found.count : 0
+  if (!props.counts) return 0
+  if (Array.isArray(props.counts)) {
+    const found = props.counts.find(item => item && (item.value === value || item.kategori === value))
+    return found ? (found.count || 0) : 0
+  }
+  if (typeof props.counts === 'object') {
+    return props.counts[value] || 0
+  }
+  return 0
 }
 
 const hasFilter = computed(() => props.modelKategori.length > 0 || props.modelTipe.length > 0)

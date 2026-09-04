@@ -1,0 +1,875 @@
+SMK NURUL JADID DATABASE SCHEMA - VERSI EXPLAINED
+==================================================
+
+Catatan:
+- File ini dibuat untuk memudahkan memahami arti dari setiap blok SQL.
+- Karena file SQL asli sangat panjang, penjelasan dibuat per blok utama dan per baris penting agar tetap jelas dan mudah dibaca.
+- Tujuan utama: memahami struktur database, relasi antar tabel, dan maksud tiap bagian.
+
+==================================================
+1. BAGIAN AWAL DAN ATURAN SQL
+==================================================
+
+SET SQL_MODE = 'STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+- Mengaktifkan mode SQL yang ketat agar data tanggal dan nilai tidak diizinkan kosong atau salah format.
+
+SET NAMES utf8mb4;
+- Mengatur karakter database agar bisa menyimpan teks dengan berbagai huruf, termasuk bahasa Indonesia dan emoji.
+
+SET FOREIGN_KEY_CHECKS = 0;
+- Menonaktifkan pengecekan relasi antar tabel sementara saat membuat tabel agar proses pembuatan lebih mudah.
+
+CREATE DATABASE IF NOT EXISTS db_smknuruljadid CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+- Membuat database baru jika belum ada.
+- utf8mb4 = format karakter modern yang mendukung banyak simbol.
+
+USE db_smknuruljadid;
+- Memilih database ini supaya semua tabel dibuat di database yang benar.
+
+==================================================
+2. KEAMANAN & AUTENTIKASI (AUTH)
+==================================================
+
+CREATE TABLE roles (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(255) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_roles_name (name)
+);
+
+Arti:
+- Tabel roles = menyimpan peran pengguna seperti superadmin, admin, editor, ppdb, bkk.
+- id = ID unik untuk setiap role.
+- name = nama role, contoh: superadmin.
+- description = deskripsi role.
+- created_at/updated_at = waktu dibuat dan diubah.
+- UNIQUE KEY uq_roles_name(name) = nama role tidak boleh sama.
+
+CREATE TABLE permissions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_permissions_name (name)
+);
+
+Arti:
+- Tabel permissions = menyimpan semua izin akses, misalnya users.manage, content.manage, ppdb.view.
+- Setiap permission harus unik agar tidak duplikasi.
+
+CREATE TABLE role_permissions (
+    role_id BIGINT UNSIGNED NOT NULL,
+    permission_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (role_id, permission_id),
+    FOREIGN KEY (role_id) REFERENCES roles(id),
+    FOREIGN KEY (permission_id) REFERENCES permissions(id)
+);
+
+Arti:
+- Tabel penghubung antara role dan permission.
+- Satu role bisa punya banyak permission, dan satu permission bisa dipakai banyak role.
+- PRIMARY KEY (role_id, permission_id) = kombinasi keduanya unik.
+
+CREATE TABLE users (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(191) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(30) NULL,
+    profile_photo VARCHAR(500) NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    last_login_at DATETIME NULL,
+    email_verified_at DATETIME NULL,
+    remember_token VARCHAR(100) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL,
+    UNIQUE KEY uq_users_email (email),
+    KEY idx_users_active (is_active),
+    KEY idx_users_deleted_at (deleted_at)
+);
+
+Arti:
+- Tabel users = menyimpan data akun pengguna aplikasi.
+- password harus di-hash (bukan plaintext) untuk keamanan.
+- email unik, agar tidak ada akun ganda.
+- is_active = status akun aktif atau nonaktif.
+- deleted_at = soft delete, artinya data tidak benar-benar dihapus dari database.
+
+CREATE TABLE user_roles (
+    user_id BIGINT UNSIGNED NOT NULL,
+    role_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (user_id, role_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+
+Arti:
+- Menghubungkan user dengan satu atau banyak role.
+- Contoh: user bisa punya role admin dan editor sekaligus.
+
+CREATE TABLE password_reset_tokens (
+    email VARCHAR(191) NOT NULL PRIMARY KEY,
+    token VARCHAR(255) NOT NULL,
+    created_at DATETIME NULL
+);
+
+Arti:
+- Menyimpan token reset password untuk user yang lupa password.
+- email sebagai primary key, artinya satu token per email aktif.
+
+CREATE TABLE personal_access_tokens (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tokenable_type VARCHAR(255) NOT NULL,
+    tokenable_id BIGINT UNSIGNED NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    token VARCHAR(64) NOT NULL,
+    abilities TEXT NULL,
+    last_used_at DATETIME NULL,
+    expires_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_pat_token (token)
+);
+
+Arti:
+- Menyimpan token akses personal untuk API / autentikasi aplikasi.
+- tokenable_type dan tokenable_id = token milik model tertentu (misalnya User).
+- expires_at = masa berlaku token.
+
+==================================================
+3. MASTER DATA SEKOLAH
+==================================================
+
+CREATE TABLE majors (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    code VARCHAR(20) NOT NULL,
+    slug VARCHAR(180) NOT NULL,
+    description TEXT NULL,
+    short_description TEXT NULL,
+    icon VARCHAR(500) NULL,
+    image VARCHAR(500) NULL,
+    color VARCHAR(20) NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL,
+    UNIQUE KEY uq_majors_code (code),
+    UNIQUE KEY uq_majors_slug (slug)
+);
+
+Arti:
+- Tabel jurusan sekolah, contoh: TKRO, RPL, TBSM, AKL, dll.
+- code = kode singkat jurusan.
+- slug = nama yang ramah URL, seperti rpl.
+- is_active = jurusan yang aktif ditampilkan.
+
+CREATE TABLE school_profiles (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    school_name VARCHAR(150) NOT NULL,
+    tagline VARCHAR(255) NULL,
+    description TEXT NULL,
+    address TEXT NULL,
+    phone VARCHAR(30) NULL,
+    email VARCHAR(191) NULL,
+    website VARCHAR(255) NULL,
+    logo VARCHAR(500) NULL,
+    hero_image VARCHAR(500) NULL,
+    latitude DECIMAL(10,7) NULL,
+    longitude DECIMAL(10,7) NULL,
+    instagram VARCHAR(255) NULL,
+    facebook VARCHAR(255) NULL,
+    youtube VARCHAR(255) NULL,
+    whatsapp VARCHAR(30) NULL
+);
+
+Arti:
+- Menyimpan data profil sekolah yang ditampilkan di website.
+- latitude/longitude = koordinat lokasi sekolah untuk map.
+
+CREATE TABLE students (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nisn VARCHAR(30) NULL,
+    nis VARCHAR(30) NULL,
+    full_name VARCHAR(150) NOT NULL,
+    major_id BIGINT UNSIGNED NULL,
+    gender VARCHAR(20) NULL,
+    birth_place VARCHAR(100) NULL,
+    birth_date DATE NULL,
+    phone VARCHAR(30) NULL,
+    email VARCHAR(191) NULL,
+    address TEXT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'active',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL,
+    UNIQUE KEY uq_students_nisn (nisn),
+    UNIQUE KEY uq_students_nis (nis),
+    FOREIGN KEY (major_id) REFERENCES majors(id)
+);
+
+Arti:
+- Data siswa sekolah.
+- nisn dan nis biasanya nomor induk unik untuk setiap siswa.
+- major_id = jurusan siswa.
+- status = status siswa, misalnya active, alumni, dropout.
+
+CREATE TABLE major_facilities (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    major_id BIGINT UNSIGNED NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    description TEXT NULL,
+    image VARCHAR(500) NULL,
+    FOREIGN KEY (major_id) REFERENCES majors(id)
+);
+
+Arti:
+- Menyimpan fasilitas jurusan tertentu, misalnya lab komputer, bengkel, studio, dll.
+
+==================================================
+4. WEBSITE CONTENT
+==================================================
+
+CREATE TABLE news_categories (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(120) NOT NULL,
+    description TEXT NULL
+);
+
+Arti:
+- Kategori artikel berita.
+- slug digunakan untuk URL.
+
+CREATE TABLE news (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    category_id BIGINT UNSIGNED NOT NULL,
+    author_id BIGINT UNSIGNED NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL,
+    excerpt TEXT NULL,
+    content LONGTEXT NOT NULL,
+    featured_image VARCHAR(500) NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'draft',
+    published_at DATETIME NULL,
+    views BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL,
+    UNIQUE KEY uq_news_slug (slug),
+    FOREIGN KEY (category_id) REFERENCES news_categories(id),
+    FOREIGN KEY (author_id) REFERENCES users(id)
+);
+
+Arti:
+- Tabel berisi konten berita.
+- status = draft, published, archived.
+- views = jumlah pembaca/lihat.
+- is_featured = berita unggulan.
+
+CREATE TABLE achievements (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    level VARCHAR(100) NULL,
+    student_id BIGINT UNSIGNED NULL,
+    organizer VARCHAR(200) NULL,
+    year YEAR NOT NULL,
+    description TEXT NULL,
+    image VARCHAR(500) NULL,
+    rank VARCHAR(50) NULL,
+    is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+Arti:
+- Menyimpan prestasi siswa atau sekolah.
+- category bisa berupa lomba, olahraga, akademik, seni, dll.
+- year = tahun prestasi terjadi.
+
+CREATE TABLE gallery_categories (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(120) NOT NULL
+);
+
+CREATE TABLE galleries (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    category_id BIGINT UNSIGNED NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NULL,
+    image VARCHAR(500) NOT NULL,
+    alt_text VARCHAR(255) NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    is_featured BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (category_id) REFERENCES gallery_categories(id)
+);
+
+Arti:
+- Foto-foto atau galeri kegiatan sekolah.
+- category_id mengelompokkan galeri berdasarkan tema.
+
+CREATE TABLE events (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NULL,
+    event_date DATE NOT NULL,
+    start_time TIME NULL,
+    end_time TIME NULL,
+    location VARCHAR(255) NULL,
+    image VARCHAR(500) NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'scheduled'
+);
+
+Arti:
+- Menyimpan agenda atau event sekolah.
+- event_date = tanggal event.
+- location = tempat kegiatan.
+
+==================================================
+5. PPDB (PENERIMAAN PESERTA DIDIK BARU)
+==================================================
+
+CREATE TABLE ppdb_periods (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    year VARCHAR(20) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'draft',
+    quota INT UNSIGNED NOT NULL DEFAULT 0
+);
+
+Arti:
+- Masa PPDB, misalnya gelombang 2026.
+- start_date dan end_date = rentang pendaftaran.
+- quota = kuota maksimal peserta baru.
+
+CREATE TABLE ppdb_paths (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ppdb_period_id BIGINT UNSIGNED NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(120) NOT NULL,
+    description TEXT NULL,
+    requirements TEXT NULL,
+    quota INT UNSIGNED NOT NULL DEFAULT 0,
+    registration_fee DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    FOREIGN KEY (ppdb_period_id) REFERENCES ppdb_periods(id)
+);
+
+Arti:
+- Jalur PPDB, misalnya jalur prestasi, umum, afirmasi, transfer.
+- registration_fee = biaya pendaftaran.
+
+CREATE TABLE ppdb_requirements (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ppdb_path_id BIGINT UNSIGNED NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    description TEXT NULL,
+    is_required BOOLEAN NOT NULL DEFAULT TRUE,
+    FOREIGN KEY (ppdb_path_id) REFERENCES ppdb_paths(id)
+);
+
+Arti:
+- Persyaratan dokumen yang harus dipenuhi untuk jalur PPDB tertentu.
+
+CREATE TABLE ppdb_applications (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    registration_number VARCHAR(60) NOT NULL,
+    ppdb_period_id BIGINT UNSIGNED NOT NULL,
+    ppdb_path_id BIGINT UNSIGNED NOT NULL,
+    major_id BIGINT UNSIGNED NOT NULL,
+    full_name VARCHAR(150) NOT NULL,
+    nik VARCHAR(30) NULL,
+    nisn VARCHAR(30) NULL,
+    birth_place VARCHAR(100) NULL,
+    birth_date DATE NULL,
+    gender VARCHAR(20) NULL,
+    school_origin VARCHAR(200) NULL,
+    phone VARCHAR(30) NOT NULL,
+    email VARCHAR(191) NULL,
+    address TEXT NULL,
+    parent_name VARCHAR(150) NULL,
+    parent_phone VARCHAR(30) NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'pending',
+    notes TEXT NULL,
+    FOREIGN KEY (ppdb_period_id) REFERENCES ppdb_periods(id),
+    FOREIGN KEY (ppdb_path_id) REFERENCES ppdb_paths(id),
+    FOREIGN KEY (major_id) REFERENCES majors(id)
+);
+
+Arti:
+- Menyimpan data pendaftar PPDB.
+- registration_number = nomor pendaftaran unik.
+- status = pending, accepted, rejected, waiting_list.
+
+CREATE TABLE ppdb_documents (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ppdb_application_id BIGINT UNSIGNED NOT NULL,
+    requirement_id BIGINT UNSIGNED NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    original_name VARCHAR(255) NOT NULL,
+    verification_status VARCHAR(30) NOT NULL DEFAULT 'pending',
+    verified_by BIGINT UNSIGNED NULL,
+    verified_at DATETIME NULL,
+    rejection_reason TEXT NULL,
+    FOREIGN KEY (ppdb_application_id) REFERENCES ppdb_applications(id),
+    FOREIGN KEY (requirement_id) REFERENCES ppdb_requirements(id),
+    FOREIGN KEY (verified_by) REFERENCES users(id)
+);
+
+Arti:
+- Dokumen pendaftaran yang diupload oleh calon siswa.
+- verification_status = pending, approved, rejected.
+
+==================================================
+6. PKL / INDUSTRY PARTNER
+==================================================
+
+CREATE TABLE industry_partners (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    company_name VARCHAR(200) NOT NULL,
+    slug VARCHAR(220) NOT NULL,
+    industry_type VARCHAR(100) NULL,
+    address TEXT NULL,
+    city VARCHAR(100) NULL,
+    phone VARCHAR(30) NULL,
+    email VARCHAR(191) NULL,
+    website VARCHAR(255) NULL,
+    logo VARCHAR(500) NULL,
+    description TEXT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+Arti:
+- Menyimpan data mitra industri tempat siswa PKL / magang.
+
+CREATE TABLE pkl_programs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    industry_partner_id BIGINT UNSIGNED NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    description TEXT NULL,
+    quota INT UNSIGNED NOT NULL DEFAULT 0,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    requirements TEXT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'draft',
+    FOREIGN KEY (industry_partner_id) REFERENCES industry_partners(id)
+);
+
+Arti:
+- Program PKL yang tersedia untuk siswa.
+- quota = jumlah siswa yang bisa ikut.
+
+CREATE TABLE pkl_registrations (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    pkl_program_id BIGINT UNSIGNED NOT NULL,
+    registration_number VARCHAR(60) NOT NULL,
+    student_id BIGINT UNSIGNED NULL,
+    full_name VARCHAR(150) NOT NULL,
+    nisn VARCHAR(30) NULL,
+    major_id BIGINT UNSIGNED NULL,
+    phone VARCHAR(30) NOT NULL,
+    email VARCHAR(191) NULL,
+    cv_file VARCHAR(500) NULL,
+    portfolio_file VARCHAR(500) NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'pending',
+    notes TEXT NULL,
+    FOREIGN KEY (pkl_program_id) REFERENCES pkl_programs(id),
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (major_id) REFERENCES majors(id)
+);
+
+Arti:
+- Pendaftaran siswa untuk mengikuti program PKL.
+
+==================================================
+7. BKK / CAREER / LAMARAN KERJA
+==================================================
+
+CREATE TABLE job_categories (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(120) NOT NULL
+);
+
+Arti:
+- Kategori pekerjaan, misalnya IT, teknik, administrasi, dll.
+
+CREATE TABLE job_vacancies (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    industry_partner_id BIGINT UNSIGNED NOT NULL,
+    category_id BIGINT UNSIGNED NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    slug VARCHAR(220) NOT NULL,
+    description TEXT NOT NULL,
+    requirements TEXT NULL,
+    location VARCHAR(150) NULL,
+    employment_type VARCHAR(50) NOT NULL,
+    salary_min DECIMAL(15,2) NULL,
+    salary_max DECIMAL(15,2) NULL,
+    deadline DATE NULL,
+    is_remote BOOLEAN NOT NULL DEFAULT FALSE,
+    status VARCHAR(30) NOT NULL DEFAULT 'draft',
+    FOREIGN KEY (industry_partner_id) REFERENCES industry_partners(id),
+    FOREIGN KEY (category_id) REFERENCES job_categories(id)
+);
+
+Arti:
+- Menyimpan lowongan pekerjaan yang dibagikan ke siswa.
+- employment_type = full time, part time, internship.
+
+CREATE TABLE job_applications (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    job_vacancy_id BIGINT UNSIGNED NOT NULL,
+    student_id BIGINT UNSIGNED NULL,
+    full_name VARCHAR(150) NOT NULL,
+    email VARCHAR(191) NULL,
+    phone VARCHAR(30) NOT NULL,
+    major_id BIGINT UNSIGNED NULL,
+    cv_file VARCHAR(500) NULL,
+    portfolio_file VARCHAR(500) NULL,
+    cover_letter TEXT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'pending',
+    FOREIGN KEY (job_vacancy_id) REFERENCES job_vacancies(id),
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (major_id) REFERENCES majors(id)
+);
+
+Arti:
+- Data lamaran kerja siswa ke lowongan tertentu.
+
+==================================================
+8. TEFA / TOKO ONLINE / E-COMMERCE
+==================================================
+
+CREATE TABLE product_categories (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(120) NOT NULL,
+    description TEXT NULL,
+    icon VARCHAR(500) NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+Arti:
+- Kategori produk yang dijual, contoh: pakaian, alat tulis, produk sekolah.
+
+CREATE TABLE products (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    category_id BIGINT UNSIGNED NOT NULL,
+    name VARCHAR(200) NOT NULL,
+    slug VARCHAR(220) NOT NULL,
+    sku VARCHAR(80) NOT NULL,
+    short_description TEXT NULL,
+    description LONGTEXT NULL,
+    base_price DECIMAL(15,2) NULL,
+    compare_price DECIMAL(15,2) NULL,
+    stock INT UNSIGNED NOT NULL DEFAULT 0,
+    weight_gram INT UNSIGNED NULL,
+    unit VARCHAR(30) NOT NULL DEFAULT 'pcs',
+    status VARCHAR(30) NOT NULL DEFAULT 'draft',
+    rating DECIMAL(3,2) NOT NULL DEFAULT 0.00,
+    review_count INT UNSIGNED NOT NULL DEFAULT 0,
+    featured BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (category_id) REFERENCES product_categories(id)
+);
+
+Arti:
+- Tabel utama produk toko.
+- sku = kode unik produk.
+- stock = jumlah stok.
+- rating = nilai penilaian produk.
+- featured = produk unggulan.
+
+CREATE TABLE product_images (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT UNSIGNED NOT NULL,
+    image_path VARCHAR(500) NOT NULL,
+    alt_text VARCHAR(255) NULL,
+    is_primary BOOLEAN NOT NULL DEFAULT FALSE,
+    sort_order INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+Arti:
+- Menyimpan beberapa gambar produk.
+- is_primary = gambar utama produk.
+
+CREATE TABLE product_variants (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT UNSIGNED NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    sku VARCHAR(80) NOT NULL,
+    price DECIMAL(15,2) NOT NULL,
+    stock INT UNSIGNED NOT NULL DEFAULT 0,
+    image VARCHAR(500) NULL,
+    is_default BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+Arti:
+- Varian produk, misalnya ukuran S, M, L atau warna hitam, putih.
+- satu produk dapat punya banyak varian.
+
+CREATE TABLE carts (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    session_id VARCHAR(100) NOT NULL,
+    customer_name VARCHAR(150) NULL,
+    customer_phone VARCHAR(30) NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'active',
+    expires_at DATETIME NULL
+);
+
+Arti:
+- Keranjang belanja pengguna berdasarkan session.
+- status = active, expired, completed.
+
+CREATE TABLE cart_items (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    cart_id BIGINT UNSIGNED NOT NULL,
+    product_id BIGINT UNSIGNED NOT NULL,
+    product_variant_id BIGINT UNSIGNED NULL,
+    price DECIMAL(15,2) NOT NULL,
+    quantity INT UNSIGNED NOT NULL,
+    subtotal DECIMAL(15,2) NOT NULL,
+    FOREIGN KEY (cart_id) REFERENCES carts(id),
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (product_variant_id) REFERENCES product_variants(id)
+);
+
+Arti:
+- Item di keranjang belanja.
+- quantity = jumlah barang.
+- subtotal = hasil dari price x quantity.
+
+CREATE TABLE orders (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_number VARCHAR(60) NOT NULL,
+    customer_name VARCHAR(150) NOT NULL,
+    customer_phone VARCHAR(30) NOT NULL,
+    customer_email VARCHAR(191) NULL,
+    customer_address TEXT NULL,
+    subtotal DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    shipping_cost DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    discount DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    total DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    payment_method VARCHAR(50) NOT NULL DEFAULT 'whatsapp',
+    checkout_channel VARCHAR(30) NOT NULL DEFAULT 'whatsapp',
+    whatsapp_number VARCHAR(30) NULL,
+    whatsapp_message TEXT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'pending'
+);
+
+Arti:
+- Data pesanan pelanggan.
+- order_number = nomor pesanan unik.
+- checkout_channel = proses checkout via WhatsApp atau channel lain.
+- total = total akhir setelah diskon dan ongkir.
+
+CREATE TABLE order_items (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT UNSIGNED NOT NULL,
+    product_id BIGINT UNSIGNED NULL,
+    product_variant_id BIGINT UNSIGNED NULL,
+    product_name VARCHAR(200) NOT NULL,
+    variant_name VARCHAR(150) NULL,
+    price DECIMAL(15,2) NOT NULL,
+    quantity INT UNSIGNED NOT NULL,
+    subtotal DECIMAL(15,2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (product_variant_id) REFERENCES product_variants(id)
+);
+
+Arti:
+- Rincian produk yang ada di setiap pesanan.
+
+CREATE TABLE order_status_histories (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT UNSIGNED NOT NULL,
+    status VARCHAR(30) NOT NULL,
+    note TEXT NULL,
+    changed_by BIGINT UNSIGNED NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (changed_by) REFERENCES users(id)
+);
+
+Arti:
+- Catatan perubahan status pesanan seperti pending -> diproses -> dikirim.
+
+CREATE TABLE inventory_movements (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT UNSIGNED NULL,
+    product_variant_id BIGINT UNSIGNED NULL,
+    movement_type VARCHAR(30) NOT NULL,
+    quantity INT NOT NULL,
+    reference_type VARCHAR(100) NULL,
+    reference_id BIGINT UNSIGNED NULL,
+    notes TEXT NULL,
+    created_by BIGINT UNSIGNED NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (product_variant_id) REFERENCES product_variants(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
+);
+
+Arti:
+- Log pergerakan stok barang masuk/keluar.
+- movement_type bisa: in, out, adjustment.
+
+CREATE TABLE product_reviews (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT UNSIGNED NOT NULL,
+    order_id BIGINT UNSIGNED NULL,
+    customer_name VARCHAR(150) NOT NULL,
+    rating TINYINT UNSIGNED NOT NULL,
+    review TEXT NULL,
+    image VARCHAR(500) NULL,
+    is_published BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (order_id) REFERENCES orders(id)
+);
+
+Arti:
+- Ulasan produk dari pelanggan.
+- rating = 1 sampai 5.
+
+==================================================
+9. NOTIFIKASI, AUDIT, DAN SETTINGS
+==================================================
+
+CREATE TABLE notifications (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    read_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+Arti:
+- Menyimpan notifikasi ke user, misalnya order baru, dokumen disetujui, dll.
+
+CREATE TABLE activity_logs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NULL,
+    action VARCHAR(100) NOT NULL,
+    target_type VARCHAR(100) NULL,
+    target_id BIGINT UNSIGNED NULL,
+    description TEXT NULL,
+    ip_address VARCHAR(45) NULL,
+    user_agent VARCHAR(500) NULL,
+    metadata JSON NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+Arti:
+- Log aktivitas pengguna untuk audit.
+- metadata = data tambahan dalam format JSON.
+
+CREATE TABLE settings (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    setting_key VARCHAR(100) NOT NULL,
+    setting_value TEXT NULL,
+    setting_type VARCHAR(30) NOT NULL DEFAULT 'string',
+    UNIQUE KEY uq_settings_key (setting_key)
+);
+
+Arti:
+- Menyimpan pengaturan aplikasi, misalnya nama sekolah, WhatsApp admin, mata uang, timezone.
+
+==================================================
+10. SEED DATA AWAL (RBAC)
+==================================================
+
+INSERT INTO roles (name, description) VALUES
+('superadmin', 'Full system access'),
+('admin', 'Administrative access'),
+('editor', 'Content management access'),
+('bkk', 'PKL and career management access'),
+('ppdb', 'PPDB management access');
+
+Arti:
+- Menambahkan role default sistem.
+
+INSERT INTO permissions (name, description) VALUES
+('dashboard.view', 'View dashboard'),
+('users.view', 'View users'),
+('users.manage', 'Manage users'),
+('content.view', 'View website content'),
+('content.manage', 'Manage website content'),
+('ppdb.view', 'View PPDB'),
+('ppdb.manage', 'Manage PPDB'),
+('pkl.view', 'View PKL'),
+('pkl.manage', 'Manage PKL'),
+('bkk.view', 'View BKK'),
+('bkk.manage', 'Manage BKK'),
+('products.view', 'View products'),
+('products.manage', 'Manage products'),
+('orders.view', 'View orders'),
+('orders.manage', 'Manage orders'),
+('audit.view', 'View audit logs'),
+('settings.manage', 'Manage settings');
+
+Arti:
+- Menambahkan permission default yang dipakai aplikasi.
+
+INSERT INTO settings (setting_key, setting_value, setting_type) VALUES
+('school_name', 'SMK Nurul Jadid', 'string'),
+('seller_whatsapp', '', 'phone'),
+('admin_email', '', 'email'),
+('currency', 'IDR', 'string'),
+('timezone', 'Asia/Jakarta', 'string'),
+('order_checkout_channel', 'whatsapp', 'string');
+
+Arti:
+- Mengisi pengaturan utama aplikasi setelah instalasi.
+
+==================================================
+11. RINGKASAN STRUKTUR DATABASE
+==================================================
+
+Secara umum database ini dibuat untuk sistem sekolah modern dengan fitur:
+- Auth dan RBAC (user, role, permission)
+- Profil sekolah dan data siswa
+- Berita, event, prestasi, galeri
+- PPDB dan dokumen pendaftaran
+- PKL / mitra industri
+- BKK dan lowongan kerja
+- Toko / e-commerce dan transaksi
+- Notifikasi, audit log, dan setting aplikasi
+
+Tujuan desain database ini:
+- Memudahkan pengelolaan sistem sekolah dan website
+- Memiliki relasi yang jelas antar data
+- Memberi keamanan dari sisi struktur data
+- Menyediakan data untuk kebutuhan admin, siswa, dan pelaku usaha
+
+==================================================
+12. CATATAN PENTING UNTUK PENGEMBANGAN LARAVEL
+==================================================
+
+- Password harus di-hash sebelum disimpan.
+- Gunakan Eloquent atau Query Builder agar aman dari SQL Injection.
+- Gunakan foreign key untuk menjaga integritas data.
+- Dokument upload harus disimpan di folder private agar aman.
+- Untuk checkout produk, validasi stok dan harga harus dilakukan di backend.
+- Gunakan transaksi database untuk proses order agar data konsisten.
+
+==================================================
+END OF FILE
+==================================================

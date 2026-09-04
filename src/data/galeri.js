@@ -202,12 +202,12 @@ export const galeriList = [
 ];
 
 export const kategoriList = [
-  { value: null, label: 'Semua' },
-  { value: 'fasilitas', label: 'Fasilitas' },
-  { value: 'kegiatan-siswa', label: 'Kegiatan Siswa' },
-  { value: 'lab-praktik', label: 'Lab & Praktik' },
-  { value: 'prestasi', label: 'Prestasi' },
-  { value: 'acara-sekolah', label: 'Acara Sekolah' }
+  { value: 'semua', label: 'Semua', icon: 'Image' },
+  { value: 'fasilitas', label: 'Fasilitas', icon: 'Building2' },
+  { value: 'kegiatan-siswa', label: 'Kegiatan Siswa', icon: 'GraduationCap' },
+  { value: 'lab-praktik', label: 'Lab & Praktik', icon: 'Microscope' },
+  { value: 'prestasi', label: 'Prestasi', icon: 'Trophy' },
+  { value: 'acara-sekolah', label: 'Acara Sekolah', icon: 'PartyPopper' }
 ];
 
 export function getAllGaleri() {

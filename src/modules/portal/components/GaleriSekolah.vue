@@ -21,8 +21,10 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { getFeaturedGaleri } from '@/data/galeri';
+import { ref, computed, onMounted } from 'vue';
+import { getPublicContent } from '@/api/endpoints';
+import { mapGallery } from '@/modules/contentMapper';
+import { galeriList } from '@/data/galeri';
 
 defineOptions({
   name: 'GaleriSekolah'
@@ -35,18 +37,38 @@ defineProps({
   }
 });
 
+const rawGalleries = ref([]);
+
+onMounted(async () => {
+  try {
+    const res = await getPublicContent('galleries');
+    const data = (res.data?.data || []).map(mapGallery);
+    if (data.length > 0) {
+      rawGalleries.value = data;
+    } else {
+      rawGalleries.value = galeriList;
+    }
+  } catch (err) {
+    rawGalleries.value = galeriList;
+  }
+});
+
 const galeri = computed(() => {
-  const featured = getFeaturedGaleri(4);
+  const list = rawGalleries.value;
+  const featured = list.filter(g => g.featured || g.is_featured);
+  const selected = featured.length >= 4 ? featured.slice(0, 4) : list.slice(0, 4);
+
   const heightMap = [
     'item-height-1',
     'item-height-2',
     'item-height-3',
     'item-height-4'
   ];
-  return featured.map((item, idx) => ({
-    id: item.id,
-    src: item.gambar,
-    alt: item.judul,
+
+  return selected.map((item, idx) => ({
+    id: item.id || idx,
+    src: item.gambar || item.src,
+    alt: item.judul || item.title || 'Galeri SMK',
     heightClass: heightMap[idx] || 'item-height-1'
   }));
 });

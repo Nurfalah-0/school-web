@@ -2,7 +2,9 @@
   <div class="admin-forgot-page">
     <div class="admin-forgot-card">
       <h2 class="admin-forgot-title">Reset Password</h2>
-      <p class="admin-forgot-desc">Masukkan email administrator untuk menerima tautan reset password.</p>
+      <p class="admin-forgot-desc">
+        Masukkan email administrator untuk menerima tautan reset password.
+      </p>
 
       <div v-if="message" :class="['admin-alert', messageType]">
         {{ message }}
@@ -27,66 +29,68 @@
 
         <button type="submit" class="submit-btn" :disabled="isLoading">
           <span v-if="isLoading" class="spinner"></span>
-          <span>{{ isLoading ? 'Mengirim...' : 'Kirim Link Reset' }}</span>
+          <span>{{ isLoading ? "Mengirim..." : "Kirim Link Reset" }}</span>
         </button>
       </form>
 
       <p class="admin-forgot-footer">
-        <router-link to="/login" class="admin-back-link">← Kembali ke Login</router-link>
+        <router-link to="/login" class="admin-back-link"
+          >← Kembali ke Login</router-link
+        >
       </p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
-import { Mail } from 'lucide-vue-next'
-import { adminForgotPassword } from '@/api/endpoints'
+import { ref, reactive, onMounted, onUnmounted } from "vue";
+import { Mail } from "lucide-vue-next";
 
-const email = ref('')
-const isLoading = ref(false)
-const message = ref('')
-const messageType = ref('success')
-const errors = reactive({ email: '' })
+const email = ref("");
+const isLoading = ref(false);
+const message = ref("");
+const messageType = ref("success");
+const errors = reactive({ email: "" });
 
 onMounted(() => {
-  document.body.style.overflow = 'hidden'
-  document.documentElement.style.overflow = 'hidden'
-})
+  document.body.style.overflow = "hidden";
+  document.documentElement.style.overflow = "hidden";
+});
 
 onUnmounted(() => {
-  document.body.style.overflow = ''
-  document.documentElement.style.overflow = ''
-})
+  document.body.style.overflow = "";
+  document.documentElement.style.overflow = "";
+});
 
 function validate() {
-  errors.email = ''
+  errors.email = "";
   if (!email.value.trim()) {
-    errors.email = 'Email wajib diisi.'
-    return false
+    errors.email = "Email wajib diisi.";
+    return false;
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-    errors.email = 'Format email tidak valid.'
-    return false
+    errors.email = "Format email tidak valid.";
+    return false;
   }
-  return true
+  return true;
 }
 
 async function handleSubmit() {
-  message.value = ''
-  if (!validate()) return
+  message.value = "";
+  if (!validate()) return;
 
-  isLoading.value = true
+  isLoading.value = true;
   try {
-    await adminForgotPassword({ email: email.value.trim() })
-    message.value = 'Link reset password telah dikirim ke email Anda.'
-    messageType.value = 'success'
-    email.value = ''
+    await adminForgotPassword({ email: email.value.trim() });
+    message.value = "Link reset password telah dikirim ke email Anda.";
+    messageType.value = "success";
+    email.value = "";
   } catch (err) {
-    message.value = err.response?.data?.message || 'Gagal mengirim. Coba lagi nanti.'
-    messageType.value = 'error'
+    message.value =
+      err.response?.data?.message || "Gagal mengirim. Coba lagi nanti.";
+    messageType.value = "error";
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 </script>
@@ -111,7 +115,7 @@ async function handleSubmit() {
 }
 
 .admin-forgot-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 900;
   font-size: 1.75rem;
   color: #0f172a;
@@ -171,7 +175,9 @@ async function handleSubmit() {
   border-radius: 0.875rem;
   background: #eef2ff;
   border: 1px solid transparent;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .input-wrap:focus-within {

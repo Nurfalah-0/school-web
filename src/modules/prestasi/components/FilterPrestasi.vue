@@ -20,22 +20,22 @@
 defineProps({
   aktif: {
     type: String,
-    default: 'semua'
-  }
-})
+    default: "semua",
+  },
+});
 
-defineEmits(['update:kategori'])
+const emit = defineEmits(["update:kategori"]);
 
 const kategoriList = [
-  { label: 'Semua', value: 'semua' },
-  { label: 'Akademik', value: 'akademik' },
-  { label: 'Non-Akademik', value: 'non-akademik' },
-  { label: 'Seni & Budaya', value: 'seni-budaya' },
-  { label: 'Olahraga', value: 'olahraga' }
-]
+  { label: "Semua", value: "semua" },
+  { label: "Akademik", value: "akademik" },
+  { label: "Non-Akademik", value: "non-akademik" },
+  { label: "Seni & Budaya", value: "seni-budaya" },
+  { label: "Olahraga", value: "olahraga" },
+];
 
 function pilihKategori(value) {
-  $emit('update:kategori', value)
+  emit("update:kategori", value);
 }
 </script>
 

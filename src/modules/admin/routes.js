@@ -23,4 +23,16 @@ export default [
     component: () => import('./views/AdminDashboard.vue'),
     meta: { hideNavbar: true },
   },
+  {
+    path: '/admin/manage',
+    name: 'AdminManagement',
+    component: () => import('./views/AdminManagement.vue'),
+    meta: { hideNavbar: true },
+  },
+  {
+    path: '/admin/content',
+    name: 'AdminContent',
+    component: () => import('./views/AdminContent.vue'),
+    meta: { hideNavbar: true },
+  },
 ];

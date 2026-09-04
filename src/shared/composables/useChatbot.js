@@ -98,7 +98,7 @@ export function useChatbot() {
         content: m.content
       }))
 
-      const { data } = await client.post('/api/chat', {
+      const { data } = await client.post('/chat', {
         messages: apiMessages,
         sessionId: sessionId.value
       })

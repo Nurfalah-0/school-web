@@ -10,9 +10,15 @@
           </div>
         </div>
         <nav class="admin-topbar-nav">
-          <router-link to="/support" class="admin-topbar-link">Support</router-link>
-          <router-link to="/portal-guide" class="admin-topbar-link">Portal Guide</router-link>
-          <router-link to="/admin/contact" class="admin-topbar-btn">Contact Admin</router-link>
+          <router-link to="/support" class="admin-topbar-link"
+            >Support</router-link
+          >
+          <router-link to="/portal-guide" class="admin-topbar-link"
+            >Portal Guide</router-link
+          >
+          <router-link to="/admin/contact" class="admin-topbar-btn"
+            >Contact Admin</router-link
+          >
         </nav>
       </div>
     </header>
@@ -30,7 +36,8 @@
             Empowering<br />the Future<br />workforce<br />through Digital<br />Innovation.
           </h1>
           <p class="admin-hero-desc">
-            Manage scholastic records, faculty configurations, and systemic operations with unparalleled clarity and speed.
+            Manage scholastic records, faculty configurations, and systemic
+            operations with unparalleled clarity and speed.
           </p>
           <div class="admin-hero-indicators">
             <span class="admin-hero-indicator active"></span>
@@ -44,7 +51,9 @@
         <div class="admin-form-card">
           <div class="admin-form-header">
             <h2 class="admin-form-title">Admin Login</h2>
-            <p class="admin-form-desc">Please enter your credentials to access the portal.</p>
+            <p class="admin-form-desc">
+              Please enter your credentials to access the portal.
+            </p>
           </div>
 
           <div v-if="globalError" class="admin-alert">
@@ -90,7 +99,9 @@
                   <EyeOff v-else :size="20" color="#64748b" />
                 </button>
               </div>
-              <p v-if="errors.password" class="form-error">{{ errors.password }}</p>
+              <p v-if="errors.password" class="form-error">
+                {{ errors.password }}
+              </p>
             </div>
 
             <div class="form-row">
@@ -99,7 +110,9 @@
                 <span class="check-box"></span>
                 <span class="check-text">Remember Me</span>
               </label>
-              <router-link to="/admin/forgot-password" class="forgot-link">Forgot Password?</router-link>
+              <router-link to="/admin/forgot-password" class="forgot-link"
+                >Forgot Password?</router-link
+              >
             </div>
 
             <button
@@ -108,7 +121,13 @@
               :disabled="isLoading || isRateLimited"
             >
               <span v-if="isLoading" class="spinner"></span>
-              <span>{{ isLoading ? 'Signing In...' : isRateLimited ? 'Coba lagi nanti' : 'Sign In' }}</span>
+              <span>{{
+                isLoading
+                  ? "Signing In..."
+                  : isRateLimited
+                    ? "Coba lagi nanti"
+                    : "Sign In"
+              }}</span>
             </button>
           </form>
 
@@ -132,111 +151,130 @@
     <footer class="admin-footer">
       <span>© 2026 SMK Nurul Jadid. Empowering the future workforce.</span>
       <div class="admin-footer-links">
-        <router-link to="/privacy" class="admin-footer-link">Privacy Policy</router-link>
-        <router-link to="/terms" class="admin-footer-link">Terms of Service</router-link>
-        <router-link to="/security" class="admin-footer-link">Security</router-link>
+        <router-link to="/privacy" class="admin-footer-link"
+          >Privacy Policy</router-link
+        >
+        <router-link to="/terms" class="admin-footer-link"
+          >Terms of Service</router-link
+        >
+        <router-link to="/security" class="admin-footer-link"
+          >Security</router-link
+        >
       </div>
     </footer>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { Mail, Lock, Eye, EyeOff, HelpCircle, BookOpen } from 'lucide-vue-next'
-import { adminLogin } from '@/api/endpoints'
-import logoSrc from '@/assets/logo.webp'
+import { ref, reactive, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import { Mail, Lock, Eye, EyeOff, HelpCircle, BookOpen } from "lucide-vue-next";
+import { loginUser } from "@/api/endpoints";
+import logoSrc from "@/assets/logo.webp";
 
-const router = useRouter()
+const router = useRouter();
 
-const email = ref('')
-const password = ref('')
-const showPassword = ref(false)
-const rememberMe = ref(false)
-const isLoading = ref(false)
-const globalError = ref('')
-const errors = reactive({ email: '', password: '' })
+const email = ref("");
+const password = ref("");
+const showPassword = ref(false);
+const rememberMe = ref(false);
+const isLoading = ref(false);
+const globalError = ref("");
+const errors = reactive({ email: "", password: "" });
 
-let failedAttempts = Number(sessionStorage.getItem('admin_login_failed') || 0)
-let rateLimitedUntil = Number(sessionStorage.getItem('admin_login_limited_until') || 0)
-const isRateLimited = ref(rateLimitedUntil > Date.now())
+let failedAttempts = Number(sessionStorage.getItem("admin_login_failed") || 0);
+let rateLimitedUntil = Number(
+  sessionStorage.getItem("admin_login_limited_until") || 0,
+);
+const isRateLimited = ref(rateLimitedUntil > Date.now());
 
 onMounted(() => {
-  document.body.style.overflow = 'hidden'
-  document.documentElement.style.overflow = 'hidden'
-  const savedEmail = localStorage.getItem('admin_remember_email')
-  if (savedEmail) email.value = savedEmail
+  document.body.style.overflow = "hidden";
+  document.documentElement.style.overflow = "hidden";
+  const savedEmail = localStorage.getItem("admin_remember_email");
+  if (savedEmail) email.value = savedEmail;
   if (isRateLimited.value) {
     const check = setInterval(() => {
       if (Date.now() >= rateLimitedUntil) {
-        isRateLimited.value = false
-        sessionStorage.removeItem('admin_login_limited_until')
-        clearInterval(check)
+        isRateLimited.value = false;
+        sessionStorage.removeItem("admin_login_limited_until");
+        clearInterval(check);
       }
-    }, 1000)
+    }, 1000);
   }
-})
+});
 
 onUnmounted(() => {
-  document.body.style.overflow = ''
-  document.documentElement.style.overflow = ''
-})
+  document.body.style.overflow = "";
+  document.documentElement.style.overflow = "";
+});
 
 function validate() {
-  errors.email = ''
-  errors.password = ''
-  let valid = true
+  errors.email = "";
+  errors.password = "";
+  let valid = true;
   if (!email.value.trim()) {
-    errors.email = 'Email wajib diisi.'
-    valid = false
+    errors.email = "Email wajib diisi.";
+    valid = false;
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-    errors.email = 'Format email tidak valid.'
-    valid = false
+    errors.email = "Format email tidak valid.";
+    valid = false;
   }
   if (!password.value) {
-    errors.password = 'Password wajib diisi.'
-    valid = false
+    errors.password = "Password wajib diisi.";
+    valid = false;
   }
-  return valid
+  return valid;
 }
 
 async function handleLogin() {
-  globalError.value = ''
-  if (!validate()) return
-  if (isRateLimited.value) return
+  globalError.value = "";
+  if (!validate()) return;
+  if (isRateLimited.value) return;
 
-  isLoading.value = true
+  isLoading.value = true;
   try {
-    const res = await adminLogin({ email: email.value.trim(), password: password.value })
+    const res = await loginUser({
+      email: email.value.trim(),
+      password: password.value,
+    });
 
-    const token = res.data?.token
-    if (!token) throw new Error('Token tidak ditemukan.')
+    const token = res.data?.access_token;
+    if (!token) throw new Error("Token tidak ditemukan.");
 
-    const storage = rememberMe.value ? localStorage : sessionStorage
-    storage.setItem('admin_token', token)
-    storage.setItem('admin_email', email.value.trim())
-    if (rememberMe.value) localStorage.setItem('admin_remember_email', email.value.trim())
-    else localStorage.removeItem('admin_remember_email')
+    const storage = rememberMe.value ? localStorage : sessionStorage;
+    storage.setItem("auth_token", token);
+    storage.setItem("admin_email", email.value.trim());
+    if (rememberMe.value)
+      localStorage.setItem("admin_remember_email", email.value.trim());
+    else localStorage.removeItem("admin_remember_email");
 
-    sessionStorage.removeItem('admin_login_failed')
-    sessionStorage.removeItem('admin_login_limited_until')
+    if (res.data?.user) {
+      storage.setItem("user_info", JSON.stringify(res.data.user));
+    }
 
-    router.push('/admin/dashboard')
+    sessionStorage.removeItem("admin_login_failed");
+    sessionStorage.removeItem("admin_login_limited_until");
+
+    router.push("/admin/dashboard");
   } catch (err) {
-    failedAttempts += 1
-    sessionStorage.setItem('admin_login_failed', failedAttempts)
+    failedAttempts += 1;
+    sessionStorage.setItem("admin_login_failed", failedAttempts);
 
     if (failedAttempts >= 5) {
-      const until = Date.now() + 60 * 1000
-      rateLimitedUntil = until
-      isRateLimited.value = true
-      sessionStorage.setItem('admin_login_limited_until', String(until))
-      globalError.value = 'Terlalu banyak percobaan. Coba lagi dalam beberapa menit.'
+      const until = Date.now() + 60 * 1000;
+      rateLimitedUntil = until;
+      isRateLimited.value = true;
+      sessionStorage.setItem("admin_login_limited_until", String(until));
+      globalError.value =
+        "Terlalu banyak percobaan. Coba lagi dalam beberapa menit.";
     } else {
-      globalError.value = 'Email atau password salah. Silakan coba lagi.'
+      globalError.value =
+        err.response?.data?.message ||
+        "Email atau password salah. Silakan coba lagi.";
     }
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 </script>
@@ -290,7 +328,7 @@ async function handleLogin() {
 }
 
 .admin-brand-name {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 700;
   font-size: 1.25rem;
   color: #1e3a8a;
@@ -350,7 +388,7 @@ async function handleLogin() {
   position: relative;
   height: 100%;
   overflow: hidden;
-  background-image: url('https://images.unsplash.com/photo-1497215842964-222b430dc094?w=1600&q=80');
+  background-image: url("https://images.unsplash.com/photo-1497215842964-222b430dc094?w=1600&q=80");
   background-size: cover;
   background-position: center;
 }
@@ -358,14 +396,23 @@ async function handleLogin() {
 .admin-hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(10, 15, 46, 0.95), rgba(30, 58, 138, 0.85), rgba(30, 58, 138, 0.7));
+  background: linear-gradient(
+    to top,
+    rgba(10, 15, 46, 0.95),
+    rgba(30, 58, 138, 0.85),
+    rgba(30, 58, 138, 0.7)
+  );
   z-index: 1;
 }
 
 .admin-hero-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(59, 130, 246, 0.08) 0%,
+    transparent 70%
+  );
   z-index: 2;
   pointer-events: none;
 }
@@ -407,7 +454,7 @@ async function handleLogin() {
 }
 
 .admin-hero-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 900;
   font-size: clamp(1.5rem, 3vw, 2.5rem);
   line-height: 1.02;
@@ -476,7 +523,7 @@ async function handleLogin() {
 }
 
 .admin-form-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 900;
   font-size: 1.875rem;
   color: #0f172a;
@@ -527,7 +574,9 @@ async function handleLogin() {
   border-radius: 1rem;
   background: #eef0fc;
   border: 1px solid transparent;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .input-wrap:focus-within {
@@ -604,7 +653,7 @@ async function handleLogin() {
 }
 
 .check-label input:checked + .check-box::after {
-  content: '';
+  content: "";
   width: 0.35rem;
   height: 0.65rem;
   border: solid #ffffff;

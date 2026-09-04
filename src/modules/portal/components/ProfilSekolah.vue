@@ -5,9 +5,10 @@
         <!-- Kolom Kiri: Gedung Sekolah -->
         <div class="profil-col profil-col-left">
           <img
-            :src="buildingImage"
+            :src="finalBuildingImage"
             alt="Foto gedung SMK Nurul Jadid"
             class="profil-building-img"
+            loading="lazy"
           />
         </div>
 
@@ -15,9 +16,10 @@
         <div class="profil-col profil-col-center">
           <div class="profil-lab-wrap">
             <img
-              :src="labImage"
+              :src="finalLabImage"
               alt="Siswa sedang praktik di lab komputer"
               class="profil-lab-img"
+              loading="lazy"
             />
           </div>
           <div class="profil-highlight-card">
@@ -28,7 +30,7 @@
               fill="currentColor"
               aria-hidden="true"
             >
-              <path d="M12 2L9 9H2l6 4.5L5.5 22 12 17l6.5 5-2.5-8.5L22 9h-7z"/>
+              <path d="M12 2L9 9H2l6 4.5L5.5 22 12 17l6.5 5-2.5-8.5L22 9h-7z" />
             </svg>
             <p class="profil-highlight-text">Education for the Future</p>
           </div>
@@ -38,7 +40,8 @@
         <div class="profil-col profil-col-right">
           <span class="profil-label">{{ label }}</span>
           <h2 class="profil-title">
-            <span>{{ titleLine1 }}</span><br />
+            <span>{{ titleLine1 }}</span
+            ><br />
             <span>{{ titleLine2 }}</span>
           </h2>
           <p class="profil-description">{{ description }}</p>
@@ -60,55 +63,73 @@
 </template>
 
 <script setup>
-import labImg from '../../../assets/hero-lab.webp';
-import gedungImg from '../../../assets/gedung.png';
+import { computed } from "vue";
+import { useSiteImages } from "@/composables/useSiteImages";
+import labImg from "../../../assets/hero-lab.webp";
+import gedungImg from "../../../assets/gedung.png";
 
-defineProps({
+const { getImageByKey, images } = useSiteImages();
+
+const props = defineProps({
   label: {
     type: String,
-    default: 'PROFIL SEKOLAH'
+    default: "PROFIL SEKOLAH",
   },
   titleLine1: {
     type: String,
-    default: 'Tradisi Pesantren, Inovasi'
+    default: "Tradisi Pesantren, Inovasi",
   },
   titleLine2: {
     type: String,
-    default: 'Masa Depan'
+    default: "Masa Depan",
   },
   description: {
     type: String,
-    default: 'SMK Nurul Jadid bukan sekadar lembaga pendidikan vokasi. Kami adalah ekosistem yang menggabungkan nilai-nilai spiritual luhur dengan keahlian teknis mutakhir. Berdiri sejak puluhan tahun, kami terus bertransformasi menjadi pusat unggulan (Center of Excellence).'
+    default:
+      "SMK Nurul Jadid bukan sekadar lembaga pendidikan vokasi. Kami adalah ekosistem yang menggabungkan nilai-nilai spiritual luhur dengan keahlian teknis mutakhir. Berdiri sejak puluhan tahun, kami terus bertransformasi menjadi pusat unggulan (Center of Excellence).",
   },
   buildingImage: {
     type: String,
-    default: () => gedungImg
+    default: null,
   },
   labImage: {
     type: String,
-    default: () => labImg
+    default: null,
   },
   visionTitle: {
     type: String,
-    default: 'Visi'
+    default: "Visi",
   },
   visionText: {
     type: String,
-    default: 'Menjadi SMK rujukan nasional berbasis iman dan teknologi.'
+    default: "Menjadi SMK rujukan nasional berbasis iman dan teknologi.",
   },
   missionTitle: {
     type: String,
-    default: 'Misi'
+    default: "Misi",
   },
   missionText: {
     type: String,
-    default: 'Memberdayakan potensi siswa melalui pendidikan vokasi terapan.'
-  }
+    default: "Memberdayakan potensi siswa melalui pendidikan vokasi terapan.",
+  },
+});
+
+// Use database images if available, fallback to props or assets
+const finalBuildingImage = computed(() => {
+  if (props.buildingImage) return props.buildingImage;
+  const img = getImageByKey("about_image");
+  return img?.image_url || gedungImg;
+});
+
+const finalLabImage = computed(() => {
+  if (props.labImage) return props.labImage;
+  const img = getImageByKey("facility_lab_komputer");
+  return img?.image_url || labImg;
 });
 </script>
 
 <style lang="scss" scoped>
-@use '../../../assets/styles/variables' as *;
+@use "../../../assets/styles/variables" as *;
 
 .profil-sekolah {
   background: #ffffff;

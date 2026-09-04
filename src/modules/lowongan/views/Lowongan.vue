@@ -22,9 +22,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { getAllLowongan, getKategoriCounts } from '@/data/lowongan'
+import { getPublicContent } from '@/api/endpoints'
+import { mapVacancy } from '@/modules/contentMapper'
 import LowonganHero from '../components/LowonganHero.vue'
 import FilterLowongan from '../components/FilterLowongan.vue'
 import GridLowongan from '../components/GridLowongan.vue'
@@ -37,10 +38,11 @@ const searchQuery = ref('')
 const kategoriFilter = ref([])
 const tipeFilter = ref([])
 const visibleCount = ref(4)
+const lowonganItems = ref([])
 
 const hasilFilter = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
-  return getAllLowongan().filter(item => {
+  return lowonganItems.value.filter(item => {
     const cocokSearch = !q ||
       item.posisi.toLowerCase().includes(q) ||
       item.perusahaan.toLowerCase().includes(q)
@@ -49,6 +51,24 @@ const hasilFilter = computed(() => {
     return cocokSearch && cocokKategori && cocokTipe
   })
 })
+onMounted(async () => {
+  try {
+    const response = await getPublicContent('job_vacancies')
+    const fetched = (response.data?.data || []).map(mapVacancy)
+    if (fetched.length > 0) {
+      lowonganItems.value = fetched
+    }
+  } catch (err) {
+    console.warn('Gagal memuat lowongan dari API:', err)
+  }
+})
+
+function getKategoriCounts() {
+  return lowonganItems.value.reduce((counts, item) => {
+    counts[item.kategori] = (counts[item.kategori] || 0) + 1
+    return counts
+  }, {})
+}
 
 const dataDitampilkan = computed(() => hasilFilter.value.slice(0, visibleCount.value))
 

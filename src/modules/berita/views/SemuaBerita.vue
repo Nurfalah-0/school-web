@@ -46,31 +46,21 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { Calendar } from 'lucide-vue-next'
-import {
-  getAllBerita,
-  getBeritaByKategori,
-  getBeritaByTag,
-  kategoriColorMap
-} from '@/data/berita'
+import { useRoute } from 'vue-router'
+import { getNews } from '@/api/endpoints'
+import { mapNews } from '../services/newsMapper'
 
 const route = useRoute()
-const router = useRouter()
-
 const kategoriAktif = ref('Semua')
+const beritaList = ref([])
 
-const kategoriList = [
+const kategoriList = computed(() => [
   { label: 'Semua', value: 'Semua' },
-  { label: 'Prestasi', value: 'PRESTASI' },
-  { label: 'Kegiatan', value: 'KEGIATAN' },
-  { label: 'Sosial', value: 'SOSIAL' }
-]
-
-const baseList = computed(() => getAllBerita())
+  ...[...new Set(beritaList.value.map(item => item.kategori))].map(kategori => ({ label: kategori, value: kategori }))
+])
 
 const filteredBerita = computed(() => {
-  let list = baseList.value
+  let list = beritaList.value
 
   if (route.query.tag) {
     const tag = route.query.tag
@@ -90,10 +80,23 @@ function excerpt(artikel) {
 }
 
 function kategoriColor(kategori) {
-  return kategoriColorMap[kategori]?.bg || '#042d86'
+  const colors = ['#1e3a8a', '#0f766e', '#b45309', '#7c3aed', '#be123c']
+  const index = [...(kategori || '')].reduce((sum, letter) => sum + letter.charCodeAt(0), 0) % colors.length
+  return colors[index]
 }
 
-onMounted(() => {
+async function loadBerita() {
+  const response = await getNews(1, 100)
+  const articles = response.data?.data?.data || response.data?.data || []
+  beritaList.value = articles.map(mapNews)
+}
+
+onMounted(async () => {
+  try {
+    await loadBerita()
+  } catch {
+    beritaList.value = []
+  }
   if (route.query.tag) {
     kategoriAktif.value = 'Semua'
   }

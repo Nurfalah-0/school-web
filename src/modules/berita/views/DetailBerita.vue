@@ -26,9 +26,10 @@
 </template>
 
 <script setup>
-import { computed, watch, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
-import { getBeritaBySlug, getBeritaLainnya } from '@/data/berita'
+import { getNews, getNewsDetail } from '@/api/endpoints'
+import { mapNews } from '../services/newsMapper'
 import Breadcrumb from '../components/Breadcrumb.vue'
 import ArtikelHeader from '../components/ArtikelHeader.vue'
 import KontenArtikel from '../components/KontenArtikel.vue'
@@ -39,8 +40,8 @@ import FooterSection from '../../portal/components/FooterSection.vue'
 
 const route = useRoute()
 
-const artikelAktif = computed(() => getBeritaBySlug(route.params.slug))
-const beritaLainnya = computed(() => getBeritaLainnya(route.params.slug, 3))
+const artikelAktif = ref(null)
+const beritaLainnya = ref([])
 
 const breadcrumbItems = computed(() => [
   { label: 'Beranda', to: '/' },
@@ -48,9 +49,39 @@ const breadcrumbItems = computed(() => [
   { label: artikelAktif.value?.judul || 'Detail Berita' }
 ])
 
+async function loadArticle(slug) {
+  artikelAktif.value = null
+  try {
+    const [detailResponse, listResponse] = await Promise.allSettled([getNewsDetail(slug), getNews(1, 12)])
+    
+    if (detailResponse.status === 'fulfilled' && (detailResponse.value?.data?.data || detailResponse.value?.data)) {
+      artikelAktif.value = mapNews(detailResponse.value.data?.data || detailResponse.value.data)
+    }
+
+    const articles = listResponse.status === 'fulfilled' ? (listResponse.value.data?.data?.data || listResponse.value.data?.data || []) : []
+    
+    // If detail failed, check if article is in list
+    if (!artikelAktif.value && articles.length) {
+      const match = articles.find(a => String(a.slug || a.id) === String(slug))
+      if (match) {
+        artikelAktif.value = mapNews(match)
+      }
+    }
+    
+    beritaLainnya.value = articles
+      .filter(item => String(item.slug || item.id) !== String(slug))
+      .slice(0, 3)
+      .map(mapNews)
+  } catch (e) {
+    artikelAktif.value = null
+    beritaLainnya.value = []
+  }
+}
+
 watch(
   () => route.params.slug,
-  () => {
+  (slug) => {
+    loadArticle(slug)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   },
   { immediate: true }

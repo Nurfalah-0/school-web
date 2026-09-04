@@ -31,9 +31,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { CodeXml, Briefcase, Network, Palette, Calculator } from 'lucide-vue-next'
-import { jurusanList } from '@/data/jurusan'
+import { getMajors } from '@/api/endpoints'
 
 const iconMap = {
   CodeXml,
@@ -42,6 +42,18 @@ const iconMap = {
   Palette,
   Calculator
 }
+const jurusanList = ref([])
+onMounted(async () => {
+  try {
+    const response = await getMajors()
+    const items = response.data?.data || []
+    if (items.length > 0) {
+      jurusanList.value = items.map(item => ({ ...item, slug: item.slug, nama: item.name, kategori: item.code, deskripsi: item.description || 'Program keahlian SMK Nurul Jadid.', gambarHero: item.image || 'https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian', icon: 'CodeXml' }))
+    }
+  } catch (err) {
+    console.warn('Gagal memuat jurusan dari API, menggunakan data default:', err)
+  }
+})
 </script>
 
 <style lang="scss" scoped>

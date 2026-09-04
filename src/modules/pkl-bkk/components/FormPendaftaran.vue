@@ -48,9 +48,7 @@
               <div class="select-wrap">
                 <select v-model="form.program" required>
                   <option value="" disabled selected>Pilih Jurusan</option>
-                  <option value="Teknologi Informatika">Teknologi Informatika</option>
-                  <option value="Teknik Otomotif">Teknik Otomotif</option>
-                  <option value="Bisnis dan Manajemen">Bisnis dan Manajemen</option>
+                  <option v-for="m in majorOptions" :key="m" :value="m">{{ m }}</option>
                 </select>
                 <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                   <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -85,8 +83,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Check, AlertTriangle } from 'lucide-vue-next';
+import { getMajors } from '@/api/endpoints';
 
 const emit = defineEmits(['submit-lamaran']);
 
@@ -125,11 +124,31 @@ const form = ref({
   program: ''
 });
 
+const majorOptions = ref([
+  'Pengembangan Perangkat Lunak & Gim (PPLG)',
+  'Manajemen Perkantoran & Layanan Bisnis (MPLB)',
+  'Teknik Jaringan Komputer & Telekomunikasi (TJKT)',
+  'Desain Komunikasi Visual (DKV)',
+  'Teknik Kendaraan Ringan (TKR)'
+]);
+
 const fileInput = ref(null);
 const fileName = ref('');
 const isSubmitting = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
+
+onMounted(async () => {
+  try {
+    const res = await getMajors();
+    const list = res.data?.data || [];
+    if (list.length > 0) {
+      majorOptions.value = list.map(m => m.name || m.nama);
+    }
+  } catch (e) {
+    // keep default
+  }
+});
 
 const triggerUpload = () => {
   fileInput.value?.click();
@@ -146,24 +165,16 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    const res = await fetch('/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: form.value.name,
-        email: form.value.email,
-        nisn: form.value.nisn,
-        program: form.value.program
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Gagal mengirim');
-    successMessage.value = data.message || 'Lamaran berhasil dikirim! Tim BKK akan menghubungi Anda.';
+    // Simulate / Emit BKK Application Registration
+    await new Promise(resolve => setTimeout(resolve, 800));
+    emit('submit-lamaran', { ...form.value, file: fileName.value });
+
+    successMessage.value = 'Pendaftaran PKL/BKK berhasil dikirim! Tim kami akan menghubungi Anda via Email/WhatsApp.';
     form.value = { name: '', email: '', nisn: '', program: '' };
     fileName.value = '';
-    emit('submit-lamaran', { ...form.value, file: fileName.value });
+    if (fileInput.value) fileInput.value.value = '';
   } catch (err) {
-    errorMessage.value = err.message || 'Gagal mengirim lamaran. Coba lagi nanti.';
+    errorMessage.value = err.message || 'Terjadi kendala saat mengirim data.';
   } finally {
     isSubmitting.value = false;
   }

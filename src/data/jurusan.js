@@ -97,7 +97,13 @@ export const jurusanList = [
 ];
 
 export function getJurusanBySlug(slug) {
-  return jurusanList.find(j => j.slug === slug) || null;
+  if (!slug) return null;
+  const s = String(slug).toLowerCase().trim();
+  return jurusanList.find(j => 
+    j.slug.toLowerCase() === s || 
+    j.nama.toLowerCase().includes(s) ||
+    s.includes(j.slug.toLowerCase())
+  ) || null;
 }
 
 export function getAllJurusan() {
@@ -105,5 +111,7 @@ export function getAllJurusan() {
 }
 
 export function getJurusanLainnya(excludeSlug) {
-  return jurusanList.filter(j => j.slug !== excludeSlug);
+  if (!excludeSlug) return jurusanList.slice(0, 4);
+  const s = String(excludeSlug).toLowerCase().trim();
+  return jurusanList.filter(j => j.slug.toLowerCase() !== s);
 }

@@ -7,7 +7,7 @@
     <div class="lowongan-lainnya-list">
       <router-link
         v-for="item in items"
-        :key="item.slug"
+        :key="item.slug || item.id"
         :to="`/lowongan/${item.slug}`"
         class="lowongan-lainnya-card"
       >
@@ -15,13 +15,13 @@
           <div class="lowongan-lainnya-icon" :style="{ background: iconBg(item.kategori) }">
             <component :is="iconComponent(item.icon)" :size="18" :color="iconColor(item.kategori)" />
           </div>
-          <span v-if="item.status === 'Baru'" class="lowongan-lainnya-badge">Baru</span>
+          <span v-if="item.status === 'Baru' || item.is_featured" class="lowongan-lainnya-badge">Baru</span>
         </div>
         <h4 class="lowongan-lainnya-name">{{ item.posisi }}</h4>
         <p class="lowongan-lainnya-company">{{ item.perusahaan }}</p>
         <div class="lowongan-lainnya-meta">
-          <span>{{ item.lokasi }}</span>
-          <span>{{ item.tipePekerjaanLabel }}</span>
+          <span>{{ item.lokasi || 'Probolinggo' }}</span>
+          <span>{{ item.tipePekerjaanLabel || item.tipePekerjaan }}</span>
         </div>
       </router-link>
     </div>
@@ -37,16 +37,19 @@ const props = defineProps({
   currentSlug: {
     type: String,
     default: ''
+  },
+  allJobs: {
+    type: Array,
+    default: () => []
   }
 })
 
 const items = computed(() => {
-  const all = getAllLowongan()
-  const current = all.find(item => item.slug === props.currentSlug)
+  const all = props.allJobs && props.allJobs.length ? props.allJobs : getAllLowongan()
+  const current = all.find(item => item.slug === props.currentSlug || String(item.id) === props.currentSlug)
   if (!current) return all.slice(0, 4)
-  return all
-    .filter(item => item.slug !== current.slug && item.kategori === current.kategori)
-    .slice(0, 4)
+  const others = all.filter(item => item.slug !== current.slug && String(item.id) !== String(current.id))
+  return others.slice(0, 4)
 })
 
 function iconComponent(name) {
@@ -120,11 +123,13 @@ function iconBg(kategori) {
   padding: 1rem;
   border: 1px solid #e2e8f0;
   border-radius: 1rem;
-  transition: box-shadow 0.2s ease;
-}
+  transition: all 0.2s ease;
 
-.lowongan-lainnya-card:hover {
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  &:hover {
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+  }
 }
 
 .lowongan-lainnya-top {

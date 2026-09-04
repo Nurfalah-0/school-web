@@ -9,9 +9,9 @@
           </div>
           <div class="detail-lowongan-info">
             <div class="detail-lowongan-pills">
-              <span v-if="lowongan.status === 'Baru'" class="detail-lowongan-pill detail-lowongan-pill-new">Baru</span>
-              <span class="detail-lowongan-pill detail-lowongan-pill-category">{{ lowongan.kategoriLabel }}</span>
-              <span class="detail-lowongan-pill">{{ lowongan.tipePekerjaanLabel }}</span>
+              <span v-if="lowongan.status === 'Baru' || lowongan.is_featured" class="detail-lowongan-pill detail-lowongan-pill-new">Baru</span>
+              <span class="detail-lowongan-pill detail-lowongan-pill-category">{{ lowongan.kategoriLabel || lowongan.kategori }}</span>
+              <span class="detail-lowongan-pill">{{ lowongan.tipePekerjaanLabel || lowongan.tipePekerjaan }}</span>
             </div>
             <h1 class="detail-lowongan-title">{{ lowongan.posisi }}</h1>
             <p class="detail-lowongan-company">{{ lowongan.perusahaan }}</p>
@@ -21,33 +21,33 @@
         <div class="detail-lowongan-meta">
           <span class="detail-lowongan-meta-item">
             <MapPin :size="16" color="#64748b" />
-            {{ lowongan.lokasi }}
+            {{ lowongan.lokasi || 'Probolinggo & Sekitarnya' }}
           </span>
           <span class="detail-lowongan-meta-item">
             <Clock :size="16" color="#64748b" />
-            {{ lowongan.deadlineLabel }}
+            {{ lowongan.deadlineLabel || (lowongan.deadline ? formatDate(lowongan.deadline) : 'Terbuka Terus') }}
           </span>
         </div>
 
         <div class="detail-lowongan-section">
-          <h2 class="detail-lowongan-section-title">Deskripsi</h2>
-          <p class="detail-lowongan-text">{{ lowongan.deskripsiLengkap || lowongan.deskripsiSingkat }}</p>
+          <h2 class="detail-lowongan-section-title">Deskripsi Pekerjaan</h2>
+          <p class="detail-lowongan-text">{{ lowongan.deskripsiLengkap || lowongan.deskripsiSingkat || lowongan.description }}</p>
         </div>
 
-        <div class="detail-lowongan-section">
-          <h2 class="detail-lowongan-section-title">Kualifikasi</h2>
+        <div class="detail-lowongan-section" v-if="kualifikasiList.length">
+          <h2 class="detail-lowongan-section-title">Kualifikasi & Persyaratan</h2>
           <ul class="detail-lowongan-list">
-            <li v-for="(item, idx) in lowongan.kualifikasi" :key="idx" class="detail-lowongan-list-item">
+            <li v-for="(item, idx) in kualifikasiList" :key="idx" class="detail-lowongan-list-item">
               <Check :size="16" color="#047857" />
               {{ item }}
             </li>
           </ul>
         </div>
 
-        <div class="detail-lowongan-section">
-          <h2 class="detail-lowongan-section-title">Benefit</h2>
+        <div class="detail-lowongan-section" v-if="benefitList.length">
+          <h2 class="detail-lowongan-section-title">Benefit & Fasilitas</h2>
           <ul class="detail-lowongan-list">
-            <li v-for="(item, idx) in lowongan.benefit" :key="idx" class="detail-lowongan-list-item">
+            <li v-for="(item, idx) in benefitList" :key="idx" class="detail-lowongan-list-item">
               <Check :size="16" color="#047857" />
               {{ item }}
             </li>
@@ -56,7 +56,7 @@
 
         <div class="detail-lowongan-cta">
           <button type="button" class="detail-lowongan-btn" @click="openModal">
-            {{ lowongan.ctaLabel }}
+            {{ lowongan.ctaLabel || 'Lamar Lowongan Ini' }}
             <ArrowRight :size="18" color="#ffffff" />
           </button>
         </div>
@@ -64,7 +64,7 @@
         <ModalLamaran v-model:open="isModalOpen" :posisi="lowongan.posisi" />
       </div>
       <aside class="detail-lowongan-sidebar">
-        <LowonganLainnya :current-slug="slug" />
+        <LowonganLainnya :current-slug="slug" :all-jobs="allJobsList" />
       </aside>
     </div>
     <FooterSection
@@ -74,16 +74,23 @@
     />
   </div>
 
+  <div v-else-if="isLoading" class="detail-lowongan-loading">
+    <div class="spinner"></div>
+    <p>Memuat informasi lowongan...</p>
+  </div>
+
   <div v-else class="detail-lowongan-empty">
     <p class="detail-lowongan-empty-text">Lowongan tidak ditemukan.</p>
-    <router-link to="/lowongan" class="detail-lowongan-back">Kembali ke Lowongan</router-link>
+    <router-link to="/lowongan" class="detail-lowongan-back">Kembali ke Daftar Lowongan</router-link>
   </div>
 </template>
 
 <script setup>
-import { computed, watch, watchEffect, ref } from 'vue'
+import { computed, watch, watchEffect, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { getLowonganBySlug } from '@/data/lowongan'
+import { getPublicContent } from '@/api/endpoints'
+import { mapVacancy } from '@/modules/contentMapper'
+import { getAllLowongan, getLowonganBySlug } from '@/data/lowongan'
 import Breadcrumb from '../../berita/components/Breadcrumb.vue'
 import LowonganLainnya from '../components/LowonganLainnya.vue'
 import ModalLamaran from '../components/ModalLamaran.vue'
@@ -92,8 +99,78 @@ import { MapPin, Clock, Check, ArrowRight, CodeXml, Car, Palette, Landmark } fro
 
 const route = useRoute()
 const slug = computed(() => route.params.slug)
-const lowongan = computed(() => getLowonganBySlug(slug.value))
 const isModalOpen = ref(false)
+const isLoading = ref(true)
+const apiLowonganList = ref([])
+
+onMounted(async () => {
+  await fetchJobs()
+})
+
+watch(() => route.params.slug, async () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+  if (!apiLowonganList.value.length) {
+    await fetchJobs()
+  }
+}, { immediate: true })
+
+async function fetchJobs() {
+  isLoading.value = true
+  try {
+    const res = await getPublicContent('job_vacancies')
+    const fetched = (res.data?.data || []).map(mapVacancy)
+    if (fetched.length > 0) {
+      apiLowonganList.value = fetched
+    } else {
+      apiLowonganList.value = getAllLowongan()
+    }
+  } catch (err) {
+    apiLowonganList.value = getAllLowongan()
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const allJobsList = computed(() => {
+  return apiLowonganList.value.length ? apiLowonganList.value : getAllLowongan()
+})
+
+const lowongan = computed(() => {
+  const target = String(slug.value || '').toLowerCase()
+  const foundInApi = allJobsList.value.find(item =>
+    String(item.slug || '').toLowerCase() === target ||
+    String(item.id || '') === target
+  )
+  if (foundInApi) return foundInApi
+  return getLowonganBySlug(slug.value)
+})
+
+const kualifikasiList = computed(() => {
+  if (!lowongan.value) return []
+  if (Array.isArray(lowongan.value.kualifikasi) && lowongan.value.kualifikasi.length) {
+    return lowongan.value.kualifikasi
+  }
+  if (typeof lowongan.value.requirements === 'string') {
+    return lowongan.value.requirements.split('\n').filter(s => s.trim())
+  }
+  return [
+    'Pendidikan minimal SMK / Sederajat jurusan terkait',
+    'Memiliki integritas, disiplin, dan motivasi belajar tinggi',
+    'Mampu bekerja secara mandiri maupun dalam tim'
+  ]
+})
+
+const benefitList = computed(() => {
+  if (!lowongan.value) return []
+  if (Array.isArray(lowongan.value.benefit) && lowongan.value.benefit.length) {
+    return lowongan.value.benefit
+  }
+  return [
+    'Gaji & Tunjangan Kompetitif',
+    'Pelatihan & Sertifikasi Industri',
+    'Jenjang Karir Terbuka Luas'
+  ]
+})
 
 const breadcrumbItems = computed(() => [
   { label: 'Beranda', to: '/' },
@@ -123,10 +200,6 @@ const bkkContactInfo = [
   }
 ]
 
-watch(() => route.params.slug, () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}, { immediate: true })
-
 watchEffect(() => {
   document.title = lowongan.value
     ? `${lowongan.value.posisi} - SMK Nurul Jadid`
@@ -135,6 +208,12 @@ watchEffect(() => {
 
 function openModal() {
   isModalOpen.value = true
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 function iconComponent(name) {
@@ -227,6 +306,7 @@ function iconBg(kategori) {
   color: #334155;
   font-size: 0.8rem;
   font-weight: 700;
+  text-transform: capitalize;
 }
 
 .detail-lowongan-pill-new {
@@ -343,6 +423,29 @@ function iconBg(kategori) {
   .detail-lowongan-sidebar {
     margin-top: 2rem;
   }
+}
+
+.detail-lowongan-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  color: #64748b;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #1e3a8a;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .detail-lowongan-empty {

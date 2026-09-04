@@ -22,7 +22,7 @@
               {{ poin }}
             </li>
           </ul>
-          <a :href="item.link" :class="['jalur-btn', { primary: item.highlighted }]">
+          <a :href="item.link" :class="['jalur-btn', { primary: item.highlighted }]" @click.prevent="scrollToPendaftaran">
             {{ item.btnText }}
           </a>
         </div>
@@ -80,6 +80,17 @@ defineProps({
     ]
   }
 });
+
+const scrollToPendaftaran = () => {
+  const el = document.querySelector('#pendaftaran');
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const input = el.querySelector('input');
+    if (input) {
+      setTimeout(() => input.focus(), 600);
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>
