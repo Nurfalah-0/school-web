@@ -17,7 +17,7 @@ Frontend akan tersedia di `http://localhost:5173` dan backend di `http://localho
 
 ## Login Admin
 
-Super admin = username: superadmin@smknuruljadid.sch.idpassword: password123
+Super admin = username: superadmin@smknuruljadid.sch.id password: password123
 
 Admin = username: admin@smknuruljadid
 password: password123
