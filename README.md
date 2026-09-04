@@ -4,7 +4,7 @@ Website sekolah sederhana menggunakan Vue.js untuk front-end dan Express.js untu
 
 ## Jalankan proyek
 
-1. Buka terminal di folder `C:\\Users\\HP\\school-web`
+1. Buka folder school-web
 2. Jalankan `npm install`
 3. Jalankan `npm run dev`
 
