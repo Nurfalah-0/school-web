@@ -4,7 +4,7 @@
       <TefaHero />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="100">
-      <FilterKategori v-model:kategori="kategoriAktif" />
+      <FilterKategori v-model:kategori="kategoriAktif" @reset-filter="resetKategori" />
     </AnimateOnScroll>
 
     <!-- Cart Bar -->
@@ -24,7 +24,48 @@
     </div>
 
     <AnimateOnScroll animation="fadeInUp" :delay="200">
-      <GridProduk :kategori-filter="kategoriAktif" @tambah-keranjang="tambahKeKeranjang" />
+      <GridProduk id="produk" :kategori-filter="kategoriAktif" @tambah-keranjang="tambahKeKeranjang" />
+    </AnimateOnScroll>
+
+    <!-- Cart Bar -->
+    <div v-if="cart.length > 0" class="cart-bar">
+      <div class="cart-bar-inner">
+        <div class="cart-bar-info">
+          <ShoppingCart :size="20" color="#1e3a8a" />
+          <span class="cart-bar-count">{{ cartTotalQty }} item</span>
+          <span class="cart-bar-separator">|</span>
+          <span class="cart-bar-total">{{ formatRupiah(cartTotal) }}</span>
+        </div>
+        <button class="cart-bar-btn" @click="cartOpen = true">
+          Lihat Keranjang
+          <ChevronRight :size="18" color="#ffffff" />
+        </button>
+      </div>
+    </div>
+
+    <AnimateOnScroll animation="fadeInUp" :delay="250">
+      <section id="portofolio" class="portofolio-section">
+        <div class="portofolio-inner">
+          <div class="portofolio-header">
+            <span class="portofolio-label">JASA PROFESIONAL</span>
+            <h2 class="portofolio-title">Portofolio Jasa</h2>
+            <p class="portofolio-desc">Layanan profesional berbasis kompetensi siswa dan tenaga pengajar.</p>
+          </div>
+          <div class="portofolio-grid">
+            <div v-for="item in portofolioList" :key="item.nama" class="portofolio-card">
+              <div class="portofolio-icon" :style="{ background: item.bg }">
+                <component :is="item.icon" :size="24" :color="item.color" />
+              </div>
+              <h3 class="portofolio-name">{{ item.nama }}</h3>
+              <p class="portofolio-text">{{ item.deskripsi }}</p>
+              <button class="portofolio-btn" type="button" @click="pesanJasa(item)">
+                Pesan Jasa
+                <ArrowRight :size="16" :color="item.color" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
     </AnimateOnScroll>
 
     <!-- Floating Cart Button -->
@@ -93,7 +134,7 @@ import FilterKategori from '../components/FilterKategori.vue'
 import GridProduk from '../components/GridProduk.vue'
 import DetailProduk from '../components/DetailProduk.vue'
 import FooterSection from '../../portal/components/FooterSection.vue'
-import { X, Trash2, ShoppingCart, MessageCircle, ChevronRight } from 'lucide-vue-next'
+import { X, Trash2, ShoppingCart, MessageCircle, ChevronRight, CodeXml, Palette, Megaphone, Wrench } from 'lucide-vue-next'
 import { formatRupiah } from '../../../shared/utils/formatRupiah'
 import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
@@ -102,6 +143,48 @@ const { produkAktif, pilihProduk, reset } = useProdukAktif()
 const kategoriAktif = ref('Semua Produk')
 const cartOpen = ref(false)
 const cart = ref([])
+
+const portofolioList = [
+  {
+    nama: 'Web Development',
+    deskripsi: 'Website company profile, e-commerce, dan sistem informasi berbasis web.',
+    icon: CodeXml,
+    color: '#1e3a8a',
+    bg: '#dbeafe'
+  },
+  {
+    nama: 'Design Grafis',
+    deskripsi: 'Branding, media sosial, packaging, dan materi cetak profesional.',
+    icon: Palette,
+    color: '#7e22ce',
+    bg: '#f3e8ff'
+  },
+  {
+    nama: 'Multimedia & Film',
+    deskripsi: 'Produksi video, motion graphic, dan dokumentasi kegiatan sekolah.',
+    icon: Megaphone,
+    color: '#b45309',
+    bg: '#fef3c7'
+  },
+  {
+    nama: 'Teknik & Fabrikasi',
+    deskripsi: 'Jasa perbaikan, modifikasi perangkat, dan produksi karya teknik.',
+    icon: Wrench,
+    color: '#047857',
+    bg: '#d1fae5'
+  }
+]
+
+function resetKategori() {
+  kategoriAktif.value = 'Semua Produk'
+}
+
+function pesanJasa(item) {
+  const phoneNumber = '6281259075405'
+  const message = `Halo Admin Tefa Store! Saya tertarik dengan jasa: ${item.nama}. ${item.deskripsi} Mohon info lebih lanjut.`
+  const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+  window.open(waUrl, '_blank')
+}
 
 const produkDefault = {
   id: 1,
@@ -503,5 +586,129 @@ function checkoutWhatsApp() {
   font-weight: 800;
   display: grid;
   place-items: center;
+}
+
+/* Portofolio Section */
+.portofolio-section {
+  background: #ffffff;
+  padding: 4rem 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.portofolio-inner {
+  width: min(1200px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+.portofolio-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.portofolio-label {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #b45309;
+  margin-bottom: 0.5rem;
+}
+
+.portofolio-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  color: #0f172a;
+  margin: 0;
+}
+
+.portofolio-desc {
+  color: #475569;
+  margin: 0.5rem 0 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.portofolio-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .portofolio-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .portofolio-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}
+
+.portofolio-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #ffffff;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.portofolio-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+.portofolio-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+}
+
+.portofolio-name {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #0f172a;
+  margin: 0;
+}
+
+.portofolio-text {
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.portofolio-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 9999px;
+  border: none;
+  background: #042d86;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.portofolio-btn:hover {
+  background: #032263;
 }
 </style>

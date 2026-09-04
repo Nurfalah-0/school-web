@@ -53,16 +53,16 @@
 
           <form class="admin-form" @submit.prevent="handleLogin">
             <div class="form-group">
-              <label class="form-label" for="email">Administrator Email</label>
+              <label class="form-label" for="email">Administrator (Username atau Email)</label>
               <div class="input-wrap">
                 <Mail :size="20" color="#64748b" />
                 <input
                   id="email"
                   v-model="email"
-                  type="email"
+                  type="text"
                   class="form-input"
-                  placeholder="admin@smknuruljadid.edu"
-                  autocomplete="email"
+                  placeholder="admin"
+                  autocomplete="username"
                 />
               </div>
               <p v-if="errors.email" class="form-error">{{ errors.email }}</p>
@@ -144,7 +144,6 @@
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Mail, Lock, Eye, EyeOff, HelpCircle, BookOpen } from 'lucide-vue-next'
-import { adminLogin } from '@/api/endpoints'
 import logoSrc from '@/assets/logo.webp'
 
 const router = useRouter()
@@ -187,10 +186,7 @@ function validate() {
   errors.password = ''
   let valid = true
   if (!email.value.trim()) {
-    errors.email = 'Email wajib diisi.'
-    valid = false
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-    errors.email = 'Format email tidak valid.'
+    errors.email = 'Username/email wajib diisi.'
     valid = false
   }
   if (!password.value) {
@@ -207,15 +203,15 @@ async function handleLogin() {
 
   isLoading.value = true
   try {
-    const res = await adminLogin({ email: email.value.trim(), password: password.value })
+    if (email.value.trim() !== 'admin' || password.value !== 'admin') {
+      throw new Error('Username/email atau password salah.')
+    }
 
-    const token = res.data?.token
-    if (!token) throw new Error('Token tidak ditemukan.')
-
+    const token = btoa('admin:admin:' + Date.now())
     const storage = rememberMe.value ? localStorage : sessionStorage
     storage.setItem('admin_token', token)
-    storage.setItem('admin_email', email.value.trim())
-    if (rememberMe.value) localStorage.setItem('admin_remember_email', email.value.trim())
+    storage.setItem('admin_email', 'admin')
+    if (rememberMe.value) localStorage.setItem('admin_remember_email', 'admin')
     else localStorage.removeItem('admin_remember_email')
 
     sessionStorage.removeItem('admin_login_failed')
@@ -233,7 +229,7 @@ async function handleLogin() {
       sessionStorage.setItem('admin_login_limited_until', String(until))
       globalError.value = 'Terlalu banyak percobaan. Coba lagi dalam beberapa menit.'
     } else {
-      globalError.value = 'Email atau password salah. Silakan coba lagi.'
+      globalError.value = err.message || 'Email atau password salah. Silakan coba lagi.'
     }
   } finally {
     isLoading.value = false

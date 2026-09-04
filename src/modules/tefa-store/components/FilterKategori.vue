@@ -3,7 +3,7 @@
     <div class="filter-inner">
       <div class="filter-header">
         <h2 class="filter-title">Pilih Kategori</h2>
-        <a href="#" class="filter-link">Lihat Semua</a>
+        <button type="button" class="filter-link" @click="$emit('reset-filter')">Lihat Semua</button>
       </div>
       <div class="filter-scroll">
         <button
@@ -28,7 +28,7 @@ defineProps({
   }
 })
 
-defineEmits(['update:modelValue'])
+defineEmits(['update:modelValue', 'reset-filter'])
 
 const kategoriList = [
   { label: 'Semua Produk', value: 'Semua Produk' },
