@@ -1,20 +1,44 @@
 # SMK Sekolah Web
 
-Website sekolah sederhana menggunakan Vue.js untuk front-end dan Express.js untuk back-end.
+Website sekolah menggunakan Vue.js untuk frontend dan Laravel untuk backend.
 
 ## Jalankan proyek
+1. Buka terminal di folder hasil clone.
+2. Pastikan Node.js, PHP, Composer, dan MySQL sudah terpasang.
+3. Jalankan `bash setup.sh` untuk memasang semua dependency dan menyiapkan Laravel.
+4. Pastikan `DB_PASSWORD` di `backend/.env` sesuai password MySQL lokal.
+5. Jalankan `npm run dev` untuk menjalankan frontend dan backend.
+7. Jalankan `npm install`
+8. Jalankan `npm run dev`
 
-1. Buka terminal di folder `C:\\Users\\HP\\school-web`
-2. Jalankan `npm install`
-3. Jalankan `npm run dev`
+Frontend akan tersedia di `http://localhost:5173` dan backend Laravel di `http://localhost:8000`.
 
-Frontend akan tersedia di `http://localhost:5173` dan backend di `http://localhost:4000`.
+## Database
+
+Konfigurasi koneksi MySQL lokal berada di `backend/.env`:
+
+- Database: `db_smknuruljadid`
+- Host: `127.0.0.1`
+- Port: `3306`
+- Username: `root`
+- Password: kosong secara default
+
+Jika MySQL Anda memakai password atau port berbeda, ubah `DB_PASSWORD` atau `DB_PORT` di `backend/.env`. File SQL di `backend/database/` hanya perlu diimpor jika database belum memiliki tabel, dan `db_smknuruljadid_latest.sql` akan menghapus lalu membuat ulang database. Jangan menjalankan `migrate:fresh` pada database yang sudah berisi data.
 
 ## Struktur
 
-- `src/` : aplikasi Vue
-- `server/` : backend Express API
+- `frontend/` : aplikasi Vue dan konfigurasi Vite
+- `backend/` : aplikasi Laravel API
 
 ## Login Admin
 
-username: admin password: admin123
+Super admin = username: superadmin@smknuruljadid.sch.id password: password123
+
+Admin = username: admin@smknuruljadid
+password: password123
+
+TU = username: tu@smknuruljadid
+password:password123
+
+Guru = username: guru@smknuruljadid
+password: password123
