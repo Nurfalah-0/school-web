@@ -1,37 +1,29 @@
 <template>
   <section class="cta-prestasi">
     <div class="cta-prestasi-inner">
-      <div class="cta-prestasi-icon">
-        <Megaphone :size="48" color="#ffffff" />
-      </div>
-      <h2 class="cta-prestasi-title">Punya Prestasi Baru?</h2>
+      <h2 class="cta-prestasi-title">Prestasi Membanggakan</h2>
       <p class="cta-prestasi-desc">
-        Laporkan prestasimu untuk ditampilkan di halaman ini dan inspirasi teman-teman lainnya!
+        Berikut adalah pencapaian siswa SMK CareerHub di berbagai bidang. Prestasi ini menjadi bukti komitmen kami dalam mencetak generasi unggul dan berdaya saing global.
       </p>
-      <button type="button" class="cta-prestasi-btn" @click="openModal">
-        Kirim Prestasi
-        <ArrowRight :size="18" color="#1e3a8a" />
-      </button>
+      <div class="cta-prestasi-stats">
+        <div class="cta-stat">
+          <span class="cta-stat-number">50+</span>
+          <span class="cta-stat-label">Prestasi</span>
+        </div>
+        <div class="cta-stat">
+          <span class="cta-stat-number">20+</span>
+          <span class="cta-stat-label">Lomba</span>
+        </div>
+        <div class="cta-stat">
+          <span class="cta-stat-number">15+</span>
+          <span class="cta-stat-label">Medali</span>
+        </div>
+      </div>
     </div>
-
-    <ModalKirimPrestasi v-model:open="isModalOpen" @submit="handleSubmit" />
   </section>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Megaphone, ArrowRight } from 'lucide-vue-next'
-import ModalKirimPrestasi from './ModalKirimPrestasi.vue'
-
-const isModalOpen = ref(false)
-
-function openModal() {
-  isModalOpen.value = true
-}
-
-function handleSubmit() {
-  isModalOpen.value = false
-}
 </script>
 
 <style lang="scss" scoped>
@@ -50,11 +42,7 @@ function handleSubmit() {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 1.25rem;
-}
-
-.cta-prestasi-icon {
-  margin-bottom: 0.5rem;
+  gap: 1.5rem;
 }
 
 .cta-prestasi-title {
@@ -74,26 +62,35 @@ function handleSubmit() {
   max-width: 36rem;
 }
 
-.cta-prestasi-btn {
-  display: inline-flex;
-  align-items: center;
+.cta-prestasi-stats {
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem;
-  border-radius: 9999px;
-  background: #fbbf24;
-  color: #1e3a8a;
-  font-weight: 700;
-  font-size: 1rem;
-  border: none;
-  cursor: pointer;
-  margin-top: 0.75rem;
-  transition: background 0.2s ease, transform 0.2s ease;
+  gap: 2rem;
+  margin-top: 1rem;
 }
 
-.cta-prestasi-btn:hover {
-  background: #f59e0b;
-  transform: translateY(-1px);
+.cta-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cta-stat-number {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 2.5rem;
+  color: #fbbf24;
+  line-height: 1;
+}
+
+.cta-stat-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 @media (max-width: 767px) {
@@ -103,8 +100,12 @@ function handleSubmit() {
     border-radius: 1.5rem;
   }
 
-  .cta-prestasi-btn {
-    width: 100%;
+  .cta-prestasi-stats {
+    gap: 1.5rem;
+  }
+
+  .cta-stat-number {
+    font-size: 2rem;
   }
 }
 </style>
