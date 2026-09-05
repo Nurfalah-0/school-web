@@ -5,7 +5,10 @@
         <div class="semua-berita-header">
           <span class="semua-berita-label">INFORMASI & KEGIATAN</span>
           <h1 class="semua-berita-title">Semua Berita</h1>
-          <p class="semua-berita-desc">Dapatkan informasi terbaru seputar kegiatan, prestasi, dan pengumuman SMK Nurul Jadid.</p>
+          <p class="semua-berita-desc">
+            Dapatkan informasi terbaru seputar kegiatan, prestasi, dan
+            pengumuman SMK Nurul Jadid.
+          </p>
         </div>
 
         <AnimateOnScroll animation="fadeInUp" :delay="100">
@@ -24,16 +27,34 @@
 
         <AnimateOnScroll animation="fadeInUp" :delay="200">
           <div class="semua-berita-grid">
-            <div v-for="item in filteredBerita" :key="item.slug" class="semua-berita-card">
-              <router-link :to="`/berita/${item.slug}`" class="semua-berita-card-link">
+            <div
+              v-for="item in filteredBerita"
+              :key="item.slug"
+              class="semua-berita-card"
+            >
+              <router-link
+                :to="`/berita/${item.slug}`"
+                class="semua-berita-card-link"
+              >
                 <div class="semua-berita-img-wrap">
-                  <img :src="item.gambarUtama" :alt="item.judul" class="semua-berita-img" loading="lazy" />
-                  <span class="semua-berita-badge" :style="{ background: kategoriColor(item.kategori) }">
+                  <img
+                    :src="item.gambarUtama"
+                    :alt="item.judul"
+                    class="semua-berita-img"
+                    loading="lazy"
+                    crossorigin="anonymous"
+                  />
+                  <span
+                    class="semua-berita-badge"
+                    :style="{ background: kategoriColor(item.kategori) }"
+                  >
                     {{ item.kategori }}
                   </span>
                 </div>
                 <div class="semua-berita-body">
-                  <span class="semua-berita-date">{{ item.tanggalDisplay }}</span>
+                  <span class="semua-berita-date">{{
+                    item.tanggalDisplay
+                  }}</span>
                   <h3 class="semua-berita-name">{{ item.judul }}</h3>
                   <p class="semua-berita-excerpt">{{ excerpt(item) }}</p>
                 </div>
@@ -53,70 +74,76 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { getNews } from '@/api/endpoints'
-import { mapNews } from '../services/newsMapper'
-import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
+import { ref, computed, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
+import { getNews } from "@/api/endpoints";
+import { mapNews } from "../services/newsMapper";
+import AnimateOnScroll from "@/shared/components/AnimateOnScroll.vue";
 
-const route = useRoute()
-const kategoriAktif = ref('Semua')
-const beritaList = ref([])
+const route = useRoute();
+const kategoriAktif = ref("Semua");
+const beritaList = ref([]);
 
 const kategoriList = computed(() => [
-  { label: 'Semua', value: 'Semua' },
-  ...[...new Set(beritaList.value.map(item => item.kategori))].map(kategori => ({ label: kategori, value: kategori }))
-])
+  { label: "Semua", value: "Semua" },
+  ...[...new Set(beritaList.value.map((item) => item.kategori))].map(
+    (kategori) => ({ label: kategori, value: kategori }),
+  ),
+]);
 
 const filteredBerita = computed(() => {
-  let list = beritaList.value
+  let list = beritaList.value;
 
   if (route.query.tag) {
-    const tag = route.query.tag
-    list = list.filter(b => b.tags && b.tags.includes(tag))
+    const tag = route.query.tag;
+    list = list.filter((b) => b.tags && b.tags.includes(tag));
   }
 
-  if (kategoriAktif.value !== 'Semua') {
-    list = list.filter(b => b.kategori === kategoriAktif.value)
+  if (kategoriAktif.value !== "Semua") {
+    list = list.filter((b) => b.kategori === kategoriAktif.value);
   }
 
-  return list
-})
+  return list;
+});
 
 function excerpt(artikel) {
-  const txt = artikel.konten.find(b => b.tipe === 'paragraf')?.teks || ''
-  return txt.length > 120 ? txt.slice(0, 120).trim() + '...' : txt
+  const txt = artikel.konten.find((b) => b.tipe === "paragraf")?.teks || "";
+  return txt.length > 120 ? txt.slice(0, 120).trim() + "..." : txt;
 }
 
 function kategoriColor(kategori) {
-  const colors = ['#1e3a8a', '#0f766e', '#b45309', '#7c3aed', '#be123c']
-  const index = [...(kategori || '')].reduce((sum, letter) => sum + letter.charCodeAt(0), 0) % colors.length
-  return colors[index]
+  const colors = ["#1e3a8a", "#0f766e", "#b45309", "#7c3aed", "#be123c"];
+  const index =
+    [...(kategori || "")].reduce(
+      (sum, letter) => sum + letter.charCodeAt(0),
+      0,
+    ) % colors.length;
+  return colors[index];
 }
 
 async function loadBerita() {
-  const response = await getNews(1, 100)
-  const articles = response.data?.data?.data || response.data?.data || []
-  beritaList.value = articles.map(mapNews)
+  const response = await getNews(1, 100);
+  const articles = response.data?.data?.data || response.data?.data || [];
+  beritaList.value = articles.map(mapNews);
 }
 
 onMounted(async () => {
   try {
-    await loadBerita()
+    await loadBerita();
   } catch {
-    beritaList.value = []
+    beritaList.value = [];
   }
   if (route.query.tag) {
-    kategoriAktif.value = 'Semua'
+    kategoriAktif.value = "Semua";
   }
-})
+});
 
 watch(
   () => route.query.tag,
   () => {
-    kategoriAktif.value = 'Semua'
-  }
-)
+    kategoriAktif.value = "Semua";
+  },
+);
 </script>
 
 <style lang="scss" scoped>
@@ -147,7 +174,7 @@ watch(
 }
 
 .semua-berita-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 800;
   font-size: clamp(1.8rem, 2.8vw, 2.4rem);
   color: #1e293b;
@@ -177,7 +204,10 @@ watch(
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .filter-pill:hover {
@@ -273,7 +303,7 @@ watch(
 }
 
 .semua-berita-name {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 700;
   font-size: 1.15rem;
   color: #1e293b;

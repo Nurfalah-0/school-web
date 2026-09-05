@@ -16,7 +16,9 @@
         </h1>
 
         <p class="ppdb-hero-desc">
-          Bergabunglah dengan komunitas pembelajar inovatif di SMK Nurul Jadid. Kurikulum berbasis industri dan fasilitas modern siap menempa skill profesionalmu.
+          Bergabunglah dengan komunitas pembelajar inovatif di SMK Nurul Jadid.
+          Kurikulum berbasis industri dan fasilitas modern siap menempa skill
+          profesionalmu.
         </p>
 
         <div class="ppdb-hero-chip-row">
@@ -41,8 +43,18 @@
         </div>
 
         <div class="ppdb-hero-actions">
-          <a class="ppdb-btn-primary" href="#pendaftaran" @click.prevent="scrollToSection('#pendaftaran')">Daftar Sekarang</a>
-          <a class="ppdb-btn-secondary" href="#status" @click.prevent="scrollToSection('#status')">Cek Status</a>
+          <a
+            class="ppdb-btn-primary"
+            href="#pendaftaran"
+            @click.prevent="scrollToSection('#pendaftaran')"
+            >Daftar Sekarang</a
+          >
+          <a
+            class="ppdb-btn-secondary"
+            href="#status"
+            @click.prevent="scrollToSection('#status')"
+            >Cek Status</a
+          >
         </div>
       </div>
 
@@ -81,7 +93,12 @@
           </div>
 
           <div class="ppdb-hero-blob">
-            <img :src="heroImg" alt="Siswa SMK Nurul Jadid" class="ppdb-hero-img" />
+            <img
+              :src="heroImg"
+              alt="Siswa SMK Nurul Jadid"
+              class="ppdb-hero-img"
+              crossorigin="anonymous"
+            />
           </div>
         </div>
       </div>
@@ -90,15 +107,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { BookOpen, Users } from 'lucide-vue-next';
-import heroImg from '../../../assets/hero-lab.webp';
+import { ref, onMounted, onUnmounted } from "vue";
+import { BookOpen, Users } from "lucide-vue-next";
+import heroImg from "../../../assets/hero-lab.webp";
 
 const props = defineProps({
   deadline: {
     type: String,
-    default: '2025-03-01T00:00:00'
-  }
+    default: "2025-03-01T00:00:00",
+  },
 });
 
 const countdown = ref({ days: 0, hours: 0, minutes: 0 });
@@ -107,8 +124,8 @@ let timer = null;
 const scrollToSection = (selector) => {
   const el = document.querySelector(selector);
   if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    const input = el.querySelector('input');
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    const input = el.querySelector("input");
     if (input) {
       setTimeout(() => input.focus(), 600);
     }
@@ -140,7 +157,11 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .ppdb-hero {
   background:
-    radial-gradient(circle at top left, rgba(191, 219, 254, 0.8), transparent 28%),
+    radial-gradient(
+      circle at top left,
+      rgba(191, 219, 254, 0.8),
+      transparent 28%
+    ),
     linear-gradient(135deg, #ffffff 0%, #eef4ff 45%, #dfeafc 100%);
   padding: 5rem 0;
   position: relative;
@@ -149,7 +170,7 @@ onUnmounted(() => {
 
 .ppdb-hero::before,
 .ppdb-hero::after {
-  content: '';
+  content: "";
   position: absolute;
   border-radius: 50%;
   filter: blur(18px);
@@ -227,7 +248,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 900;
   font-size: clamp(2.4rem, 3.7vw, 4.2rem);
   line-height: 0.96;
@@ -237,7 +258,7 @@ onUnmounted(() => {
 }
 
 .ppdb-hero-main-text {
-  color: #042D86;
+  color: #042d86;
 }
 
 .ppdb-hero-main-line {
@@ -250,18 +271,18 @@ onUnmounted(() => {
 
 .ppdb-hero-prelude {
   font-size: 0.9em;
-  color: #042D86;
+  color: #042d86;
 }
 
 .ppdb-hero-accent {
   font-style: italic;
-  color: #6B4400;
+  color: #6b4400;
   font-size: 1.02em;
 }
 
 .ppdb-hero-tail {
   font-size: 1em;
-  color: #042D86;
+  color: #042d86;
 }
 
 .ppdb-hero-desc {
@@ -306,7 +327,9 @@ onUnmounted(() => {
   backdrop-filter: blur(12px);
   border-radius: 1rem;
   padding: 1rem 1.15rem;
-  box-shadow: 0 18px 34px rgba(37, 99, 235, 0.09), 0 5px 12px rgba(15, 23, 42, 0.04);
+  box-shadow:
+    0 18px 34px rgba(37, 99, 235, 0.09),
+    0 5px 12px rgba(15, 23, 42, 0.04);
   text-align: center;
   min-width: 5.5rem;
   display: flex;
@@ -315,7 +338,7 @@ onUnmounted(() => {
 }
 
 .ppdb-hero-count-box strong {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 900;
   font-size: 1.8rem;
   color: #0f2c7c;
@@ -349,7 +372,10 @@ onUnmounted(() => {
   font-weight: 800;
   font-size: 1rem;
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
   box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
 }
 
@@ -392,7 +418,11 @@ onUnmounted(() => {
 .ppdb-hero-blob-bg {
   position: absolute;
   inset: 8% 4% 6% 8%;
-  background: linear-gradient(135deg, rgba(191, 219, 254, 0.9), rgba(147, 197, 253, 0.7));
+  background: linear-gradient(
+    135deg,
+    rgba(191, 219, 254, 0.9),
+    rgba(147, 197, 253, 0.7)
+  );
   border-radius: 30% 70% 55% 45% / 40% 34% 66% 60%;
   filter: blur(35px);
   opacity: 0.9;

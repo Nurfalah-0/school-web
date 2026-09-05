@@ -30,6 +30,7 @@
               :src="heroImg"
               alt="Siswa SMK Nurul Jadid"
               loading="lazy"
+              crossorigin="anonymous"
             />
           </div>
 

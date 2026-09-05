@@ -54,9 +54,27 @@
         <div class="demo-info">
           <p><strong>Pilih Akun Demo (Login Cepat):</strong></p>
           <div class="quick-logins">
-            <button type="button" @click="setDemoAccount('superadmin')" class="demo-btn">Superadmin</button>
-            <button type="button" @click="setDemoAccount('admin')" class="demo-btn">Admin Sekolah</button>
-            <button type="button" @click="setDemoAccount('tu')" class="demo-btn">TU Sekolah</button>
+            <button
+              type="button"
+              @click="setDemoAccount('superadmin')"
+              class="demo-btn"
+            >
+              Superadmin
+            </button>
+            <button
+              type="button"
+              @click="setDemoAccount('admin')"
+              class="demo-btn"
+            >
+              Admin Sekolah
+            </button>
+            <button
+              type="button"
+              @click="setDemoAccount('tu')"
+              class="demo-btn"
+            >
+              TU Sekolah
+            </button>
           </div>
         </div>
 
@@ -88,11 +106,11 @@ const isLoading = ref(false);
 const errorMessage = ref("");
 
 const setDemoAccount = (role) => {
-  if (role === 'superadmin') {
+  if (role === "superadmin") {
     email.value = "superadmin@smknuruljadid.sch.id";
-  } else if (role === 'admin') {
+  } else if (role === "admin") {
     email.value = "admin@smknuruljadid.sch.id";
-  } else if (role === 'tu') {
+  } else if (role === "tu") {
     email.value = "tu@smknuruljadid.sch.id";
   }
   password.value = "password123";
@@ -103,7 +121,12 @@ const handleLogin = async () => {
   errorMessage.value = "";
 
   try {
-    // Call backend API
+    // Step 1: Get CSRF cookie from backend
+    await fetch("http://localhost:8000/api/sanctum/csrf-cookie", {
+      credentials: "include",
+    });
+
+    // Step 2: Login with credentials
     const res = await loginUser({
       email: email.value,
       password: password.value,

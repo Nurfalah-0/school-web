@@ -40,6 +40,7 @@ else
 fi
 
 php backend/artisan config:clear
+php backend/artisan storage:link
 
 echo "[5/5] Setup selesai."
 echo
