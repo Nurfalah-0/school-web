@@ -1,23 +1,14 @@
 <template>
   <section class="cta-prestasi">
     <div class="cta-prestasi-inner">
-      <h2 class="cta-prestasi-title">Prestasi Membanggakan</h2>
+      <h2 class="cta-prestasi-title">Terus Berusaha, Prestasi Menggapai Mereka yang Mencintai Proses</h2>
       <p class="cta-prestasi-desc">
-        Berikut adalah pencapaian siswa SMK CareerHub di berbagai bidang. Prestasi ini menjadi bukti komitmen kami dalam mencetak generasi unggul dan berdaya saing global.
+        “Kegagalan adalah kesempatan untuk mulai lagi dengan lebih pintar.” — Jangan pernah berhenti mencoba, karena setiap usaha akan membawamu lebih dekat pada hasil yang membanggakan.
       </p>
-      <div class="cta-prestasi-stats">
-        <div class="cta-stat">
-          <span class="cta-stat-number">50+</span>
-          <span class="cta-stat-label">Prestasi</span>
-        </div>
-        <div class="cta-stat">
-          <span class="cta-stat-number">20+</span>
-          <span class="cta-stat-label">Lomba</span>
-        </div>
-        <div class="cta-stat">
-          <span class="cta-stat-number">15+</span>
-          <span class="cta-stat-label">Medali</span>
-        </div>
+      <div class="cta-prestasi-quotes">
+        <blockquote class="cta-quote">“Senyumlah, karena kamu masih bisa berjuang.”</blockquote>
+        <blockquote class="cta-quote">“Langkah kecil hari ini adalah langkah hebat esok hari.”</blockquote>
+        <blockquote class="cta-quote">“Jangan takut gagal, takutlah untuk tidak mencoba.”</blockquote>
       </div>
     </div>
   </section>
@@ -62,35 +53,26 @@
   max-width: 36rem;
 }
 
-.cta-prestasi-stats {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-  margin-top: 1rem;
-}
-
-.cta-stat {
+.cta-prestasi-quotes {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
+  gap: 1rem;
+  width: 100%;
+  max-width: 36rem;
 }
 
-.cta-stat-number {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-weight: 900;
-  font-size: 2.5rem;
-  color: #fbbf24;
-  line-height: 1;
-}
-
-.cta-stat-label {
-  font-size: 0.9rem;
+.cta-quote {
+  font-style: italic;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 1.05rem;
+  color: #fbbf24;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #fbbf24;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 0.5rem;
+  text-align: left;
+  line-height: 1.6;
 }
 
 @media (max-width: 767px) {
@@ -100,12 +82,8 @@
     border-radius: 1.5rem;
   }
 
-  .cta-prestasi-stats {
-    gap: 1.5rem;
-  }
-
-  .cta-stat-number {
-    font-size: 2rem;
+  .cta-prestasi-quotes {
+    gap: 0.75rem;
   }
 }
 </style>
