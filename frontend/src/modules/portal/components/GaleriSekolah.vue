@@ -13,7 +13,13 @@
           class="galeri-item"
           :class="[item.heightClass]"
         >
-          <img :src="item.src" :alt="item.alt" class="galeri-img" loading="lazy" />
+          <img
+            :src="item.src"
+            :alt="item.alt"
+            class="galeri-img"
+            loading="lazy"
+            crossorigin="anonymous"
+          />
         </div>
       </div>
     </div>
@@ -21,27 +27,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { getPublicContent } from '@/api/endpoints';
-import { mapGallery } from '@/modules/contentMapper';
-import { galeriList } from '@/data/galeri';
+import { ref, computed, onMounted } from "vue";
+import { getPublicContent } from "@/api/endpoints";
+import { mapGallery } from "@/modules/contentMapper";
+import { galeriList } from "@/data/galeri";
 
 defineOptions({
-  name: 'GaleriSekolah'
+  name: "GaleriSekolah",
 });
 
 defineProps({
   title: {
     type: String,
-    default: 'Galeri Sekolah'
-  }
+    default: "Galeri Sekolah",
+  },
 });
 
 const rawGalleries = ref([]);
 
 onMounted(async () => {
   try {
-    const res = await getPublicContent('galleries');
+    const res = await getPublicContent("galleries");
     const data = (res.data?.data || []).map(mapGallery);
     if (data.length > 0) {
       rawGalleries.value = data;
@@ -55,21 +61,22 @@ onMounted(async () => {
 
 const galeri = computed(() => {
   const list = rawGalleries.value;
-  const featured = list.filter(g => g.featured || g.is_featured);
-  const selected = featured.length >= 4 ? featured.slice(0, 4) : list.slice(0, 4);
+  const featured = list.filter((g) => g.featured || g.is_featured);
+  const selected =
+    featured.length >= 4 ? featured.slice(0, 4) : list.slice(0, 4);
 
   const heightMap = [
-    'item-height-1',
-    'item-height-2',
-    'item-height-3',
-    'item-height-4'
+    "item-height-1",
+    "item-height-2",
+    "item-height-3",
+    "item-height-4",
   ];
 
   return selected.map((item, idx) => ({
     id: item.id || idx,
     src: item.gambar || item.src,
-    alt: item.judul || item.title || 'Galeri SMK',
-    heightClass: heightMap[idx] || 'item-height-1'
+    alt: item.judul || item.title || "Galeri SMK",
+    heightClass: heightMap[idx] || "item-height-1",
   }));
 });
 </script>
@@ -100,7 +107,7 @@ const galeri = computed(() => {
 }
 
 .galeri-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 900;
   font-size: clamp(1.9rem, 4vw, 3rem);
   color: #0f172a;
@@ -157,7 +164,9 @@ const galeri = computed(() => {
   border-radius: 2rem;
   background: #f8fafc;
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-  transition: opacity 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    box-shadow 0.3s ease;
   position: relative;
 }
 
@@ -190,10 +199,14 @@ const galeri = computed(() => {
 }
 
 .galeri-item::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.2), rgba(21, 21, 48, 0.08));
+  background: linear-gradient(
+    180deg,
+    rgba(248, 250, 252, 0.2),
+    rgba(21, 21, 48, 0.08)
+  );
   opacity: 0.4;
   pointer-events: none;
 }

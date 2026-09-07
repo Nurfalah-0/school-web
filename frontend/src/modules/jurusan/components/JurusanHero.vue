@@ -11,13 +11,21 @@
         </h1>
         <p class="jurusan-hero-desc">{{ jurusan.deskripsi }}</p>
         <div class="jurusan-hero-actions">
-          <router-link to="/ppdb" class="jurusan-btn-primary">Daftar Sekarang</router-link>
+          <router-link to="/ppdb" class="jurusan-btn-primary"
+            >Daftar Sekarang</router-link
+          >
           <a href="#kurikulum" class="jurusan-btn-secondary">Lihat Silabus</a>
         </div>
       </div>
       <div class="jurusan-hero-visual">
         <div class="jurusan-hero-img-wrap">
-          <img :src="jurusan.gambarHero" :alt="jurusan.nama" class="jurusan-hero-img" loading="eager" />
+          <img
+            :src="jurusan.gambarHero"
+            :alt="jurusan.nama"
+            class="jurusan-hero-img"
+            loading="eager"
+            crossorigin="anonymous"
+          />
         </div>
       </div>
     </div>
@@ -25,20 +33,25 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { CodeXml } from 'lucide-vue-next'
+import { computed } from "vue";
+import { CodeXml } from "lucide-vue-next";
 
 const props = defineProps({
   jurusan: {
     type: Object,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 </script>
 
 <style lang="scss" scoped>
 .jurusan-hero {
-  background: linear-gradient(135deg, #ffffff 0%, #eef2ff 60%, rgba(232, 230, 247, 0.4) 100%);
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #eef2ff 60%,
+    rgba(232, 230, 247, 0.4) 100%
+  );
   border-radius: 1.75rem;
   padding: 2.5rem;
 }
@@ -84,7 +97,7 @@ const props = defineProps({
 }
 
 .jurusan-hero-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 800;
   font-size: clamp(1.75rem, 2.5vw, 2.25rem);
   line-height: 1.15;
@@ -119,7 +132,9 @@ const props = defineProps({
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .jurusan-btn-primary:hover {
@@ -156,7 +171,9 @@ const props = defineProps({
   min-height: 420px;
   border-radius: 1.25rem;
   overflow: hidden;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.7);
 }
 
 .jurusan-hero-img {

@@ -12,8 +12,17 @@
         class="berita-lainnya-card"
       >
         <div class="berita-lainnya-img-wrap">
-          <img :src="item.gambarUtama" :alt="item.judul" class="berita-lainnya-img" loading="lazy" />
-          <span class="berita-lainnya-badge" :style="{ background: kategoriColor(item.kategori) }">
+          <img
+            :src="item.gambarUtama"
+            :alt="item.judul"
+            class="berita-lainnya-img"
+            loading="lazy"
+            crossorigin="anonymous"
+          />
+          <span
+            class="berita-lainnya-badge"
+            :style="{ background: kategoriColor(item.kategori) }"
+          >
             {{ item.kategori }}
           </span>
         </div>
@@ -30,19 +39,23 @@
 </template>
 
 <script setup>
-import { Calendar } from 'lucide-vue-next'
+import { Calendar } from "lucide-vue-next";
 
 defineProps({
   items: {
     type: Array,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
 function kategoriColor(kategori) {
-  const colors = ['#1e3a8a', '#0f766e', '#b45309', '#7c3aed', '#be123c']
-  const index = [...(kategori || '')].reduce((sum, letter) => sum + letter.charCodeAt(0), 0) % colors.length
-  return colors[index]
+  const colors = ["#1e3a8a", "#0f766e", "#b45309", "#7c3aed", "#be123c"];
+  const index =
+    [...(kategori || "")].reduce(
+      (sum, letter) => sum + letter.charCodeAt(0),
+      0,
+    ) % colors.length;
+  return colors[index];
 }
 </script>
 
@@ -76,7 +89,7 @@ function kategoriColor(kategori) {
 }
 
 .berita-lainnya-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 700;
   font-size: 1.25rem;
   color: #0f172a;
@@ -135,7 +148,7 @@ function kategoriColor(kategori) {
 }
 
 .berita-lainnya-name {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 700;
   font-size: 1rem;
   color: #0f172a;

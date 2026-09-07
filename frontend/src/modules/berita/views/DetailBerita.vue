@@ -7,7 +7,12 @@
           <ArtikelHeader :artikel="artikelAktif" />
           <AnimateOnScroll animation="scaleIn" :delay="100">
             <div class="detail-berita-img-wrap">
-              <img :src="artikelAktif.gambarUtama" :alt="artikelAktif.judul" class="detail-berita-img" />
+              <img
+                :src="artikelAktif.gambarUtama"
+                :alt="artikelAktif.judul"
+                class="detail-berita-img"
+                crossorigin="anonymous"
+              />
             </div>
           </AnimateOnScroll>
           <AnimateOnScroll animation="fadeInUp" :delay="200">
@@ -32,79 +37,96 @@
 
     <div v-if="!artikelAktif" class="detail-berita-empty">
       <p class="detail-berita-empty-text">Artikel tidak ditemukan.</p>
-      <router-link to="/berita" class="detail-berita-back">Kembali ke Semua Berita</router-link>
+      <router-link to="/berita" class="detail-berita-back"
+        >Kembali ke Semua Berita</router-link
+      >
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, watch, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
-import { getNews, getNewsDetail } from '@/api/endpoints'
-import { mapNews } from '../services/newsMapper'
-import Breadcrumb from '../components/Breadcrumb.vue'
-import ArtikelHeader from '../components/ArtikelHeader.vue'
-import KontenArtikel from '../components/KontenArtikel.vue'
-import TagsShareBar from '../components/TagsShareBar.vue'
-import BeritaLainnya from '../components/BeritaLainnya.vue'
-import CtaPpdb from '../components/CtaPpdb.vue'
-import FooterSection from '../../portal/components/FooterSection.vue'
-import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
+import { computed, ref, watch, watchEffect } from "vue";
+import { useRoute } from "vue-router";
+import { getNews, getNewsDetail } from "@/api/endpoints";
+import { mapNews } from "../services/newsMapper";
+import Breadcrumb from "../components/Breadcrumb.vue";
+import ArtikelHeader from "../components/ArtikelHeader.vue";
+import KontenArtikel from "../components/KontenArtikel.vue";
+import TagsShareBar from "../components/TagsShareBar.vue";
+import BeritaLainnya from "../components/BeritaLainnya.vue";
+import CtaPpdb from "../components/CtaPpdb.vue";
+import FooterSection from "../../portal/components/FooterSection.vue";
+import AnimateOnScroll from "@/shared/components/AnimateOnScroll.vue";
 
-const route = useRoute()
+const route = useRoute();
 
-const artikelAktif = ref(null)
-const beritaLainnya = ref([])
+const artikelAktif = ref(null);
+const beritaLainnya = ref([]);
 
 const breadcrumbItems = computed(() => [
-  { label: 'Beranda', to: '/' },
-  { label: 'Berita', to: '/berita' },
-  { label: artikelAktif.value?.judul || 'Detail Berita' }
-])
+  { label: "Beranda", to: "/" },
+  { label: "Berita", to: "/berita" },
+  { label: artikelAktif.value?.judul || "Detail Berita" },
+]);
 
 async function loadArticle(slug) {
-  artikelAktif.value = null
+  artikelAktif.value = null;
   try {
-    const [detailResponse, listResponse] = await Promise.allSettled([getNewsDetail(slug), getNews(1, 12)])
-    
-    if (detailResponse.status === 'fulfilled' && (detailResponse.value?.data?.data || detailResponse.value?.data)) {
-      artikelAktif.value = mapNews(detailResponse.value.data?.data || detailResponse.value.data)
+    const [detailResponse, listResponse] = await Promise.allSettled([
+      getNewsDetail(slug),
+      getNews(1, 12),
+    ]);
+
+    if (
+      detailResponse.status === "fulfilled" &&
+      (detailResponse.value?.data?.data || detailResponse.value?.data)
+    ) {
+      artikelAktif.value = mapNews(
+        detailResponse.value.data?.data || detailResponse.value.data,
+      );
     }
 
-    const articles = listResponse.status === 'fulfilled' ? (listResponse.value.data?.data?.data || listResponse.value.data?.data || []) : []
-    
+    const articles =
+      listResponse.status === "fulfilled"
+        ? listResponse.value.data?.data?.data ||
+          listResponse.value.data?.data ||
+          []
+        : [];
+
     // If detail failed, check if article is in list
     if (!artikelAktif.value && articles.length) {
-      const match = articles.find(a => String(a.slug || a.id) === String(slug))
+      const match = articles.find(
+        (a) => String(a.slug || a.id) === String(slug),
+      );
       if (match) {
-        artikelAktif.value = mapNews(match)
+        artikelAktif.value = mapNews(match);
       }
     }
-    
+
     beritaLainnya.value = articles
-      .filter(item => String(item.slug || item.id) !== String(slug))
+      .filter((item) => String(item.slug || item.id) !== String(slug))
       .slice(0, 3)
-      .map(mapNews)
+      .map(mapNews);
   } catch (e) {
-    artikelAktif.value = null
-    beritaLainnya.value = []
+    artikelAktif.value = null;
+    beritaLainnya.value = [];
   }
 }
 
 watch(
   () => route.params.slug,
   (slug) => {
-    loadArticle(slug)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    loadArticle(slug);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
 watchEffect(() => {
   document.title = artikelAktif.value
     ? `${artikelAktif.value.judul} - SMK Nurul Jadid`
-    : 'Berita - SMK Nurul Jadid'
-})
+    : "Berita - SMK Nurul Jadid";
+});
 </script>
 
 <style lang="scss" scoped>

@@ -18,10 +18,10 @@ class NewsController extends Controller
             $query = DB::table('news')->where('published', true);
 
             if ($request->has('search')) {
-                $search = $request->search;
+                $search = $request->input('search');
                 $query->where(function ($q) use ($search) {
-                    $q->where('title', 'like', "%$search%")
-                        ->orWhere('content', 'like', "%$search%");
+                    $q->where('title', 'like', '%' . $search . '%')
+                        ->orWhere('content', 'like', '%' . $search . '%');
                 });
             }
 

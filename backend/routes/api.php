@@ -15,6 +15,13 @@ use App\Http\Controllers\Api\PpdbController;
 use App\Http\Controllers\Api\CategoryController;
 
 // =============================================
+//  CSRF TOKEN — untuk SPA
+// =============================================
+Route::get('/sanctum/csrf-cookie', function () {
+    return response()->json(['success' => true]);
+})->middleware('web');
+
+// =============================================
 //  AUTH — Publik
 // =============================================
 Route::prefix('auth')->group(function () {

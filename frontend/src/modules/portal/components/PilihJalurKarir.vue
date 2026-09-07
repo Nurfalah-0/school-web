@@ -6,24 +6,40 @@
           <span class="pilih-jalur-label">{{ label }}</span>
           <h2 class="pilih-jalur-title">{{ title }}</h2>
         </div>
-        <router-link to="/jurusan" class="pilih-jalur-btn">{{ seeAllText }}</router-link>
+        <router-link to="/jurusan" class="pilih-jalur-btn">{{
+          seeAllText
+        }}</router-link>
       </div>
 
       <div class="pilih-jalur-grid">
         <div v-for="card in programs" :key="card.slug" class="pilih-jalur-card">
           <div class="pilih-jalur-img-wrap">
-            <img :src="card.gambarHero" :alt="`Siswa praktik jurusan ${card.nama}`" class="pilih-jalur-img" loading="lazy" />
+            <img
+              :src="card.gambarHero"
+              :alt="`Siswa praktik jurusan ${card.nama}`"
+              class="pilih-jalur-img"
+              loading="lazy"
+              crossorigin="anonymous"
+            />
             <span class="pilih-jalur-badge">{{ card.kategori }}</span>
           </div>
           <div class="pilih-jalur-body">
             <div class="pilih-jalur-card-header">
               <span class="pilih-jalur-icon">
-                <component :is="iconMap[card.icon]" :size="20" color="#042d86" />
+                <component
+                  :is="iconMap[card.icon]"
+                  :size="20"
+                  color="#042d86"
+                />
               </span>
               <h3 class="pilih-jalur-name">{{ card.nama }}</h3>
             </div>
             <p class="pilih-jalur-text">{{ card.deskripsi }}</p>
-            <router-link :to="`/jurusan/${card.slug}`" class="pilih-jalur-detail">Detail Jurusan</router-link>
+            <router-link
+              :to="`/jurusan/${card.slug}`"
+              class="pilih-jalur-detail"
+              >Detail Jurusan</router-link
+            >
           </div>
         </div>
       </div>
@@ -32,39 +48,45 @@
 </template>
 
 <script setup>
-import { CodeXml, Briefcase, Network, Palette, Calculator } from 'lucide-vue-next'
-import { jurusanList } from '@/data/jurusan'
+import {
+  CodeXml,
+  Briefcase,
+  Network,
+  Palette,
+  Calculator,
+} from "lucide-vue-next";
+import { jurusanList } from "@/data/jurusan";
 
 const iconMap = {
   CodeXml,
   Briefcase,
   Network,
   Palette,
-  Calculator
-}
+  Calculator,
+};
 
 defineProps({
   label: {
     type: String,
-    default: 'PROGRAM KEAHLIAN'
+    default: "PROGRAM KEAHLIAN",
   },
   title: {
     type: String,
-    default: 'Pilih Jalur Karirmu'
+    default: "Pilih Jalur Karirmu",
   },
   seeAllText: {
     type: String,
-    default: 'Lihat Semua Jurusan'
+    default: "Lihat Semua Jurusan",
   },
   programs: {
     type: Array,
-    default: () => jurusanList.slice(0, 3)
-  }
-})
+    default: () => jurusanList.slice(0, 3),
+  },
+});
 </script>
 
 <style lang="scss" scoped>
-@use '../../../assets/styles/variables' as *;
+@use "../../../assets/styles/variables" as *;
 
 .pilih-jalur {
   background: #ffffff;
@@ -231,7 +253,9 @@ defineProps({
   font-size: 0.9rem;
   text-decoration: none;
   margin-top: auto;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .pilih-jalur-detail:hover {

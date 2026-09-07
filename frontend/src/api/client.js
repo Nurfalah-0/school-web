@@ -7,7 +7,8 @@ const client = axios.create({
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
-  }
+  },
+  withCredentials: true, // Allow credentials (cookies)
 });
 
 // Helper for global API notifications
@@ -80,12 +81,16 @@ client.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('auth_token');
-      sessionStorage.removeItem('auth_token');
-      localStorage.removeItem('user_info');
-      localStorage.removeItem('admin_token');
-      if (window.location.pathname.startsWith('/admin')) {
-        window.location.href = '/login';
+      // Prevent infinite redirect loop
+      if (window.location.pathname !== '/login') {
+        localStorage.removeItem('auth_token');
+        sessionStorage.removeItem('auth_token');
+        localStorage.removeItem('user_info');
+        localStorage.removeItem('admin_token');
+        
+        if (window.location.pathname.startsWith('/admin')) {
+          window.location.href = '/login';
+        }
       }
     } else if (error.response?.status >= 500) {
       showNotification('Terjadi masalah pada server. Sedang dalam perbaikan.');

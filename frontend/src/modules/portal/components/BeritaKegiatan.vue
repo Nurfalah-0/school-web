@@ -21,6 +21,7 @@
                 :alt="beritaUtama.judul"
                 class="berita-featured-img"
                 loading="lazy"
+                crossorigin="anonymous"
               />
               <span class="berita-featured-badge">UTAMA</span>
             </div>
@@ -47,6 +48,7 @@
                 :alt="item.judul"
                 class="berita-list-img"
                 loading="lazy"
+                crossorigin="anonymous"
               />
             </div>
             <div class="berita-list-body">

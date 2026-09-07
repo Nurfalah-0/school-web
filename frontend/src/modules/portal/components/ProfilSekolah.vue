@@ -9,6 +9,7 @@
             alt="Foto gedung SMK Nurul Jadid"
             class="profil-building-img"
             loading="lazy"
+            crossorigin="anonymous"
           />
         </div>
 
@@ -20,6 +21,7 @@
               alt="Siswa sedang praktik di lab komputer"
               class="profil-lab-img"
               loading="lazy"
+              crossorigin="anonymous"
             />
           </div>
           <div class="profil-highlight-card">

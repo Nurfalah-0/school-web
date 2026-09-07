@@ -5,24 +5,44 @@
         <div class="semua-jurusan-header">
           <span class="semua-jurusan-label">PROGRAM KEAHLIAN</span>
           <h1 class="semua-jurusan-title">Semua Jurusan</h1>
-          <p class="semua-jurusan-desc">Pilih program keahlian yang sesuai dengan passion dan tujuan karirmu.</p>
+          <p class="semua-jurusan-desc">
+            Pilih program keahlian yang sesuai dengan passion dan tujuan
+            karirmu.
+          </p>
         </div>
         <AnimateOnScroll animation="fadeInUp" :delay="100">
           <div class="semua-jurusan-grid">
-            <div v-for="item in jurusanList" :key="item.slug" class="semua-jurusan-card">
+            <div
+              v-for="item in jurusanList"
+              :key="item.slug"
+              class="semua-jurusan-card"
+            >
               <div class="semua-jurusan-img-wrap">
-                <img :src="item.gambarHero" :alt="item.nama" class="semua-jurusan-img" loading="lazy" />
+                <img
+                  :src="item.gambarHero"
+                  :alt="item.nama"
+                  class="semua-jurusan-img"
+                  loading="lazy"
+                  crossorigin="anonymous"
+                />
                 <span class="semua-jurusan-badge">{{ item.kategori }}</span>
               </div>
               <div class="semua-jurusan-body">
                 <div class="semua-jurusan-card-header">
                   <span class="semua-jurusan-icon">
-                    <component :is="iconMap[item.icon]" :size="20" color="#042d86" />
+                    <component
+                      :is="iconMap[item.icon]"
+                      :size="20"
+                      color="#042d86"
+                    />
                   </span>
                   <h3 class="semua-jurusan-name">{{ item.nama }}</h3>
                 </div>
                 <p class="semua-jurusan-text">{{ item.deskripsi }}</p>
-                <router-link :to="`/jurusan/${item.slug}`" class="semua-jurusan-detail">
+                <router-link
+                  :to="`/jurusan/${item.slug}`"
+                  class="semua-jurusan-detail"
+                >
                   Detail Jurusan
                 </router-link>
               </div>
@@ -35,34 +55,53 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { CodeXml, Briefcase, Network, Palette, Calculator } from 'lucide-vue-next'
-import { getMajors } from '@/api/endpoints'
-import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
+import { computed, onMounted, ref } from "vue";
+import {
+  CodeXml,
+  Briefcase,
+  Network,
+  Palette,
+  Calculator,
+} from "lucide-vue-next";
+import { getMajors } from "@/api/endpoints";
+import AnimateOnScroll from "@/shared/components/AnimateOnScroll.vue";
 
 const iconMap = {
   CodeXml,
   Briefcase,
   Network,
   Palette,
-  Calculator
-}
-const jurusanList = ref([])
+  Calculator,
+};
+const jurusanList = ref([]);
 onMounted(async () => {
   try {
-    const response = await getMajors()
-    const items = response.data?.data || []
+    const response = await getMajors();
+    const items = response.data?.data || [];
     if (items.length > 0) {
-      jurusanList.value = items.map(item => ({ ...item, slug: item.slug, nama: item.name, kategori: item.code, deskripsi: item.description || 'Program keahlian SMK Nurul Jadid.', gambarHero: item.image || 'https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian', icon: 'CodeXml' }))
+      jurusanList.value = items.map((item) => ({
+        ...item,
+        slug: item.slug,
+        nama: item.name,
+        kategori: item.code,
+        deskripsi: item.description || "Program keahlian SMK Nurul Jadid.",
+        gambarHero:
+          item.image ||
+          "https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian",
+        icon: "CodeXml",
+      }));
     }
   } catch (err) {
-    console.warn('Gagal memuat jurusan dari API, menggunakan data default:', err)
+    console.warn(
+      "Gagal memuat jurusan dari API, menggunakan data default:",
+      err,
+    );
   }
-})
+});
 </script>
 
 <style lang="scss" scoped>
-@use '../../../assets/styles/variables' as *;
+@use "../../../assets/styles/variables" as *;
 
 .semua-jurusan-page {
   min-height: 100vh;
@@ -90,7 +129,7 @@ onMounted(async () => {
 }
 
 .semua-jurusan-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 800;
   font-size: clamp(1.8rem, 2.8vw, 2.4rem);
   color: #0f172a;
@@ -191,7 +230,7 @@ onMounted(async () => {
 }
 
 .semua-jurusan-name {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.15rem;
   color: #0f172a;
@@ -218,7 +257,9 @@ onMounted(async () => {
   font-size: 0.9rem;
   text-decoration: none;
   margin-top: auto;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .semua-jurusan-detail:hover {
