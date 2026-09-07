@@ -61,15 +61,6 @@
             </div>
           </div>
 
-          <div class="ppdb-hero-card">
-            <img
-              class="ppdb-hero-image"
-              :src="heroImg"
-              alt="Siswa Vokasi SMK"
-              loading="lazy"
-            />
-          </div>
-
           <div class="ppdb-hero-float-card ppdb-hero-float-card-bottom">
             <div class="ppdb-float-icon-wrap ppdb-float-icon-wrap-alt">
               <Users class="ppdb-float-icon" />
