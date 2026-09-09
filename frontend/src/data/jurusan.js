@@ -1,5 +1,81 @@
 export const jurusanList = [
   {
+    slug: 'teknik-kendaraan-ringan-otomotif',
+    kategori: 'Teknik Otomotif',
+    nama: 'Teknik Kendaraan Ringan Otomotif (TKRO)',
+    deskripsi: 'Mempelajari perawatan dan perbaikan kendaraan ringan dengan praktik langsung menggunakan peralatan otomotif sesuai standar industri.',
+    gambarHero: 'https://images.unsplash.com/photo-1487754180451-c456f62b519a?w=1200&q=80',
+    icon: 'Briefcase',
+    iconBg: '#b45309',
+    keunggulan: [
+      { icon: 'Rocket', judul: 'Praktik Bengkel Intensif', deskripsi: 'Siswa berlatih mendiagnosis, merawat, dan memperbaiki kendaraan ringan melalui praktik bengkel yang terarah.' },
+      { icon: 'Handshake', judul: 'Mitra Industri Otomotif', deskripsi: 'Pembelajaran didukung kemitraan dengan bengkel dan perusahaan otomotif untuk pengalaman kerja yang relevan.' },
+      { icon: 'Award', judul: 'Sertifikasi Kompetensi', deskripsi: 'Mempersiapkan siswa mengikuti uji kompetensi dan sertifikasi di bidang teknik kendaraan ringan.' }
+    ],
+    kurikulum: [
+      { kelas: 'Kelas 10: Dasar Otomotif', warna: 'navy', deskripsi: 'Pengenalan keselamatan kerja, alat ukur, komponen kendaraan, dan dasar perawatan mesin kendaraan ringan.', tags: ['K3', 'Alat Ukur', 'Dasar Mesin'] },
+      { kelas: 'Kelas 11: Perawatan Kendaraan', warna: 'teal', deskripsi: 'Perawatan sistem mesin, pemindah tenaga, kelistrikan, dan sistem chassis kendaraan ringan.', tags: ['Mesin', 'Kelistrikan', 'Chassis'] },
+      { kelas: 'Kelas 12: Spesialisasi & PKL', warna: 'gold', deskripsi: 'Diagnosis kerusakan, perbaikan kendaraan, persiapan uji kompetensi, dan Praktik Kerja Lapangan di industri otomotif.', tags: ['Diagnosis', 'Perbaikan', 'PKL'] }
+    ]
+  },
+  {
+    slug: 'rekayasa-perangkat-lunak',
+    kategori: 'Teknologi Informasi',
+    nama: 'Rekayasa Perangkat Lunak (RPL)',
+    deskripsi: 'Mempelajari pengembangan perangkat lunak dan aplikasi melalui perancangan, pemrograman, pengujian, serta pengelolaan database.',
+    gambarHero: 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=1200&q=80',
+    icon: 'CodeXml',
+    iconBg: '#1e3a5f',
+    keunggulan: [
+      { icon: 'Rocket', judul: 'Project-Based Learning', deskripsi: 'Siswa mengerjakan proyek aplikasi nyata untuk membangun portofolio sejak kelas 10.' },
+      { icon: 'Handshake', judul: 'Mitra Industri Teknologi', deskripsi: 'Bekerja sama dengan startup dan software house untuk pengalaman PKL dan kerja.' },
+      { icon: 'Award', judul: 'Sertifikasi Kompetensi', deskripsi: 'Mempersiapkan siswa mengikuti sertifikasi dan uji kompetensi bidang perangkat lunak.' }
+    ],
+    kurikulum: [
+      { kelas: 'Kelas 10: Dasar Pemrograman', warna: 'navy', deskripsi: 'Logika pemrograman, algoritma, desain antarmuka, dan pembuatan website sederhana.', tags: ['HTML/CSS', 'Algoritma', 'UI/UX'] },
+      { kelas: 'Kelas 11: Pengembangan Aplikasi', warna: 'teal', deskripsi: 'Pengembangan aplikasi web, mobile, database, dan integrasi frontend dengan backend.', tags: ['JavaScript', 'Database', 'Framework'] },
+      { kelas: 'Kelas 12: Spesialisasi & PKL', warna: 'gold', deskripsi: 'Pengembangan proyek akhir, pengujian aplikasi, dan Praktik Kerja Lapangan di industri teknologi.', tags: ['API', 'Testing', 'PKL'] }
+    ]
+  },
+  {
+    slug: 'teknik-bisnis-sepeda-motor',
+    kategori: 'Teknik Otomotif',
+    nama: 'Teknik Bisnis Sepeda Motor (TBSM)',
+    deskripsi: 'Mempelajari perawatan, perbaikan, dan pengelolaan bisnis sepeda motor sesuai kebutuhan industri otomotif modern.',
+    gambarHero: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1200&q=80',
+    icon: 'Briefcase',
+    iconBg: '#b45309',
+    keunggulan: [
+      { icon: 'Rocket', judul: 'Praktik Bengkel Motor', deskripsi: 'Siswa berlatih melakukan servis dan perbaikan sepeda motor dengan prosedur kerja yang benar.' },
+      { icon: 'Handshake', judul: 'Kemitraan Dunia Kerja', deskripsi: 'Pembelajaran terhubung dengan bengkel dan jaringan industri sepeda motor.' },
+      { icon: 'Award', judul: 'Kompetensi Otomotif', deskripsi: 'Mempersiapkan siswa untuk uji kompetensi dan karir teknisi sepeda motor.' }
+    ],
+    kurikulum: [
+      { kelas: 'Kelas 10: Dasar Sepeda Motor', warna: 'navy', deskripsi: 'Keselamatan kerja, alat ukur, komponen, dan prinsip kerja mesin sepeda motor.', tags: ['K3', 'Alat Ukur', 'Mesin'] },
+      { kelas: 'Kelas 11: Perawatan dan Perbaikan', warna: 'teal', deskripsi: 'Perawatan mesin, kelistrikan, chassis, dan sistem bahan bakar sepeda motor.', tags: ['Servis', 'Kelistrikan', 'Chassis'] },
+      { kelas: 'Kelas 12: Spesialisasi & PKL', warna: 'gold', deskripsi: 'Diagnosis kerusakan, manajemen bengkel, dan Praktik Kerja Lapangan di industri otomotif.', tags: ['Diagnosis', 'Bisnis Bengkel', 'PKL'] }
+    ]
+  },
+  {
+    slug: 'akuntansi-dan-keuangan-lembaga',
+    kategori: 'Bisnis & Keuangan',
+    nama: 'Akuntansi dan Keuangan Lembaga (AKL)',
+    deskripsi: 'Mempelajari pencatatan, pengelolaan, dan analisis keuangan untuk kebutuhan perusahaan, perbankan, dan lembaga keuangan.',
+    gambarHero: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=1200&q=80',
+    icon: 'Calculator',
+    iconBg: '#7c3aed',
+    keunggulan: [
+      { icon: 'Rocket', judul: 'Praktik Akuntansi', deskripsi: 'Pembelajaran menggunakan studi kasus dan simulasi transaksi keuangan perusahaan.' },
+      { icon: 'Handshake', judul: 'Kemitraan Perbankan', deskripsi: 'Mengenal proses kerja lembaga keuangan melalui kerja sama dan pengalaman industri.' },
+      { icon: 'Award', judul: 'Sertifikasi Akuntansi', deskripsi: 'Mempersiapkan siswa mengikuti uji kompetensi akuntansi dan perpajakan.' }
+    ],
+    kurikulum: [
+      { kelas: 'Kelas 10: Dasar Akuntansi', warna: 'navy', deskripsi: 'Persamaan akuntansi, pencatatan transaksi, dan penyusunan laporan keuangan sederhana.', tags: ['Akuntansi Dasar', 'Matematika', 'Excel'] },
+      { kelas: 'Kelas 11: Akuntansi Perusahaan', warna: 'teal', deskripsi: 'Akuntansi perusahaan dagang, jasa, manufaktur, serta pengenalan perpajakan.', tags: ['Buku Besar', 'Laporan Keuangan', 'Pajak'] },
+      { kelas: 'Kelas 12: Spesialisasi & PKL', warna: 'gold', deskripsi: 'Auditing, aplikasi akuntansi, persiapan uji kompetensi, dan Praktik Kerja Lapangan.', tags: ['Audit', 'Aplikasi Akuntansi', 'PKL'] }
+    ]
+  },
+  {
     slug: 'pplg',
     kategori: 'Teknologi Informasi',
     nama: 'Pengembangan Perangkat Lunak & Gim (PPLG)',

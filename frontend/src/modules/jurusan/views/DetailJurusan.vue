@@ -20,7 +20,10 @@
       <FooterSection />
     </AnimateOnScroll>
 
-    <div v-if="!jurusanAktif" class="detail-jurusan-empty">
+    <div v-if="isLoading" class="detail-jurusan-empty">
+      <p>Memuat data jurusan...</p>
+    </div>
+    <div v-else-if="!jurusanAktif" class="detail-jurusan-empty">
       <h1>Jurusan tidak ditemukan</h1>
       <router-link to="/jurusan" class="detail-jurusan-back">Kembali ke Semua Jurusan</router-link>
     </div>
@@ -28,9 +31,9 @@
 </template>
 
 <script setup>
-import { computed, watch, onMounted } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { getJurusanBySlug, getJurusanLainnya } from '@/data/jurusan'
+import { getMajors } from '@/api/endpoints'
 import JurusanHero from '../components/JurusanHero.vue'
 import KeunggulanProgram from '../components/KeunggulanProgram.vue'
 import SidebarJurusan from '../components/SidebarJurusan.vue'
@@ -39,14 +42,77 @@ import FooterSection from '../../portal/components/FooterSection.vue'
 import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const route = useRoute()
+const apiMajors = ref([])
+const isLoading = ref(true)
 
-const jurusanAktif = computed(() => getJurusanBySlug(route.params.slug))
-const jurusanLainnya = computed(() => getJurusanLainnya(route.params.slug))
+function textValue(value, fallback) {
+  if (Array.isArray(value)) return value.join(', ')
+  if (typeof value === 'string' && value.trim()) {
+    try {
+      const parsed = JSON.parse(value)
+      if (Array.isArray(parsed)) return parsed.join(', ')
+    } catch {
+      return value
+    }
+    return value
+  }
+  return fallback
+}
+
+function mapMajor(item) {
+  const description = textValue(item.description, `Program keahlian ${item.name}.`)
+  const vision = textValue(item.vision, description)
+  const mission = textValue(item.mission, description)
+  const facilities = textValue(item.facilities, `Fasilitas pembelajaran ${item.name}.`)
+  const iconByCode = {
+    RPL: 'CodeXml',
+    TKRO: 'Briefcase',
+    TBSM: 'Briefcase',
+    AKL: 'Calculator',
+    TJKT: 'Network',
+    DKV: 'Palette'
+  }
+
+  return {
+    ...item,
+    slug: item.slug,
+    kategori: item.code || 'Program Keahlian',
+    nama: item.name,
+    deskripsi: description,
+    gambarHero: item.image || `https://placehold.co/1200x800/e2e8f0/475569?text=${encodeURIComponent(item.name)}`,
+    icon: iconByCode[item.code] || 'Briefcase',
+    iconBg: '#1e3a5f',
+    keunggulan: [
+      { icon: 'Rocket', judul: 'Profil Program', deskripsi: description },
+      { icon: 'Handshake', judul: 'Visi Program', deskripsi: vision },
+      { icon: 'Award', judul: 'Fasilitas Program', deskripsi: facilities }
+    ],
+    kurikulum: [
+      { kelas: 'Kelas 10: Dasar Program', warna: 'navy', deskripsi: description, tags: [item.code || 'Dasar Keahlian'] },
+      { kelas: 'Kelas 11: Pengembangan Kompetensi', warna: 'teal', deskripsi: vision, tags: ['Kompetensi', item.code || 'Program Keahlian'] },
+      { kelas: 'Kelas 12: Spesialisasi & PKL', warna: 'gold', deskripsi: mission, tags: ['Spesialisasi', 'PKL'] }
+    ]
+  }
+}
+
+onMounted(async () => {
+  try {
+    const response = await getMajors()
+    apiMajors.value = (response.data?.data || []).map(mapMajor)
+  } catch (error) {
+    apiMajors.value = []
+  } finally {
+    isLoading.value = false
+  }
+})
+
+const jurusanAktif = computed(() => apiMajors.value.find((item) => item.slug === route.params.slug))
+const jurusanLainnya = computed(() => apiMajors.value.filter((item) => item.slug !== route.params.slug))
 
 watch(
-  () => route.params.slug,
-  (slug) => {
-    const jurusan = getJurusanBySlug(slug)
+  [() => route.params.slug, apiMajors],
+  ([slug]) => {
+    const jurusan = apiMajors.value.find((item) => item.slug === slug)
     if (jurusan) {
       document.title = `${jurusan.nama} - SMK Nurul Jadid`
     } else {
