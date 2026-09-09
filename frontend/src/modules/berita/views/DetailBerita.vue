@@ -11,7 +11,7 @@
                 :src="artikelAktif.gambarUtama"
                 :alt="artikelAktif.judul"
                 class="detail-berita-img"
-                crossorigin="anonymous"
+                @error="artikelAktif.gambarUtama = 'https://placehold.co/1200x700/e2e8f0/475569?text=Berita'"
               />
             </div>
           </AnimateOnScroll>

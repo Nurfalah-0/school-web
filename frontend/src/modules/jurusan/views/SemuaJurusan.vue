@@ -23,7 +23,6 @@
                   :alt="item.nama"
                   class="semua-jurusan-img"
                   loading="lazy"
-                  crossorigin="anonymous"
                 />
                 <span class="semua-jurusan-badge">{{ item.kategori }}</span>
               </div>
@@ -64,6 +63,7 @@ import {
   Calculator,
 } from "lucide-vue-next";
 import { getMajors } from "@/api/endpoints";
+import { jurusanList as fallbackJurusanList } from "@/data/jurusan";
 import AnimateOnScroll from "@/shared/components/AnimateOnScroll.vue";
 
 const iconMap = {
@@ -73,30 +73,49 @@ const iconMap = {
   Palette,
   Calculator,
 };
+const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:8000/api").replace(/\/api\/?$/, "");
+
+const normalizeImageUrl = (value) => {
+  if (!value) return "";
+  if (value.startsWith("http://") || value.startsWith("https://")) return value;
+  if (value.startsWith("/storage/")) return `${API_BASE}${value}`;
+  return value;
+};
+
 const jurusanList = ref([]);
 onMounted(async () => {
   try {
     const response = await getMajors();
     const items = response.data?.data || [];
+
     if (items.length > 0) {
-      jurusanList.value = items.map((item) => ({
-        ...item,
-        slug: item.slug,
-        nama: item.name,
-        kategori: item.code,
-        deskripsi: item.description || "Program keahlian SMK Nurul Jadid.",
-        gambarHero:
-          item.image ||
-          "https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian",
-        icon: "CodeXml",
-      }));
+      jurusanList.value = items.map((item) => {
+        const fallback = fallbackJurusanList.find((entry) => entry.slug === item.slug) || {};
+
+        return {
+          ...fallback,
+          ...item,
+          slug: item.slug || fallback.slug,
+          nama: item.name || fallback.nama,
+          kategori: item.code || fallback.kategori,
+          deskripsi: item.description || fallback.deskripsi || "Program keahlian SMK Nurul Jadid.",
+          gambarHero:
+            normalizeImageUrl(item.image) ||
+            fallback.gambarHero ||
+            "https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian",
+          icon: fallback.icon || "CodeXml",
+        };
+      });
+      return;
     }
   } catch (err) {
-    console.warn(
-      "Gagal memuat jurusan dari API, menggunakan data default:",
-      err,
-    );
+    console.warn("Gagal memuat jurusan dari API, mencoba data dummy:", err);
   }
+
+  jurusanList.value = fallbackJurusanList.map((item) => ({
+    ...item,
+    gambarHero: item.gambarHero || "https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian",
+  }));
 });
 </script>
 

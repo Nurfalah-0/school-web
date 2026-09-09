@@ -34,6 +34,7 @@
 import { computed, ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getMajors } from '@/api/endpoints'
+import { jurusanList as fallbackJurusanList } from '@/data/jurusan'
 import JurusanHero from '../components/JurusanHero.vue'
 import KeunggulanProgram from '../components/KeunggulanProgram.vue'
 import SidebarJurusan from '../components/SidebarJurusan.vue'
@@ -44,6 +45,14 @@ import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 const route = useRoute()
 const apiMajors = ref([])
 const isLoading = ref(true)
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/api\/?$/, '')
+
+function normalizeImageUrl(value) {
+  if (!value) return ''
+  if (value.startsWith('http://') || value.startsWith('https://')) return value
+  if (value.startsWith('/storage/')) return `${API_BASE}${value}`
+  return value
+}
 
 function textValue(value, fallback) {
   if (Array.isArray(value)) return value.join(', ')
@@ -60,10 +69,12 @@ function textValue(value, fallback) {
 }
 
 function mapMajor(item) {
-  const description = textValue(item.description, `Program keahlian ${item.name}.`)
+  const fallback = fallbackJurusanList.find((entry) => entry.slug === item.slug) || {}
+  const name = item.name || fallback.nama || 'Program Keahlian'
+  const description = textValue(item.description, fallback.deskripsi || `Program keahlian ${name}.`)
   const vision = textValue(item.vision, description)
   const mission = textValue(item.mission, description)
-  const facilities = textValue(item.facilities, `Fasilitas pembelajaran ${item.name}.`)
+  const facilities = textValue(item.facilities, `Fasilitas pembelajaran ${name}.`)
   const iconByCode = {
     RPL: 'CodeXml',
     TKRO: 'Briefcase',
@@ -74,14 +85,15 @@ function mapMajor(item) {
   }
 
   return {
+    ...fallback,
     ...item,
-    slug: item.slug,
+    slug: item.slug || fallback.slug,
     kategori: item.code || 'Program Keahlian',
-    nama: item.name,
+    nama: name,
     deskripsi: description,
-    gambarHero: item.image || `https://placehold.co/1200x800/e2e8f0/475569?text=${encodeURIComponent(item.name)}`,
-    icon: iconByCode[item.code] || 'Briefcase',
-    iconBg: '#1e3a5f',
+    gambarHero: normalizeImageUrl(item.image) || fallback.gambarHero || `https://placehold.co/1200x800/e2e8f0/475569?text=${encodeURIComponent(name)}`,
+    icon: iconByCode[item.code] || fallback.icon || 'Briefcase',
+    iconBg: fallback.iconBg || '#1e3a5f',
     keunggulan: [
       { icon: 'Rocket', judul: 'Profil Program', deskripsi: description },
       { icon: 'Handshake', judul: 'Visi Program', deskripsi: vision },
@@ -98,12 +110,30 @@ function mapMajor(item) {
 onMounted(async () => {
   try {
     const response = await getMajors()
-    apiMajors.value = (response.data?.data || []).map(mapMajor)
+    const items = response.data?.data || []
+
+    if (items.length > 0) {
+      apiMajors.value = items.map(mapMajor)
+    } else {
+      apiMajors.value = fallbackJurusanList.map((item) => ({
+        ...item,
+        slug: item.slug,
+        kategori: item.kategori,
+        nama: item.nama,
+        deskripsi: item.deskripsi,
+        gambarHero: item.gambarHero,
+        icon: item.icon,
+        iconBg: item.iconBg,
+        keunggulan: item.keunggulan,
+        kurikulum: item.kurikulum,
+      }))
+    }
   } catch (error) {
-    apiMajors.value = []
-  } finally {
-    isLoading.value = false
+    console.warn('Gagal memuat jurusan dari API, mencoba data dummy:', error)
+    apiMajors.value = fallbackJurusanList
   }
+
+  isLoading.value = false
 })
 
 const jurusanAktif = computed(() => apiMajors.value.find((item) => item.slug === route.params.slug))

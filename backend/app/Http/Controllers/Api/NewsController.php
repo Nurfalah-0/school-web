@@ -96,7 +96,7 @@ class NewsController extends Controller
 
             if ($request->hasFile('featured_image')) {
                 $path = $request->file('featured_image')->store('news-images', 'public');
-                $data['featured_image'] = $path;
+                $data['featured_image'] = url(Storage::url($path));
             }
 
             $id = DB::table('news')->insertGetId($data);
@@ -153,7 +153,7 @@ class NewsController extends Controller
                     Storage::disk('public')->delete($article->featured_image);
                 }
                 $path = $request->file('featured_image')->store('news-images', 'public');
-                $data['featured_image'] = $path;
+                $data['featured_image'] = url(Storage::url($path));
             }
 
             DB::table('news')->where('id', $id)->update($data);
@@ -161,6 +161,57 @@ class NewsController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'News updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function uploadImage(Request $request, $id)
+    {
+        try {
+            $article = DB::table('news')->where('id', $id)->first();
+
+            if (!$article) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'News not found'
+                ], 404);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'featured_image' => 'required|image|max:5120',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            if ($article->featured_image) {
+                $oldPath = parse_url($article->featured_image, PHP_URL_PATH) ?: $article->featured_image;
+                $oldPath = preg_replace('#^.*/storage/#', '', $oldPath);
+                if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+
+            $path = $request->file('featured_image')->store('news-images', 'public');
+            $imageUrl = url(Storage::url($path));
+            DB::table('news')->where('id', $id)->update([
+                'featured_image' => $imageUrl,
+                'updated_at' => now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'News image uploaded successfully',
+                'data' => DB::table('news')->where('id', $id)->first(),
             ]);
         } catch (\Exception $e) {
             return response()->json([

@@ -77,15 +77,43 @@ export const getRegistrationDetail = (id) => client.get(`/ppdb/applications/${id
 // News endpoints
 export const getNews = (page = 1, perPage = 10) => client.get('/news', { params: { page, per_page: perPage } });
 export const getNewsDetail = (id) => client.get(`/news/${id}`);
-export const createNews = (data) => client.post('/admin/news', data);
-export const updateNews = (id, data) => client.post(`/admin/news/${id}?_method=PUT`, data);
+export const createNews = (data) => client.post('/admin/news', data, {
+  headers: { 'Content-Type': 'multipart/form-data' },
+});
+export const updateNews = (id, data) => client.post(`/admin/news/${id}`, data, {
+  headers: { 'Content-Type': 'multipart/form-data' },
+});
+export const uploadNewsImage = (id, file) => {
+  const data = new FormData();
+  data.append('featured_image', file);
+  return client.post(`/admin/news/${id}/image`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};
 export const deleteNews = (id) => client.delete(`/admin/news/${id}`);
 export const publishNews = (id) => client.post(`/admin/news/${id}/publish`);
 export const unpublishNews = (id) => client.post(`/admin/news/${id}/unpublish`);
 
 // Major management endpoints
-export const createMajor = (data) => client.post('/admin/majors', data);
-export const updateMajor = (id, data) => client.put(`/admin/majors/${id}`, data);
+export const createMajor = (data) => client.post('/admin/majors', data, {
+  headers: { 'Content-Type': 'multipart/form-data' },
+});
+export const updateMajor = (id, data) => {
+  if (data instanceof FormData) {
+    return client.post(`/admin/majors/${id}`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  }
+
+  return client.put(`/admin/majors/${id}`, data);
+};
+export const uploadMajorImage = (id, file) => {
+  const data = new FormData();
+  data.append('image', file);
+  return client.post(`/admin/majors/${id}/image`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};
 export const deleteMajor = (id) => client.delete(`/admin/majors/${id}`);
 
 // Categories endpoints

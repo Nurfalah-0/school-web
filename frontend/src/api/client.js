@@ -7,6 +7,7 @@ const client = axios.create({
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   },
   withCredentials: true, // Allow credentials (cookies)
 });
@@ -72,7 +73,12 @@ client.interceptors.request.use(config => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   if (config.data instanceof FormData) {
-    delete config.headers['Content-Type'];
+    if (typeof config.headers.delete === 'function') {
+      config.headers.delete('Content-Type');
+    } else {
+      delete config.headers['Content-Type'];
+      delete config.headers['content-type'];
+    }
   }
   return config;
 });

@@ -24,7 +24,6 @@
             :alt="jurusan.nama"
             class="jurusan-hero-img"
             loading="eager"
-            crossorigin="anonymous"
           />
         </div>
       </div>

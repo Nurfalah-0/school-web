@@ -19,7 +19,6 @@
               :alt="`Siswa praktik jurusan ${card.nama}`"
               class="pilih-jalur-img"
               loading="lazy"
-              crossorigin="anonymous"
             />
             <span class="pilih-jalur-badge">{{ card.kategori }}</span>
           </div>
@@ -48,6 +47,7 @@
 </template>
 
 <script setup>
+import { onMounted, ref } from "vue";
 import {
   CodeXml,
   Briefcase,
@@ -55,7 +55,8 @@ import {
   Palette,
   Calculator,
 } from "lucide-vue-next";
-import { jurusanList } from "@/data/jurusan";
+import { getMajors } from "@/api/endpoints";
+import { jurusanList as fallbackJurusanList } from "@/data/jurusan";
 
 const iconMap = {
   CodeXml,
@@ -64,6 +65,48 @@ const iconMap = {
   Palette,
   Calculator,
 };
+
+const programs = ref([]);
+const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:8000/api").replace(/\/api\/?$/, "");
+
+const normalizeImageUrl = (value) => {
+  if (!value) return "";
+  if (value.startsWith("http://") || value.startsWith("https://")) return value;
+  if (value.startsWith("/storage/")) return `${API_BASE}${value}`;
+  return value;
+};
+
+onMounted(async () => {
+  try {
+    const response = await getMajors();
+    const items = response.data?.data || [];
+
+    if (items.length > 0) {
+      programs.value = items.slice(0, 3).map((item) => {
+        const fallback = fallbackJurusanList.find((entry) => entry.slug === item.slug) || {};
+
+        return {
+          ...fallback,
+          ...item,
+          slug: item.slug || fallback.slug,
+          nama: item.name || fallback.nama,
+          kategori: item.code || fallback.kategori,
+          deskripsi: item.description || fallback.deskripsi || "Program keahlian SMK Nurul Jadid.",
+          gambarHero: normalizeImageUrl(item.image) || fallback.gambarHero || "https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian",
+          icon: fallback.icon || "CodeXml",
+        };
+      });
+      return;
+    }
+  } catch (error) {
+    console.warn("Gagal memuat jurusan API, fallback ke data dummy:", error);
+  }
+
+  programs.value = fallbackJurusanList.slice(0, 3).map((item) => ({
+    ...item,
+    gambarHero: item.gambarHero || "https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian",
+  }));
+});
 
 defineProps({
   label: {
@@ -77,10 +120,6 @@ defineProps({
   seeAllText: {
     type: String,
     default: "Lihat Semua Jurusan",
-  },
-  programs: {
-    type: Array,
-    default: () => jurusanList.slice(0, 3),
   },
 });
 </script>

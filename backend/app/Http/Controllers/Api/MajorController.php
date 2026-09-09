@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MajorFacility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -55,14 +56,24 @@ class MajorController extends Controller
     public function store(Request $request)
     {
         try {
+            if ($request->has('is_active')) {
+                $activeValue = $request->input('is_active');
+                if (in_array($activeValue, [true, 1, '1', 'true'], true)) {
+                    $request->merge(['is_active' => true]);
+                } elseif (in_array($activeValue, [false, 0, '0', 'false'], true)) {
+                    $request->merge(['is_active' => false]);
+                }
+            }
+
             $validator = Validator::make($request->all(), [
                 'code'        => 'required|string|max:20|unique:majors,code',
                 'name'        => 'required|string|max:150',
                 'description' => 'nullable|string',
-                // Frontend mengirim "capacity", dipetakan ke kolom capacity di tabel
                 'capacity'    => 'nullable|integer|min:0',
                 'vision'      => 'nullable|string',
                 'mission'     => 'nullable|string',
+                'image'       => 'nullable|image|max:5120',
+                'image_url'   => 'nullable|url',
                 'is_active'   => 'nullable|boolean',
             ]);
 
@@ -74,10 +85,19 @@ class MajorController extends Controller
             }
 
             $data = $validator->validated();
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('major-images', 'public');
+                $data['image'] = url('storage/' . ltrim($path, '/'));
+            } elseif ($request->filled('image_url')) {
+                $data['image'] = $request->image_url;
+            }
+
             $data['slug']          = Str::slug($data['name']);
             $data['student_count'] = $data['capacity'] ?? 0;
             $data['created_at']    = now();
             $data['updated_at']    = now();
+
+            unset($data['image_url']);
 
             $id = DB::table('majors')->insertGetId($data);
 
@@ -95,6 +115,15 @@ class MajorController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            if ($request->has('is_active')) {
+                $activeValue = $request->input('is_active');
+                if (in_array($activeValue, [true, 1, '1', 'true'], true)) {
+                    $request->merge(['is_active' => true]);
+                } elseif (in_array($activeValue, [false, 0, '0', 'false'], true)) {
+                    $request->merge(['is_active' => false]);
+                }
+            }
+
             $major = DB::table('majors')->where('id', $id)->first();
 
             if (!$major) {
@@ -108,6 +137,8 @@ class MajorController extends Controller
                 'capacity'    => 'nullable|integer|min:0',
                 'vision'      => 'nullable|string',
                 'mission'     => 'nullable|string',
+                'image'       => 'nullable|image|max:5120',
+                'image_url'   => 'nullable|url',
                 'is_active'   => 'nullable|boolean',
             ]);
 
@@ -120,6 +151,20 @@ class MajorController extends Controller
 
             $data = $validator->validated();
 
+            if ($request->hasFile('image')) {
+                if (!empty($major->image) && str_contains($major->image, '/storage/')) {
+                    $oldFile = str_replace('/storage/', '', parse_url($major->image, PHP_URL_PATH));
+                    if ($oldFile && Storage::disk('public')->exists($oldFile)) {
+                        Storage::disk('public')->delete($oldFile);
+                    }
+                }
+
+                $path = $request->file('image')->store('major-images', 'public');
+                $data['image'] = url(Storage::url($path));
+            } elseif ($request->filled('image_url')) {
+                $data['image'] = $request->image_url;
+            }
+
             if (isset($data['name'])) {
                 $data['slug'] = Str::slug($data['name']);
             }
@@ -128,6 +173,7 @@ class MajorController extends Controller
             }
 
             $data['updated_at'] = now();
+            unset($data['image_url']);
 
             DB::table('majors')->where('id', $id)->update($data);
 
@@ -135,6 +181,50 @@ class MajorController extends Controller
                 'success' => true,
                 'message' => 'Jurusan berhasil diperbarui.',
                 'data'    => DB::table('majors')->where('id', $id)->first(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function uploadImage(Request $request, $id)
+    {
+        try {
+            $major = DB::table('majors')->where('id', $id)->first();
+
+            if (!$major) {
+                return response()->json(['success' => false, 'message' => 'Jurusan tidak ditemukan.'], 404);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'image' => 'required|image|max:5120',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors'  => $validator->errors(),
+                ], 422);
+            }
+
+            if (!empty($major->image) && str_contains($major->image, '/storage/')) {
+                $oldFile = str_replace('/storage/', '', parse_url($major->image, PHP_URL_PATH));
+                if ($oldFile && Storage::disk('public')->exists($oldFile)) {
+                    Storage::disk('public')->delete($oldFile);
+                }
+            }
+
+            $path = $request->file('image')->store('major-images', 'public');
+            $imageUrl = url(Storage::url($path));
+            DB::table('majors')->where('id', $id)->update([
+                'image' => $imageUrl,
+                'updated_at' => now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Gambar jurusan berhasil diunggah.',
+                'data' => DB::table('majors')->where('id', $id)->first(),
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

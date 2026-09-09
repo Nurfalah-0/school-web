@@ -42,7 +42,7 @@
                     :alt="item.judul"
                     class="semua-berita-img"
                     loading="lazy"
-                    crossorigin="anonymous"
+                    @error="item.gambarUtama = 'https://placehold.co/800x500/e2e8f0/475569?text=Berita'"
                   />
                   <span
                     class="semua-berita-badge"

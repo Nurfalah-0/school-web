@@ -110,7 +110,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // ── Jurusan — manage ─────────────────────
     Route::middleware(['permission:majors.manage'])->prefix('admin/majors')->group(function () {
         Route::post('/',                                  [MajorController::class, 'store']);
+        Route::post('/{id}',                              [MajorController::class, 'update']);
         Route::put('/{id}',                               [MajorController::class, 'update']);
+        Route::post('/{id}/image',                        [MajorController::class, 'uploadImage']);
         Route::delete('/{id}',                            [MajorController::class, 'destroy']);
         Route::post('/{id}/facilities',                   [MajorController::class, 'addFacility']);
         Route::delete('/{majorId}/facilities/{facilityId}', [MajorController::class, 'removeFacility']);
@@ -119,7 +121,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // ── Berita — manage ──────────────────────
     Route::middleware(['permission:news.manage'])->prefix('admin/news')->group(function () {
         Route::post('/',               [NewsController::class, 'store']);
+        Route::post('/{id}',           [NewsController::class, 'update']);
         Route::put('/{id}',            [NewsController::class, 'update']);
+        Route::post('/{id}/image',     [NewsController::class, 'uploadImage']);
         Route::delete('/{id}',         [NewsController::class, 'destroy']);
         Route::post('/{id}/publish',   [NewsController::class, 'publish']);
         Route::post('/{id}/unpublish', [NewsController::class, 'unpublish']);

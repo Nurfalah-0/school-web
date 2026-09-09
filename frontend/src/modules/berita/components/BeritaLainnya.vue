@@ -17,7 +17,7 @@
             :alt="item.judul"
             class="berita-lainnya-img"
             loading="lazy"
-            crossorigin="anonymous"
+            @error="item.gambarUtama = 'https://placehold.co/500x300/e2e8f0/475569?text=Berita'"
           />
           <span
             class="berita-lainnya-badge"

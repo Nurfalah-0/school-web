@@ -356,6 +356,14 @@
             <option :value="false">Non-aktif</option>
           </select>
         </div>
+        <div class="form-group">
+          <label>Gambar Jurusan</label>
+          <input type="file" accept="image/*" @change="onMajorImageSelected" />
+        </div>
+        <div class="form-group">
+          <label>URL Gambar Alternatif</label>
+          <input v-model="majorForm.image_url" placeholder="https://example.com/image.jpg" />
+        </div>
         <div class="form-group full-width">
           <label>Deskripsi Singkat</label>
           <textarea v-model="majorForm.description" placeholder="Deskripsi umum program keahlian"></textarea>
@@ -386,9 +394,12 @@
               <span class="major-code-badge">{{ item.code }}</span>
               <h3>{{ item.name }}</h3>
             </div>
-            <span :class="['status-pill', item.is_active !== false ? 'status-approved' : 'status-rejected']">
-              {{ item.is_active !== false ? 'Aktif' : 'Non-aktif' }}
+            <span :class="['status-pill', isMajorActive(item) ? 'status-approved' : 'status-rejected']">
+              {{ isMajorActive(item) ? 'Aktif' : 'Non-aktif' }}
             </span>
+          </div>
+          <div v-if="item.image" class="major-image-preview">
+            <img :src="item.image" :alt="item.name" />
           </div>
           <p class="major-desc">{{ item.description || 'Belum ada deskripsi jurusan.' }}</p>
           <div class="major-meta">
@@ -846,7 +857,9 @@ import {
   getCategories,
   getUsers,
   updateNews,
+  uploadNewsImage,
   updateMajor,
+  uploadMajorImage,
   updateRegistrationStatus,
   updateSchoolProfile,
   updateStudent,
@@ -885,7 +898,7 @@ const selectedSectionFilter = ref('');
 
 // Forms
 const newsForm = reactive({ id: null, title: '', category: '', excerpt: '', content: '', image: null });
-const majorForm = reactive({ id: null, code: '', name: '', capacity: null, description: '', vision: '', mission: '', is_active: true });
+const majorForm = reactive({ id: null, code: '', name: '', capacity: null, description: '', vision: '', mission: '', image: null, image_url: '', is_active: true });
 const imageForm = reactive({ id: null, key: '', title: '', section: '', alt_text: '', image_url: '', file: null });
 const studentForm = reactive({ id: null, nisn: '', nis: '', name: '', email: '', phone: '', class: '', gender: '', major_id: null, address: '' });
 const profileForm = reactive({ school_name: '', email: '', phone: '', website: '', headmaster_name: '', founded_year: null, address: '', vision: '', mission: '' });
@@ -1127,20 +1140,27 @@ function selectNewsImage(event) {
 
 async function saveNews() {
   try {
+    const selectedImage = newsForm.image;
     const data = new FormData();
     data.append('title', newsForm.title);
     data.append('category', newsForm.category);
     data.append('excerpt', newsForm.excerpt);
     data.append('content', newsForm.content);
-    if (newsForm.image) data.append('featured_image', newsForm.image);
 
+    let newsId = newsForm.id;
     if (newsForm.id) {
       await updateNews(newsForm.id, data);
       notify('Berita berhasil diperbarui.');
     } else {
-      await createNews(data);
+      const response = await createNews(data);
+      newsId = response.data?.id || response.data?.data?.id;
       notify('Berita berhasil diterbitkan.');
     }
+
+    if (selectedImage && newsId) {
+      await uploadNewsImage(newsId, selectedImage);
+    }
+
     resetNews();
     await loadNews();
   } catch (error) { errorMessage(error); }
@@ -1159,7 +1179,28 @@ async function removeNews(id) {
 // JURUSAN & FASILITAS ACTIONS
 // =============================================
 function resetMajor() {
-  Object.assign(majorForm, { id: null, code: '', name: '', capacity: null, description: '', vision: '', mission: '', is_active: true });
+  Object.assign(majorForm, { id: null, code: '', name: '', capacity: null, description: '', vision: '', mission: '', image: null, image_url: '', is_active: true });
+}
+
+function isMajorActive(item) {
+  return item.is_active === true || item.is_active === 1 || item.is_active === '1';
+}
+
+function onMajorImageSelected(event) {
+  const file = event.target.files?.[0];
+  if (!file) {
+    majorForm.image = null;
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    notify('Ukuran gambar jurusan maksimal 5MB.', 'error');
+    event.target.value = '';
+    majorForm.image = null;
+    return;
+  }
+
+  majorForm.image = file;
 }
 
 function editMajor(item) {
@@ -1171,29 +1212,40 @@ function editMajor(item) {
     description: item.description || '',
     vision: item.vision || '',
     mission: item.mission || '',
-    is_active: item.is_active !== false,
+    image: null,
+    image_url: item.image || '',
+    is_active: isMajorActive(item),
   });
   window.scrollTo({ top: 150, behavior: 'smooth' });
 }
 
 async function saveMajor() {
   try {
-    const data = {
-      code: majorForm.code,
-      name: majorForm.name,
-      capacity: majorForm.capacity,
-      description: majorForm.description,
-      vision: majorForm.vision,
-      mission: majorForm.mission,
-      is_active: majorForm.is_active,
-    };
+    const selectedImage = majorForm.image;
+    const formData = new FormData();
+    formData.append('code', majorForm.code);
+    formData.append('name', majorForm.name);
+    if (majorForm.capacity !== null && majorForm.capacity !== '') formData.append('capacity', String(majorForm.capacity));
+    formData.append('description', majorForm.description || '');
+    formData.append('vision', majorForm.vision || '');
+    formData.append('mission', majorForm.mission || '');
+    formData.append('is_active', majorForm.is_active ? '1' : '0');
+    if (majorForm.image_url) formData.append('image_url', majorForm.image_url);
+
+    let majorId = majorForm.id;
     if (majorForm.id) {
-      await updateMajor(majorForm.id, data);
+      await updateMajor(majorForm.id, formData);
       notify('Jurusan berhasil diperbarui.');
     } else {
-      await createMajor(data);
+      const response = await createMajor(formData);
+      majorId = response.data?.id || response.data?.data?.id;
       notify('Jurusan baru berhasil ditambahkan.');
     }
+
+    if (selectedImage && majorId) {
+      await uploadMajorImage(majorId, selectedImage);
+    }
+
     resetMajor();
     await loadMajors();
   } catch (error) { errorMessage(error); }
