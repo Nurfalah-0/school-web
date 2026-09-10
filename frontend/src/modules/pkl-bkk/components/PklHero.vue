@@ -14,7 +14,7 @@
         </p>
         <div class="pkl-hero-actions">
           <a class="pkl-btn-primary" href="#pendaftaran">Ajukan PKL</a>
-          <a class="pkl-btn-secondary" href="#lowongan">Lihat Lowongan</a>
+          <router-link class="pkl-btn-secondary" to="/lowongan">Lihat Lowongan</router-link>
         </div>
       </div>
 

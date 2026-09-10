@@ -1,5 +1,5 @@
 <template>
-  <section class="form-section">
+  <section id="pendaftaran" class="form-section">
     <div class="form-deco form-deco-left" aria-hidden="true"></div>
     <div class="form-deco form-deco-right" aria-hidden="true"></div>
 
