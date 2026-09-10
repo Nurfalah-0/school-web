@@ -31,7 +31,7 @@
       </div>
 
       <div class="lowongan-footer">
-        <router-link to="/lowongan" class="lowongan-more">Lihat Semua Lowongan Lainnya →</router-link>
+        <router-link to="/lowongan" class="lowongan-more">Lihat Semua Lowongan Lainnya</router-link>
       </div>
     </div>
   </section>
