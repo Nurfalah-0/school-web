@@ -34,6 +34,10 @@
       </AnimateOnScroll>
     </div>
 
+    <div v-else-if="isLoading" class="detail-prestasi-loading">
+      <p class="detail-prestasi-empty-text">Memuat detail prestasi...</p>
+    </div>
+
     <div v-else class="detail-prestasi-empty">
       <p class="detail-prestasi-empty-text">Prestasi tidak ditemukan.</p>
       <router-link to="/prestasi" class="detail-prestasi-back">Kembali ke Prestasi</router-link>
@@ -42,8 +46,10 @@
 </template>
 
 <script setup>
-import { computed, watch, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
+import { getPublicContent } from '@/api/endpoints'
+import { mapAchievement } from '@/modules/contentMapper'
 import { getPrestasiBySlug, getPrestasiLainnya } from '@/data/prestasi'
 import Breadcrumb from '../../berita/components/Breadcrumb.vue'
 import ArtikelHeader from '../../berita/components/ArtikelHeader.vue'
@@ -57,7 +63,8 @@ import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const route = useRoute()
 const slug = computed(() => route.params.slug)
-const prestasi = computed(() => getPrestasiBySlug(slug.value))
+const prestasi = ref(null)
+const isLoading = ref(true)
 
 const breadcrumbItems = computed(() => [
   { label: 'Beranda', to: '/' },
@@ -72,7 +79,22 @@ const kontenArtikel = computed(() => {
   ]
 })
 
-watch(() => route.params.slug, () => {
+watch(() => route.params.slug, async (currentSlug) => {
+  prestasi.value = null
+  isLoading.value = true
+
+  try {
+    const response = await getPublicContent('achievements')
+    const fetched = (response.data?.data || []).map(mapAchievement)
+    const apiPrestasi = fetched.find(item => item.slug === currentSlug)
+    prestasi.value = apiPrestasi || getPrestasiBySlug(currentSlug)
+  } catch (err) {
+    prestasi.value = getPrestasiBySlug(currentSlug)
+    console.warn('Gagal memuat detail prestasi dari API:', err)
+  } finally {
+    isLoading.value = false
+  }
+
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }, { immediate: true })
 
