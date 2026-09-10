@@ -39,18 +39,17 @@
 
           <p class="detail-deskripsi">{{ displayProduk.deskripsi || 'Produk Teaching Factory (TEFA) unggulan berkualitas tinggi karya peserta didik SMK Nurul Jadid dengan standar industri.' }}</p>
 
-          <!-- Ukuran if available -->
-          <div class="detail-size" v-if="sizeList.length > 0">
-            <span class="detail-size-label">Pilihan Varian / Ukuran:</span>
+          <div class="detail-size" v-for="option in optionGroups" :key="option.name">
+            <span class="detail-size-label">{{ option.name }}:</span>
             <div class="detail-size-options">
               <button
-                v-for="u in sizeList"
-                :key="u.label"
-                :class="['detail-size-btn', { active: ukuranTerpilih === u.label }]"
+                v-for="value in option.values"
+                :key="value"
+                :class="['detail-size-btn', { active: selectedOptions[option.name] === value }]"
                 type="button"
-                @click="ukuranTerpilih = u.label"
+                @click="selectedOptions[option.name] = value"
               >
-                {{ u.label }}
+                {{ value }}
               </button>
             </div>
           </div>
@@ -146,15 +145,11 @@
                   <thead>
                     <tr>
                       <th>Ukuran</th>
-                      <th>Lebar Dada</th>
-                      <th>Panjang Baju</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="u in sizeList" :key="u.label">
                       <td><strong>{{ u.label }}</strong></td>
-                      <td>{{ u.chest }} cm</td>
-                      <td>{{ u.length }} cm</td>
                     </tr>
                   </tbody>
                 </table>
@@ -207,7 +202,7 @@ const props = defineProps({
   }
 })
 
-const ukuranTerpilih = ref('M')
+const selectedOptions = ref({})
 const quantity = ref(1)
 const tabAktif = ref('spesifikasi')
 const thumbnailAktif = ref(0)
@@ -226,22 +221,10 @@ const displayProduk = computed(() => {
   }
 })
 
-const defaultSizes = [
-  { label: 'S', chest: 48, length: 68 },
-  { label: 'M', chest: 50, length: 70 },
-  { label: 'L', chest: 52, length: 72 },
-  { label: 'XL', chest: 54, length: 74 }
-]
-
+const optionGroups = computed(() => Array.isArray(displayProduk.value.pilihan) ? displayProduk.value.pilihan.filter(option => option.name && option.values?.length) : [])
 const sizeList = computed(() => {
-  if (Array.isArray(displayProduk.value.ukuran) && displayProduk.value.ukuran.length) {
-    return displayProduk.value.ukuran
-  }
-  const k = (displayProduk.value.kategori || '').toLowerCase()
-  if (k.includes('jersey') || k.includes('cetak') || k.includes('busana') || k.includes('kaos')) {
-    return defaultSizes
-  }
-  return []
+  const option = optionGroups.value.find(item => /ukuran|size/i.test(item.name))
+  return option ? option.values.map(label => ({ label })) : []
 })
 
 const allThumbnails = computed(() => {
@@ -264,7 +247,7 @@ const totalEstimasi = computed(() => {
 const whatsappUrl = computed(() => {
   const p = displayProduk.value
   const text = encodeURIComponent(
-    `Halo Admin TEFA SMK Nurul Jadid, saya berminat memesan:\n\n*Produk:* ${p.nama}\n*Jumlah:* ${quantity.value} pcs\n*Varian:* ${ukuranTerpilih.value}\n*Total Estimasi:* ${formatRupiah(totalEstimasi.value)}\n\nMohon info ketersediaan dan cara pembayarannya. Terima kasih!`
+    `Halo Admin TEFA SMK Nurul Jadid, saya berminat memesan:\n\n*Produk:* ${p.nama}\n*Jumlah:* ${quantity.value} pcs\n${Object.entries(selectedOptions.value).map(([name, value]) => `*${name}:* ${value}`).join('\\n')}\n*Total Estimasi:* ${formatRupiah(totalEstimasi.value)}\n\nMohon info ketersediaan dan cara pembayarannya. Terima kasih!`
   )
   return `https://wa.me/6282335585491?text=${text}`
 })
@@ -280,7 +263,8 @@ function onImgError(e) {
 watch(() => props.produk, () => {
   quantity.value = 1
   thumbnailAktif.value = 0
-})
+  selectedOptions.value = Object.fromEntries(optionGroups.value.map(option => [option.name, option.values[0]]))
+}, { immediate: true })
 </script>
 
 <style lang="scss" scoped>

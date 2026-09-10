@@ -92,6 +92,14 @@
           <div class="cart-item-info">
             <h4 class="cart-item-name">{{ item.nama }}</h4>
             <p class="cart-item-price">{{ formatRupiah(item.harga) }}</p>
+            <div v-if="item.pilihan?.length" class="cart-item-options">
+              <label v-for="option in item.pilihan" :key="option.name">
+                <span>{{ option.name }}</span>
+                <select v-model="item.selectedOptions[option.name]">
+                  <option v-for="value in option.values" :key="value" :value="value">{{ value }}</option>
+                </select>
+              </label>
+            </div>
             <div class="cart-item-qty">
               <button class="qty-btn" @click="kurangiQty(item)">-</button>
               <span class="qty-value">{{ item.qty }}</span>
@@ -263,14 +271,14 @@ const cartTotalQty = computed(() => cart.value.reduce((sum, item) => sum + item.
 const cartTotal = computed(() => cart.value.reduce((sum, item) => sum + item.harga * item.qty, 0))
 
 function tambahKeKeranjang(produk) {
-  console.log('tambahKeKeranjang called with:', produk)
-  const existing = cart.value.find(item => item.id === produk.id)
+  const selectedOptions = Object.fromEntries((produk.pilihan || []).map(option => [option.name, option.values[0]]))
+  const optionKey = JSON.stringify(selectedOptions)
+  const existing = cart.value.find(item => item.id === produk.id && JSON.stringify(item.selectedOptions) === optionKey)
   if (existing) {
     existing.qty += 1
   } else {
-    cart.value.push({ ...produk, qty: 1 })
+    cart.value.push({ ...produk, selectedOptions, qty: 1 })
   }
-  console.log('cart after add:', cart.value)
   cartOpen.value = true
 }
 
@@ -301,6 +309,9 @@ function checkoutWhatsApp() {
 
   cart.value.forEach((item, index) => {
     message += `${index + 1}. ${item.nama}\n`
+    if (item.selectedOptions && Object.keys(item.selectedOptions).length) {
+      message += `   Pilihan: ${Object.entries(item.selectedOptions).map(([name, value]) => `${name}: ${value}`).join(', ')}\n`
+    }
     message += `   Harga: ${formatRupiah(item.harga)}\n`
     message += `   Qty: ${item.qty}\n`
     message += `   Subtotal: ${formatRupiah(item.harga * item.qty)}\n\n`
@@ -498,6 +509,31 @@ function checkoutWhatsApp() {
   font-size: 0.85rem;
   color: #64748b;
   margin: 0 0 8px;
+}
+
+.cart-item-options {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 10px;
+}
+
+.cart-item-options label {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.cart-item-options select {
+  min-width: 0;
+  padding: 5px 7px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 0.78rem;
 }
 
 .cart-item-qty {
