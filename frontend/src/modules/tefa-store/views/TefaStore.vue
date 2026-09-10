@@ -66,7 +66,7 @@
 
     <!-- Floating Cart Button -->
     <button v-if="cart.length > 0" class="cart-fab" @click="cartOpen = true" aria-label="Buka keranjang">
-      <ShoppingCart :size="24" color="#ffffff" />
+      <ShoppingCart :size="23" color="#ffffff" />
       <span class="cart-fab-badge">{{ cartTotalQty }}</span>
     </button>
 

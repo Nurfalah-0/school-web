@@ -60,6 +60,7 @@ Route::get('/categories', [CategoryController::class, 'index']);
 //  PPDB — Publik (tidak perlu login)
 // =============================================
 Route::prefix('ppdb')->group(function () {
+    Route::get('/schedule', [PpdbController::class, 'schedule']);
     // Kirim formulir pendaftaran
     Route::post('/apply', [PpdbController::class, 'apply']);
     // Cek status pendaftaran by nomor pendaftaran atau NISN
@@ -127,9 +128,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ── PPDB — admin ─────────────────────────
     Route::middleware(['role:superadmin,admin_sekolah,ppdb'])->prefix('ppdb')->group(function () {
+        Route::put('/schedule',                    [PpdbController::class, 'updateSchedule']);
         Route::get('/applications',              [PpdbController::class, 'index']);
         Route::get('/applications/{id}',         [PpdbController::class, 'show']);
-        Route::post('/applications/{id}/approve',[PpdbController::class, 'approve']);
+        Route::post('/applications/{id}/approve', [PpdbController::class, 'approve']);
         Route::post('/applications/{id}/reject', [PpdbController::class, 'reject']);
         Route::delete('/applications/{id}',      [PpdbController::class, 'destroy']);
         Route::get('/statistics',                [PpdbController::class, 'statistics']);

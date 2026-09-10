@@ -1,6 +1,10 @@
 <template>
   <div class="detail-prestasi-page">
-    <div v-if="prestasi">
+    <div v-if="isLoading" class="detail-prestasi-empty">
+      <p class="detail-prestasi-empty-text">Memuat prestasi...</p>
+    </div>
+
+    <div v-else-if="prestasi">
       <AnimateOnScroll animation="fadeInDown">
         <div class="detail-prestasi-layout">
           <div class="detail-prestasi-main">
@@ -23,7 +27,7 @@
           </div>
           <AnimateOnScroll animation="fadeInRight" :delay="300">
             <aside class="detail-prestasi-sidebar">
-              <PrestasiLainnya :current-slug="slug" />
+              <PrestasiLainnya :items="prestasiLainnya" />
               <CtaPpdb />
             </aside>
           </AnimateOnScroll>
@@ -42,9 +46,10 @@
 </template>
 
 <script setup>
-import { computed, watch, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
-import { getPrestasiBySlug, getPrestasiLainnya } from '@/data/prestasi'
+import { getPublicContent } from '@/api/endpoints'
+import { mapAchievement } from '@/modules/contentMapper'
 import Breadcrumb from '../../berita/components/Breadcrumb.vue'
 import ArtikelHeader from '../../berita/components/ArtikelHeader.vue'
 import KontenArtikel from '../../berita/components/KontenArtikel.vue'
@@ -57,7 +62,10 @@ import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const route = useRoute()
 const slug = computed(() => route.params.slug)
-const prestasi = computed(() => getPrestasiBySlug(slug.value))
+const items = ref([])
+const isLoading = ref(true)
+const prestasi = computed(() => items.value.find(item => item.slug === slug.value) || null)
+const prestasiLainnya = computed(() => items.value.filter(item => item.slug !== slug.value).slice(0, 3))
 
 const breadcrumbItems = computed(() => [
   { label: 'Beranda', to: '/' },
@@ -71,6 +79,21 @@ const kontenArtikel = computed(() => {
     { tipe: 'paragraf', teks: prestasi.value.deskripsiLengkap || prestasi.value.deskripsiSingkat }
   ]
 })
+
+async function loadPrestasi() {
+  isLoading.value = true
+  try {
+    const response = await getPublicContent('achievements')
+    items.value = (response.data?.data || []).map(mapAchievement)
+  } catch (err) {
+    console.warn('Gagal memuat detail prestasi dari API:', err)
+    items.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
+
+loadPrestasi()
 
 watch(() => route.params.slug, () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })

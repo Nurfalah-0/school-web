@@ -44,10 +44,11 @@
 
         <div class="ppdb-hero-actions">
           <a
-            class="ppdb-btn-primary"
+            :class="['ppdb-btn-primary', { 'is-disabled': !isOpen }]"
             href="#pendaftaran"
-            @click.prevent="scrollToSection('#pendaftaran')"
-            >Daftar Sekarang</a
+            :aria-disabled="!isOpen"
+            @click.prevent="isOpen && scrollToSection('#pendaftaran')"
+            >{{ isOpen ? 'Daftar Sekarang' : scheduleMessage }}</a
           >
           <a
             class="ppdb-btn-secondary"
@@ -98,15 +99,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
 import { BookOpen, Users } from "lucide-vue-next";
 import heroImg from "../../../assets/hero-lab.webp";
 
 const props = defineProps({
-  deadline: {
-    type: String,
-    default: "2025-03-01T00:00:00",
+  schedule: {
+    type: Object,
+    default: () => ({ registration_start: null, registration_end: null, is_open: true }),
   },
+});
+
+const isOpen = computed(() => props.schedule.is_open !== false);
+const scheduleMessage = computed(() => {
+  if (props.schedule.registration_start && new Date(props.schedule.registration_start) > new Date()) return 'Pendaftaran Belum Dibuka';
+  return 'Pendaftaran Ditutup';
 });
 
 const countdown = ref({ days: 0, hours: 0, minutes: 0 });
@@ -124,7 +131,9 @@ const scrollToSection = (selector) => {
 };
 
 const updateCountdown = () => {
-  const target = new Date(props.deadline).getTime();
+  const target = props.schedule.registration_start
+    ? new Date(props.schedule.registration_start).getTime()
+    : Date.now();
   const now = Date.now();
   const diff = Math.max(0, target - now);
 
@@ -380,6 +389,13 @@ onUnmounted(() => {
 .ppdb-btn-primary:hover,
 .ppdb-btn-secondary:hover {
   transform: translateY(-2px);
+}
+
+.ppdb-btn-primary.is-disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+  pointer-events: none;
 }
 
 .ppdb-btn-secondary {

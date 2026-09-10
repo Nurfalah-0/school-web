@@ -47,20 +47,32 @@
             <textarea v-model="form.alamat" rows="3" placeholder="Alamat lengkap" required></textarea>
           </label>
 
-          <label class="form-group">
-            <span>UPLOAD BERKAS (PDF/JPG/PNG, MAX 2MB)</span>
-            <div class="form-upload" @click.prevent="triggerUpload">
+          <div class="documents-section">
+            <div class="documents-heading">
+              <div>
+                <span class="documents-title">DOKUMEN PENDAFTARAN</span>
+                <small>PDF/JPG/PNG, maksimal 2MB per file. Dokumen bertanda * wajib.</small>
+              </div>
               <CloudUpload class="form-upload-icon" />
-              <span v-if="!fileName">Tarik file ke sini atau pilih dari perangkat</span>
-              <span v-else class="form-file-name">{{ fileName }}</span>
             </div>
-            <small class="form-upload-hint">*Ijazah/SKL, Kartu Keluarga, atau Akta Kelahiran*</small>
-            <input ref="fileInput" type="file" accept=".pdf,.jpg,.jpeg,.png" class="file-input" @change="handleFileChange" />
-          </label>
+            <div class="documents-grid">
+              <label v-for="document in documentFields" :key="document.key" class="document-field">
+                <span>{{ document.label }}<b v-if="document.required"> *</b></span>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  :required="document.required"
+                  @change="handleDocumentChange($event, document.key)"
+                />
+                <small>{{ documentFiles[document.key]?.name || 'Pilih file' }}</small>
+              </label>
+            </div>
+          </div>
 
-          <button type="submit" class="form-submit" :disabled="isSubmitting">
-            {{ isSubmitting ? 'Mengirim Pendaftaran...' : 'Kirim Pendaftaran' }}
+          <button type="submit" class="form-submit" :disabled="isSubmitting || !isOpen">
+            {{ isSubmitting ? 'Mengirim Pendaftaran...' : (isOpen ? 'Kirim Pendaftaran' : scheduleMessage) }}
           </button>
+          <p v-if="!isOpen" class="form-message error">{{ scheduleMessage }}</p>
           <p v-if="submitMessage" :class="['form-message', submitMessageType]">{{ submitMessage }}</p>
         </form>
       </div>
@@ -136,7 +148,18 @@ import {
 } from 'lucide-vue-next';
 import { applyPpdb, checkPpdbStatus, getMajors } from '../../../api/endpoints';
 
+const props = defineProps({
+  schedule: {
+    type: Object,
+    default: () => ({ registration_start: null, registration_end: null, is_open: true }),
+  },
+});
 const emit = defineEmits(['submit-pendaftaran']);
+const isOpen = computed(() => props.schedule.is_open !== false);
+const scheduleMessage = computed(() => {
+  if (props.schedule.registration_start && new Date(props.schedule.registration_start) > new Date()) return 'Pendaftaran belum dibuka.';
+  return 'Pendaftaran sudah ditutup.';
+});
 
 const majorOptions = ref([
   'Pengembangan Perangkat Lunak & Gim (PPLG)',
@@ -155,9 +178,22 @@ const form = reactive({
   alamat: ''
 });
 
-const fileInput = ref(null);
-const fileObject = ref(null);
-const fileName = ref('');
+const documentFiles = reactive({
+  kk: null,
+  ktp_ayah: null,
+  ktp_ibu: null,
+  akta_kelahiran: null,
+  ijazah_menengah: null,
+  dokumen_lain: null,
+});
+const documentFields = [
+  { key: 'kk', label: 'Kartu Keluarga', required: true },
+  { key: 'ktp_ayah', label: 'KTP Ayah', required: true },
+  { key: 'ktp_ibu', label: 'KTP Ibu', required: true },
+  { key: 'akta_kelahiran', label: 'Akta Kelahiran', required: true },
+  { key: 'ijazah_menengah', label: 'Ijazah Tingkat Menengah', required: true },
+  { key: 'dokumen_lain', label: 'Dokumen Lain', required: false },
+];
 const isSubmitting = ref(false);
 const submitMessage = ref('');
 const submitMessageType = ref('success');
@@ -204,11 +240,7 @@ const resultBadgeClass = computed(() => {
   return 'badge-warning';
 });
 
-const triggerUpload = () => {
-  fileInput.value?.click();
-};
-
-const handleFileChange = (event) => {
+const handleDocumentChange = (event, key) => {
   const file = event.target.files?.[0];
   if (file) {
     if (file.size > 2 * 1024 * 1024) {
@@ -216,15 +248,14 @@ const handleFileChange = (event) => {
       event.target.value = '';
       return;
     }
-    fileObject.value = file;
-    fileName.value = file.name;
+    documentFiles[key] = file;
   } else {
-    fileObject.value = null;
-    fileName.value = '';
+    documentFiles[key] = null;
   }
 };
 
 const handleSubmit = async () => {
+  if (!isOpen.value) return;
   isSubmitting.value = true;
   submitMessage.value = '';
   try {
@@ -235,9 +266,9 @@ const handleSubmit = async () => {
     if (form.phone) formData.append('phone', form.phone);
     formData.append('program', form.jurusan);
     formData.append('alamat', form.alamat);
-    if (fileObject.value) {
-      formData.append('berkas', fileObject.value);
-    }
+    Object.entries(documentFiles).forEach(([key, file]) => {
+      if (file) formData.append(key, file);
+    });
 
     const res = await applyPpdb(formData);
     const data = res.data;
@@ -253,9 +284,7 @@ const handleSubmit = async () => {
     form.phone = '';
     form.jurusan = '';
     form.alamat = '';
-    fileObject.value = null;
-    fileName.value = '';
-    if (fileInput.value) fileInput.value.value = '';
+    Object.keys(documentFiles).forEach((key) => { documentFiles[key] = null; });
   } catch (err) {
     const validationErrors = Object.values(err.response?.data?.errors || {}).flat().join(' ');
     submitMessage.value = validationErrors || err.response?.data?.message || err.message || 'Gagal mengirim pendaftaran.';
@@ -481,6 +510,34 @@ onMounted(async () => {
 .form-file-name {
   color: #042d86;
   font-weight: 700;
+}
+
+.documents-section {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  background: #f8fbff;
+}
+
+.documents-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.documents-title { display: block; font-weight: 800; color: #1e3a8a; }
+.documents-heading small { display: block; margin-top: 4px; color: #64748b; }
+.documents-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.document-field { display: grid; gap: 6px; color: #334155; font-weight: 700; font-size: 13px; }
+.document-field b { color: #dc2626; }
+.document-field input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; font: inherit; font-size: 12px; }
+.document-field small { color: #64748b; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .documents-grid { grid-template-columns: 1fr; }
 }
 
 .file-input {

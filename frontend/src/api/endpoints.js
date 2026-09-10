@@ -56,6 +56,8 @@ export const getMajors = () => client.get('/majors');
 export const getMajorDetail = (id) => client.get(`/majors/${id}`);
 
 // PPDB endpoints
+export const getPpdbSchedule = () => client.get('/ppdb/schedule');
+export const updatePpdbSchedule = (data) => client.put('/ppdb/schedule', data);
 export const applyPpdb = (data) => {
   if (data instanceof FormData) {
     return client.post('/ppdb/apply', data, {

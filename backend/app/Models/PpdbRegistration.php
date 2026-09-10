@@ -25,6 +25,18 @@ class PpdbRegistration extends Model
         'asal_sekolah',
         'berkas_path',
         'berkas_url',
+        'kk_path',
+        'kk_url',
+        'ktp_ayah_path',
+        'ktp_ayah_url',
+        'ktp_ibu_path',
+        'ktp_ibu_url',
+        'akta_kelahiran_path',
+        'akta_kelahiran_url',
+        'ijazah_menengah_path',
+        'ijazah_menengah_url',
+        'dokumen_lain_path',
+        'dokumen_lain_url',
         'status',
         'catatan_admin',
         'verified_by',
@@ -45,8 +57,8 @@ class PpdbRegistration extends Model
         $year   = date('Y');
         $prefix = "PPDB-{$year}-";
         $last   = static::where('no_pendaftaran', 'like', "{$prefix}%")
-                        ->orderByDesc('id')
-                        ->first();
+            ->orderByDesc('id')
+            ->first();
 
         if ($last) {
             $lastNum = (int) Str::after($last->no_pendaftaran, $prefix);
