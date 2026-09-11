@@ -25,12 +25,14 @@
       >
         <!-- Image -->
         <img
+          v-if="item.gambar"
           :src="item.gambar"
           :alt="item.judul"
           class="gallery-img"
           loading="lazy"
-          @error="onImgError"
+          @error="item.gambar = ''"
         />
+        <div v-else class="gallery-img image-placeholder" aria-hidden="true"></div>
 
         <!-- Category badge -->
         <div class="gallery-badge" v-if="item.kategori && item.kategori !== 'semua'">
@@ -85,9 +87,6 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function onImgError(e) {
-  e.target.src = 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Foto';
-}
 </script>
 
 <style lang="scss" scoped>

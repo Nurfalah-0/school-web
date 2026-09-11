@@ -20,11 +20,13 @@
       <div class="jurusan-hero-visual">
         <div class="jurusan-hero-img-wrap">
           <img
+            v-if="jurusan.gambarHero"
             :src="jurusan.gambarHero"
             :alt="jurusan.nama"
             class="jurusan-hero-img"
             loading="eager"
           />
+          <div v-else class="jurusan-hero-img image-placeholder" aria-hidden="true"></div>
         </div>
       </div>
     </div>
@@ -180,6 +182,10 @@ const props = defineProps({
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.image-placeholder {
+  background: #ffffff;
 }
 
 @media (max-width: 767px) {

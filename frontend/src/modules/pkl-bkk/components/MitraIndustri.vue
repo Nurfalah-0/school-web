@@ -8,12 +8,13 @@
       <div class="mitra-grid">
         <div v-for="(partner, idx) in activePartners" :key="partner.name || idx" class="mitra-card">
           <img
+            v-if="partner.logoSrc"
             :src="partner.logoSrc"
             :alt="partner.name"
             class="mitra-logo"
             loading="lazy"
-            @error="onLogoError"
           />
+          <div v-else class="mitra-logo image-placeholder" aria-hidden="true"></div>
         </div>
       </div>
     </div>
@@ -36,15 +37,6 @@ defineProps({
   }
 });
 
-const defaultPartners = [
-  { name: 'PT. Telkom Indonesia', logoSrc: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=300&q=80' },
-  { name: 'PT. Astra International', logoSrc: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=300&q=80' },
-  { name: 'Bank Rakyat Indonesia', logoSrc: 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=300&q=80' },
-  { name: 'PT. Komatsu Indonesia', logoSrc: 'https://images.unsplash.com/photo-1542744095-291d1f67b221?w=300&q=80' },
-  { name: 'PT. Indofood Sukses Makmur', logoSrc: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=300&q=80' },
-  { name: 'Google for Education Partner', logoSrc: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=300&q=80' }
-];
-
 const apiPartners = ref([]);
 
 onMounted(async () => {
@@ -63,12 +55,8 @@ onMounted(async () => {
 });
 
 const activePartners = computed(() => {
-  return apiPartners.value.length > 0 ? apiPartners.value : defaultPartners;
+  return apiPartners.value;
 });
-
-function onLogoError(e) {
-  e.target.src = 'https://placehold.co/200x80/f8fafc/042d86?text=MITRA+INDUSTRI';
-}
 </script>
 
 <style lang="scss" scoped>

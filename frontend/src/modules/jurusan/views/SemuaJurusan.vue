@@ -19,11 +19,13 @@
             >
               <div class="semua-jurusan-img-wrap">
                 <img
+                  v-if="item.gambarHero"
                   :src="item.gambarHero"
                   :alt="item.nama"
                   class="semua-jurusan-img"
                   loading="lazy"
                 />
+                <div v-else class="semua-jurusan-img image-placeholder" aria-hidden="true"></div>
                 <span class="semua-jurusan-badge">{{ item.kategori }}</span>
               </div>
               <div class="semua-jurusan-body">
@@ -99,10 +101,7 @@ onMounted(async () => {
           nama: item.name || fallback.nama,
           kategori: item.code || fallback.kategori,
           deskripsi: item.description || fallback.deskripsi || "Program keahlian SMK Nurul Jadid.",
-          gambarHero:
-            normalizeImageUrl(item.image) ||
-            fallback.gambarHero ||
-            "https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian",
+          gambarHero: normalizeImageUrl(item.image),
           icon: fallback.icon || "CodeXml",
         };
       });
@@ -112,10 +111,7 @@ onMounted(async () => {
     console.warn("Gagal memuat jurusan dari API, mencoba data dummy:", err);
   }
 
-  jurusanList.value = fallbackJurusanList.map((item) => ({
-    ...item,
-    gambarHero: item.gambarHero || "https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian",
-  }));
+  jurusanList.value = [];
 });
 </script>
 
@@ -207,6 +203,10 @@ onMounted(async () => {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.image-placeholder {
+  background: #ffffff;
 }
 
 .semua-jurusan-badge {

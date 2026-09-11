@@ -38,12 +38,14 @@
               >
                 <div class="semua-berita-img-wrap">
                   <img
+                    v-if="item.gambarUtama"
                     :src="item.gambarUtama"
                     :alt="item.judul"
                     class="semua-berita-img"
                     loading="lazy"
-                    @error="item.gambarUtama = 'https://placehold.co/800x500/e2e8f0/475569?text=Berita'"
+                    @error="item.gambarUtama = ''"
                   />
+                  <div v-else class="semua-berita-img image-placeholder" aria-hidden="true"></div>
                   <span
                     class="semua-berita-badge"
                     :style="{ background: kategoriColor(item.kategori) }"

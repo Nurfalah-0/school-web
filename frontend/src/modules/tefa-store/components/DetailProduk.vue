@@ -12,11 +12,12 @@
               type="button"
               @click="thumbnailAktif = idx"
             >
-              <img :src="img" :alt="`${displayProduk.nama} thumbnail ${idx + 1}`" loading="lazy" @error="onImgError" />
+              <img :src="img" :alt="`${displayProduk.nama} thumbnail ${idx + 1}`" loading="lazy" />
             </button>
           </div>
           <div class="detail-main-img">
-            <img :src="currentImage" :alt="displayProduk.nama" loading="eager" @error="onImgError" />
+            <img v-if="currentImage" :src="currentImage" :alt="displayProduk.nama" loading="eager" />
+            <div v-else class="detail-image-placeholder" aria-hidden="true"></div>
           </div>
         </div>
 
@@ -209,19 +210,10 @@ const thumbnailAktif = ref(0)
 const showSuccessModal = ref(false)
 
 const displayProduk = computed(() => {
-  return props.produk || {
-    id: 1,
-    nama: 'Custom Sports Jersey PRO',
-    kategori: 'PERCETAKAN',
-    rating: 4.9,
-    ulasan: 128,
-    harga: 145000,
-    gambar: 'https://placehold.co/600x600/1e3a8a/ffffff?text=Custom+Sports+Jersey',
-    deskripsi: 'Jersey kualitas premium hasil karya siswa Jurusan Teknik Komputer dan Jaringan bekerjasama dengan Multimedia. Didesain dengan teknologi sublimation printing terbaru untuk ketajaman warna yang tahan lama.'
-  }
+  return props.produk || null
 })
 
-const optionGroups = computed(() => Array.isArray(displayProduk.value.pilihan) ? displayProduk.value.pilihan.filter(option => option.name && option.values?.length) : [])
+const optionGroups = computed(() => Array.isArray(displayProduk.value?.pilihan) ? displayProduk.value.pilihan.filter(option => option.name && option.values?.length) : [])
 const sizeList = computed(() => {
   const option = optionGroups.value.find(item => /ukuran|size/i.test(item.name))
   return option ? option.values.map(label => ({ label })) : []
@@ -236,16 +228,17 @@ const currentImage = computed(() => {
   if (allThumbnails.value.length && allThumbnails.value[thumbnailAktif.value]) {
     return allThumbnails.value[thumbnailAktif.value]
   }
-  return displayProduk.value?.gambar || 'https://placehold.co/600x600/1e3a8a/ffffff?text=Produk+TEFA'
+  return displayProduk.value?.gambar || null
 })
 
 const totalEstimasi = computed(() => {
-  const price = Number(displayProduk.value.harga) || 0
+  const price = Number(displayProduk.value?.harga) || 0
   return price * quantity.value
 })
 
 const whatsappUrl = computed(() => {
   const p = displayProduk.value
+  if (!p) return '#'
   const text = encodeURIComponent(
     `Halo Admin TEFA SMK Nurul Jadid, saya berminat memesan:\n\n*Produk:* ${p.nama}\n*Jumlah:* ${quantity.value} pcs\n${Object.entries(selectedOptions.value).map(([name, value]) => `*${name}:* ${value}`).join('\\n')}\n*Total Estimasi:* ${formatRupiah(totalEstimasi.value)}\n\nMohon info ketersediaan dan cara pembayarannya. Terima kasih!`
   )
@@ -254,10 +247,6 @@ const whatsappUrl = computed(() => {
 
 function pesanSekarang() {
   showSuccessModal.value = true
-}
-
-function onImgError(e) {
-  e.target.src = 'https://placehold.co/600x600/1e3a8a/ffffff?text=Produk+TEFA'
 }
 
 watch(() => props.produk, () => {

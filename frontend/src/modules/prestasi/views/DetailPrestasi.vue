@@ -54,7 +54,6 @@ import { computed, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { getPublicContent } from '@/api/endpoints'
 import { mapAchievement } from '@/modules/contentMapper'
-import { getAllPrestasi, getPrestasiBySlug } from '@/data/prestasi'
 import Breadcrumb from '../../berita/components/Breadcrumb.vue'
 import ArtikelHeader from '../../berita/components/ArtikelHeader.vue'
 import KontenArtikel from '../../berita/components/KontenArtikel.vue'
@@ -69,7 +68,7 @@ const route = useRoute()
 const slug = computed(() => route.params.slug)
 const items = ref([])
 const isLoading = ref(true)
-const prestasi = computed(() => items.value.find(item => item.slug === slug.value) || getPrestasiBySlug(slug.value))
+const prestasi = computed(() => items.value.find(item => item.slug === slug.value) || null)
 const prestasiLainnya = computed(() => items.value.filter(item => item.slug !== slug.value).slice(0, 3))
 
 const breadcrumbItems = computed(() => [
@@ -92,9 +91,9 @@ watch(() => route.params.slug, async (currentSlug) => {
   try {
     const response = await getPublicContent('achievements')
     const fetched = (response.data?.data || []).map(mapAchievement)
-    items.value = fetched.length ? fetched : getAllPrestasi()
+    items.value = fetched
   } catch (err) {
-    items.value = getAllPrestasi()
+    items.value = []
     console.warn('Gagal memuat detail prestasi dari API:', err)
   } finally {
     isLoading.value = false

@@ -91,7 +91,7 @@ function mapMajor(item) {
     kategori: item.code || 'Program Keahlian',
     nama: name,
     deskripsi: description,
-    gambarHero: normalizeImageUrl(item.image) || fallback.gambarHero || `https://placehold.co/1200x800/e2e8f0/475569?text=${encodeURIComponent(name)}`,
+    gambarHero: normalizeImageUrl(item.image),
     icon: iconByCode[item.code] || fallback.icon || 'Briefcase',
     iconBg: fallback.iconBg || '#1e3a5f',
     keunggulan: [
@@ -115,18 +115,7 @@ onMounted(async () => {
     if (items.length > 0) {
       apiMajors.value = items.map(mapMajor)
     } else {
-      apiMajors.value = fallbackJurusanList.map((item) => ({
-        ...item,
-        slug: item.slug,
-        kategori: item.kategori,
-        nama: item.nama,
-        deskripsi: item.deskripsi,
-        gambarHero: item.gambarHero,
-        icon: item.icon,
-        iconBg: item.iconBg,
-        keunggulan: item.keunggulan,
-        kurikulum: item.kurikulum,
-      }))
+      apiMajors.value = []
     }
   } catch (error) {
     console.warn('Gagal memuat jurusan dari API, mencoba data dummy:', error)

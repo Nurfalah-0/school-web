@@ -5,24 +5,28 @@
         <!-- Kolom Kiri: Gedung Sekolah -->
         <div class="profil-col profil-col-left">
           <img
+            v-if="finalBuildingImage"
             :src="finalBuildingImage"
             alt="Foto gedung SMK Nurul Jadid"
             class="profil-building-img"
             loading="lazy"
             crossorigin="anonymous"
           />
+          <div v-else class="profil-building-img profil-image-placeholder" aria-hidden="true"></div>
         </div>
 
         <!-- Kolom Tengah: Lab + Card -->
         <div class="profil-col profil-col-center">
           <div class="profil-lab-wrap">
             <img
+              v-if="finalLabImage"
               :src="finalLabImage"
               alt="Siswa sedang praktik di lab komputer"
               class="profil-lab-img"
               loading="lazy"
               crossorigin="anonymous"
             />
+            <div v-else class="profil-lab-img profil-image-placeholder" aria-hidden="true"></div>
           </div>
           <div class="profil-highlight-card">
             <svg
@@ -66,8 +70,6 @@
 import { computed, onMounted, ref } from "vue";
 import { getSchoolProfile } from "@/api/endpoints";
 import { useSiteImages } from "@/composables/useSiteImages";
-import labImg from "../../../assets/hero-lab.webp";
-import gedungImg from "../../../assets/gedung.png";
 
 const { getImageByKey, images } = useSiteImages();
 const schoolProfile = ref(null);
@@ -130,17 +132,17 @@ onMounted(async () => {
   }
 });
 
-// Use database images if available, fallback to props or assets
+// Only use an explicitly supplied image or an active database image.
 const finalBuildingImage = computed(() => {
   if (props.buildingImage) return props.buildingImage;
   const img = getImageByKey("about_image");
-  return img?.image_url || gedungImg;
+  return img?.image_url || null;
 });
 
 const finalLabImage = computed(() => {
   if (props.labImage) return props.labImage;
   const img = getImageByKey("facility_lab_komputer");
-  return img?.image_url || labImg;
+  return img?.image_url || null;
 });
 </script>
 
@@ -189,6 +191,10 @@ const finalLabImage = computed(() => {
   object-fit: cover;
   border-radius: 2rem;
   display: block;
+}
+
+.profil-image-placeholder {
+  background: #ffffff;
 }
 
 @media (min-width: 768px) {

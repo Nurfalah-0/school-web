@@ -62,13 +62,14 @@
         <div class="lb-stage" @click.stop>
           <Transition name="lb-img" mode="out-in">
             <img
+              v-if="item.gambarFull"
               :key="item.id"
               :src="item.gambarFull"
               :alt="item.judul"
               class="lb-img"
-              @error="onImgError"
               draggable="false"
             />
+            <div v-else class="lb-img image-placeholder" aria-hidden="true"></div>
           </Transition>
         </div>
 
@@ -120,10 +121,6 @@ function formatDate(dateStr) {
 
 function formatKategori(k) {
   return k.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-}
-
-function onImgError(e) {
-  e.target.src = 'https://placehold.co/1200x800/1e293b/94a3b8?text=Foto+Tidak+Tersedia';
 }
 
 function onKey(e) {

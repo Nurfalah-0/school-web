@@ -315,7 +315,8 @@
       <div class="news-grid-admin">
         <article v-for="item in news" :key="item.id" class="news-card-admin">
           <div class="news-thumb-wrap">
-            <img :src="item.featured_image || item.gambarUtama || 'https://placehold.co/400x250?text=SMK+News'" :alt="item.title" />
+            <img v-if="item.featured_image || item.gambarUtama" :src="item.featured_image || item.gambarUtama" :alt="item.title" />
+            <div v-else class="news-thumb-placeholder" aria-hidden="true"></div>
             <span :class="['publish-badge', item.published !== false ? 'published' : 'draft']">
               <CheckCircle2 :size="12" v-if="item.published !== false" />
               <Clock :size="12" v-else />

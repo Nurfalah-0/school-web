@@ -17,12 +17,13 @@
           >
             <div class="berita-featured-img-wrap">
               <img
+                v-if="beritaUtama.gambarUtama"
                 :src="beritaUtama.gambarUtama"
                 :alt="beritaUtama.judul"
                 class="berita-featured-img"
                 loading="lazy"
-                @error="beritaUtama.gambarUtama = 'https://placehold.co/1000x600/e2e8f0/475569?text=Berita'"
               />
+              <div v-else class="berita-featured-img image-placeholder" aria-hidden="true"></div>
               <span class="berita-featured-badge">UTAMA</span>
             </div>
             <div class="berita-featured-body">
@@ -44,12 +45,13 @@
           >
             <div class="berita-list-thumb">
               <img
+                v-if="item.gambarUtama"
                 :src="item.gambarUtama"
                 :alt="item.judul"
                 class="berita-list-img"
                 loading="lazy"
-                @error="item.gambarUtama = 'https://placehold.co/500x300/e2e8f0/475569?text=Berita'"
               />
+              <div v-else class="berita-list-img image-placeholder" aria-hidden="true"></div>
             </div>
             <div class="berita-list-body">
               <span

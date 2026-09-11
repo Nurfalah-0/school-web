@@ -27,11 +27,13 @@
         <div class="hero-card-wrap">
           <div class="hero-card">
             <img
+              v-if="heroImg"
               :src="heroImg"
               alt="Siswa SMK Nurul Jadid"
               loading="lazy"
               crossorigin="anonymous"
             />
+            <div v-else class="hero-image-placeholder" aria-hidden="true"></div>
           </div>
 
           <div class="hero-stat-card hero-stat-top">
@@ -63,16 +65,12 @@
 import { computed } from "vue";
 import { Users, Trophy } from "lucide-vue-next";
 import { useSiteImages } from "@/composables/useSiteImages";
-import fallbackImg from "../../../assets/hero-lab.webp";
 
-const { getImageByKey, images, loading } = useSiteImages();
+const { getImageByKey } = useSiteImages();
 
 const heroImg = computed(() => {
   const heroImage = getImageByKey("hero_banner");
-  if (heroImage?.image_url) {
-    return heroImage.image_url;
-  }
-  return fallbackImg;
+  return heroImage?.image_url || null;
 });
 </script>
 
@@ -203,6 +201,12 @@ const heroImg = computed(() => {
   height: $hero-visual-height;
   object-fit: cover;
   display: block;
+}
+
+.hero-image-placeholder {
+  width: 100%;
+  height: $hero-visual-height;
+  background: #ffffff;
 }
 
 .hero-stat-card {

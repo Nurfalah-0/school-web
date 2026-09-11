@@ -13,12 +13,13 @@
       >
         <div class="berita-lainnya-img-wrap">
           <img
+            v-if="item.gambarUtama"
             :src="item.gambarUtama"
             :alt="item.judul"
             class="berita-lainnya-img"
             loading="lazy"
-            @error="item.gambarUtama = 'https://placehold.co/500x300/e2e8f0/475569?text=Berita'"
           />
+          <div v-else class="berita-lainnya-img image-placeholder" aria-hidden="true"></div>
           <span
             class="berita-lainnya-badge"
             :style="{ background: kategoriColor(item.kategori) }"

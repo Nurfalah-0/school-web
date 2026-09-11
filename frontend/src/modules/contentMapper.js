@@ -1,7 +1,7 @@
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/api\/?$/, '');
 
 export function publicImage(path) {
-    if (!path) return 'https://placehold.co/1200x700/e2e8f0/475569?text=SMK+Nurul+Jadid';
+    if (!path) return '';
     return /^https?:\/\//i.test(path) ? path : `${API_BASE}/storage/${String(path).replace(/^\/+/, '')}`;
 }
 

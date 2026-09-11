@@ -8,11 +8,13 @@
           <AnimateOnScroll animation="scaleIn" :delay="100">
             <div class="detail-berita-img-wrap">
               <img
+                v-if="artikelAktif.gambarUtama"
                 :src="artikelAktif.gambarUtama"
                 :alt="artikelAktif.judul"
                 class="detail-berita-img"
-                @error="artikelAktif.gambarUtama = 'https://placehold.co/1200x700/e2e8f0/475569?text=Berita'"
+                @error="artikelAktif.gambarUtama = ''"
               />
+              <div v-else class="detail-berita-img image-placeholder" aria-hidden="true"></div>
             </div>
           </AnimateOnScroll>
           <AnimateOnScroll animation="fadeInUp" :delay="200">

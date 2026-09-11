@@ -15,11 +15,13 @@
         <div v-for="card in programs" :key="card.slug" class="pilih-jalur-card">
           <div class="pilih-jalur-img-wrap">
             <img
+              v-if="card.gambarHero"
               :src="card.gambarHero"
               :alt="`Siswa praktik jurusan ${card.nama}`"
               class="pilih-jalur-img"
               loading="lazy"
             />
+            <div v-else class="pilih-jalur-img image-placeholder" aria-hidden="true"></div>
             <span class="pilih-jalur-badge">{{ card.kategori }}</span>
           </div>
           <div class="pilih-jalur-body">
@@ -92,7 +94,7 @@ onMounted(async () => {
           nama: item.name || fallback.nama,
           kategori: item.code || fallback.kategori,
           deskripsi: item.description || fallback.deskripsi || "Program keahlian SMK Nurul Jadid.",
-          gambarHero: normalizeImageUrl(item.image) || fallback.gambarHero || "https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian",
+          gambarHero: normalizeImageUrl(item.image),
           icon: fallback.icon || "CodeXml",
         };
       });
@@ -102,10 +104,7 @@ onMounted(async () => {
     console.warn("Gagal memuat jurusan API, fallback ke data dummy:", error);
   }
 
-  programs.value = fallbackJurusanList.slice(0, 3).map((item) => ({
-    ...item,
-    gambarHero: item.gambarHero || "https://placehold.co/1200x800/e2e8f0/475569?text=Program+Keahlian",
-  }));
+  programs.value = [];
 });
 
 defineProps({
@@ -223,6 +222,10 @@ defineProps({
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.image-placeholder {
+  background: #ffffff;
 }
 
 .pilih-jalur-badge {

@@ -28,11 +28,13 @@
         >
           <div class="produk-img-wrap">
             <img
+              v-if="item.gambar"
               :src="item.gambar"
               :alt="item.nama"
               loading="lazy"
-              @error="onImgError"
+              @error="item.gambar = ''"
             />
+            <div v-else class="produk-image-placeholder" aria-hidden="true"></div>
             <span class="produk-badge" v-if="item.kategori">{{ item.kategori }}</span>
           </div>
           <div class="produk-info">
@@ -82,10 +84,6 @@ const props = defineProps({
 })
 
 defineEmits(['tambah-keranjang'])
-
-function onImgError(e) {
-  e.target.src = 'https://placehold.co/600x600/1e3a8a/ffffff?text=Produk+TEFA'
-}
 
 const filteredProduk = computed(() => {
   if (!props.items || props.items.length === 0) return []
