@@ -702,6 +702,14 @@
           <label>Nama Sekolah <span class="req">*</span></label>
           <input v-model="profileForm.school_name" required placeholder="SMK Nurul Jadid" />
         </div>
+        <div class="form-group full-width">
+          <label>Judul Profil</label>
+          <input v-model="profileForm.profile_title_line1" placeholder="Tradisi Pesantren, Inovasi Masa Depan" />
+        </div>
+        <div class="form-group full-width">
+          <label>Deskripsi Profil Sekolah</label>
+          <textarea v-model="profileForm.profile_description" rows="5" placeholder="Tulis deskripsi profil sekolah"></textarea>
+        </div>
         <div class="form-group">
           <label>Nama Kepala Sekolah</label>
           <input v-model="profileForm.headmaster_name" placeholder="Nama Kepala Sekolah beserta gelar" />
@@ -951,7 +959,7 @@ const newsForm = reactive({ id: null, title: '', category: '', excerpt: '', cont
 const majorForm = reactive({ id: null, code: '', name: '', capacity: null, description: '', vision: '', mission: '', image: null, image_url: '', is_active: true });
 const imageForm = reactive({ id: null, key: '', title: '', section: '', alt_text: '', image_url: '', file: null });
 const studentForm = reactive({ id: null, nisn: '', nis: '', name: '', email: '', phone: '', class: '', gender: '', major_id: null, address: '' });
-const profileForm = reactive({ school_name: '', email: '', phone: '', website: '', headmaster_name: '', founded_year: null, address: '', vision: '', mission: '' });
+const profileForm = reactive({ school_name: '', profile_title_line1: '', profile_description: '', email: '', phone: '', website: '', headmaster_name: '', founded_year: null, address: '', vision: '', mission: '' });
 const categoryForm = reactive({ id: null, name: '', type: 'news' });
 const userForm = reactive({ id: null, name: '', email: '', password: '', phone: '', role: 'admin_sekolah', is_active: true });
 const ppdbSchedule = reactive({ registration_start: '', registration_end: '' });

@@ -42,20 +42,18 @@
         <div class="profil-col profil-col-right">
           <span class="profil-label">{{ label }}</span>
           <h2 class="profil-title">
-            <span>{{ titleLine1 }}</span
-            ><br />
-            <span>{{ titleLine2 }}</span>
+            <span>{{ displayedTitle }}</span>
           </h2>
-          <p class="profil-description">{{ description }}</p>
+          <p class="profil-description">{{ displayedDescription }}</p>
 
           <div class="profil-vm-row">
             <div class="profil-vm-card profil-vm-vision">
               <h4 class="profil-vm-title">{{ visionTitle }}</h4>
-              <p class="profil-vm-text">{{ visionText }}</p>
+              <p class="profil-vm-text">{{ displayedVision }}</p>
             </div>
             <div class="profil-vm-card profil-vm-mission">
               <h4 class="profil-vm-title">{{ missionTitle }}</h4>
-              <p class="profil-vm-text">{{ missionText }}</p>
+              <p class="profil-vm-text">{{ displayedMission }}</p>
             </div>
           </div>
         </div>
@@ -65,12 +63,14 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { getSchoolProfile } from "@/api/endpoints";
 import { useSiteImages } from "@/composables/useSiteImages";
 import labImg from "../../../assets/hero-lab.webp";
 import gedungImg from "../../../assets/gedung.png";
 
 const { getImageByKey, images } = useSiteImages();
+const schoolProfile = ref(null);
 
 const props = defineProps({
   label: {
@@ -116,6 +116,20 @@ const props = defineProps({
   },
 });
 
+const displayedVision = computed(() => schoolProfile.value?.vision?.trim() || props.visionText);
+const displayedMission = computed(() => schoolProfile.value?.mission?.trim() || props.missionText);
+const displayedTitle = computed(() => schoolProfile.value?.profile_title_line1?.trim() || [props.titleLine1, props.titleLine2].filter(Boolean).join(' '));
+const displayedDescription = computed(() => schoolProfile.value?.profile_description?.trim() || props.description);
+
+onMounted(async () => {
+  try {
+    const response = await getSchoolProfile();
+    schoolProfile.value = response.data?.data || null;
+  } catch (error) {
+    console.warn("Gagal memuat profil sekolah:", error);
+  }
+});
+
 // Use database images if available, fallback to props or assets
 const finalBuildingImage = computed(() => {
   if (props.buildingImage) return props.buildingImage;
@@ -152,7 +166,7 @@ const finalLabImage = computed(() => {
 
 @media (min-width: 768px) {
   .profil-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: 0.65fr 0.65fr 1.7fr;
     gap: 2.5rem;
   }
 }
@@ -171,7 +185,7 @@ const finalLabImage = computed(() => {
 .profil-building-img {
   width: 100%;
   height: 100%;
-  min-height: 480px;
+  min-height: 340px;
   object-fit: cover;
   border-radius: 2rem;
   display: block;
@@ -179,7 +193,7 @@ const finalLabImage = computed(() => {
 
 @media (min-width: 768px) {
   .profil-building-img {
-    min-height: 640px;
+    min-height: 440px;
     border-radius: 2.5rem;
   }
 }
@@ -197,7 +211,7 @@ const finalLabImage = computed(() => {
 
 .profil-lab-img {
   width: 100%;
-  height: 320px;
+  height: 210px;
   object-fit: cover;
   border-radius: 2rem;
   display: block;
@@ -205,7 +219,7 @@ const finalLabImage = computed(() => {
 
 @media (min-width: 768px) {
   .profil-lab-img {
-    height: 380px;
+    height: 230px;
     border-radius: 2.5rem;
   }
 }
@@ -217,17 +231,17 @@ const finalLabImage = computed(() => {
   justify-content: flex-end;
   align-items: flex-start;
   gap: 1rem;
-  padding: 2rem;
+  padding: 1.25rem;
   background: #ccfbf1;
   border-radius: 2rem;
-  min-height: 260px;
+  min-height: 150px;
 }
 
 @media (min-width: 768px) {
   .profil-highlight-card {
-    padding: 2.5rem;
+    padding: 1.5rem;
     border-radius: 2.5rem;
-    min-height: 320px;
+    min-height: 170px;
   }
 }
 
@@ -248,14 +262,14 @@ const finalLabImage = computed(() => {
   margin: 0;
   font-family: $font-display;
   font-weight: 700;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: #134e4a;
   line-height: 1.3;
 }
 
 @media (min-width: 768px) {
   .profil-highlight-text {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 }
 
@@ -278,7 +292,7 @@ const finalLabImage = computed(() => {
 .profil-title {
   font-family: $font-display;
   font-weight: 800;
-  font-size: clamp(1.6rem, 2.2vw, 2.1rem);
+  font-size: clamp(1.8rem, 2.5vw, 2.5rem);
   line-height: 1.2;
   color: #0f172a;
   margin: 0;
@@ -286,7 +300,7 @@ const finalLabImage = computed(() => {
 
 .profil-description {
   color: #334155;
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.75;
   margin: 0;
 }
@@ -308,7 +322,7 @@ const finalLabImage = computed(() => {
   flex: 1;
   border-left: 5px solid transparent;
   border-radius: 0 1rem 1rem 0;
-  padding: 1.25rem;
+  padding: 1.5rem;
   background: #f5f3ff;
 }
 
@@ -323,7 +337,7 @@ const finalLabImage = computed(() => {
 
 .profil-vm-title {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.1rem;
   margin: 0 0 0.5rem 0;
 }
 
@@ -337,8 +351,9 @@ const finalLabImage = computed(() => {
 
 .profil-vm-text {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #334155;
   line-height: 1.6;
+  white-space: pre-line;
 }
 </style>
