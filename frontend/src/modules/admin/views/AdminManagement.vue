@@ -703,6 +703,18 @@
           <label>Nama Sekolah <span class="req">*</span></label>
           <input v-model="profileForm.school_name" required placeholder="SMK Nurul Jadid" />
         </div>
+        <div class="form-group">
+          <label>NSM</label>
+          <input v-model="profileForm.nsm" placeholder="322052022001" />
+        </div>
+        <div class="form-group">
+          <label>NPSN</label>
+          <input v-model="profileForm.npsn" placeholder="20553240" />
+        </div>
+        <div class="form-group">
+          <label>NPWP</label>
+          <input v-model="profileForm.npwp" placeholder="01.915.650.4-625.005" />
+        </div>
         <div class="form-group full-width">
           <label>Judul Profil</label>
           <input v-model="profileForm.profile_title_line1" placeholder="Tradisi Pesantren, Inovasi Masa Depan" />
@@ -731,9 +743,33 @@
           <label>Tahun Berdiri</label>
           <input v-model.number="profileForm.founded_year" type="number" placeholder="1995" />
         </div>
+        <div class="form-group">
+          <label>Tahun Beroperasi</label>
+          <input v-model.number="profileForm.operating_year" type="number" placeholder="2008" />
+        </div>
+        <div class="form-group">
+          <label>Status Akreditasi</label>
+          <input v-model="profileForm.accreditation" placeholder="B (90)" />
+        </div>
+        <div class="form-group">
+          <label>Yayasan Penyelenggara</label>
+          <input v-model="profileForm.foundation_name" placeholder="Yayasan Nurul Jadid" />
+        </div>
         <div class="form-group full-width">
           <label>Alamat Sekolah</label>
           <textarea v-model="profileForm.address" placeholder="Alamat lengkap lokasi sekolah"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Desa</label>
+          <input v-model="profileForm.village" placeholder="Karanganyar" />
+        </div>
+        <div class="form-group">
+          <label>Kecamatan</label>
+          <input v-model="profileForm.district" placeholder="Paiton" />
+        </div>
+        <div class="form-group">
+          <label>Kota / Provinsi</label>
+          <input v-model="profileForm.city" placeholder="Probolinggo - Jawa Timur" />
         </div>
         <div class="form-group">
           <label>Visi Sekolah</label>
@@ -960,7 +996,7 @@ const newsForm = reactive({ id: null, title: '', category: '', excerpt: '', cont
 const majorForm = reactive({ id: null, code: '', name: '', capacity: null, description: '', vision: '', mission: '', image: null, image_url: '', is_active: true });
 const imageForm = reactive({ id: null, key: '', title: '', section: '', alt_text: '', image_url: '', file: null });
 const studentForm = reactive({ id: null, nisn: '', nis: '', name: '', email: '', phone: '', class: '', gender: '', major_id: null, address: '' });
-const profileForm = reactive({ school_name: '', profile_title_line1: '', profile_description: '', email: '', phone: '', website: '', headmaster_name: '', founded_year: null, address: '', vision: '', mission: '' });
+const profileForm = reactive({ school_name: '', nsm: '', npsn: '', npwp: '', profile_title_line1: '', profile_description: '', email: '', phone: '', website: '', headmaster_name: '', founded_year: null, operating_year: null, accreditation: '', foundation_name: '', address: '', village: '', district: '', city: '', vision: '', mission: '' });
 const categoryForm = reactive({ id: null, name: '', type: 'news' });
 const userForm = reactive({ id: null, name: '', email: '', password: '', phone: '', role: 'admin_sekolah', is_active: true });
 const ppdbSchedule = reactive({ registration_start: '', registration_end: '' });
