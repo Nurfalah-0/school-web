@@ -32,16 +32,16 @@
 <script setup>
 import { computed } from 'vue'
 import { Medal } from 'lucide-vue-next'
-import { getPrestasiLainnya, kategoriBadgeColors } from '@/data/prestasi'
+import { kategoriBadgeColors } from '@/data/prestasi'
 
 const props = defineProps({
-  currentSlug: {
-    type: String,
-    default: ''
+  items: {
+    type: Array,
+    default: () => []
   }
 })
 
-const items = computed(() => getPrestasiLainnya(props.currentSlug, 3))
+const items = computed(() => props.items)
 
 function badgeBg(colorKey) {
   return kategoriBadgeColors[colorKey]?.bg || '#eef2ff'

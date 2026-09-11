@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ContentController extends Controller
@@ -15,7 +14,7 @@ class ContentController extends Controller
         'galleries' => ['title', 'slug', 'category', 'description', 'image', 'alt_text', 'sort_order', 'is_featured', 'is_published'],
         'industry_partners' => ['company_name', 'slug', 'industry_type', 'address', 'city', 'phone', 'email', 'website', 'logo', 'description', 'is_active'],
         'job_vacancies' => ['title', 'slug', 'category', 'description', 'requirements', 'location', 'employment_type', 'salary_min', 'salary_max', 'deadline', 'is_remote', 'status'],
-        'products' => ['name', 'slug', 'sku', 'category', 'short_description', 'description', 'base_price', 'compare_price', 'stock', 'image', 'status', 'featured'],
+        'products' => ['name', 'slug', 'sku', 'category', 'short_description', 'description', 'base_price', 'compare_price', 'stock', 'image', 'options', 'status', 'featured'],
     ];
 
     public function index(string $type)
@@ -39,6 +38,11 @@ class ContentController extends Controller
         $table = $this->table($type);
         $data = $this->validatedData($request, $type);
         $data['slug'] = $data['slug'] ?? Str::slug($data['title'] ?? $data['name'] ?? $data['company_name']);
+        if ($table === 'products' && empty($data['sku'])) {
+            do {
+                $data['sku'] = 'SKU-' . Str::upper(Str::random(10));
+            } while (DB::table($table)->where('sku', $data['sku'])->exists());
+        }
         $data['created_at'] = now();
         $data['updated_at'] = now();
         $id = DB::table($table)->insertGetId($data);
@@ -102,11 +106,17 @@ class ContentController extends Controller
         $rules['logo'] = 'sometimes|image|max:5120';
         $rules['price'] = 'sometimes';
         $rules['short_description'] = 'sometimes|string';
+        $rules['options'] = 'sometimes|nullable|json';
 
         $data = $request->validate($rules);
 
         if ($resolved === 'products' && isset($data['price']) && !isset($data['base_price'])) {
             $data['base_price'] = (float) $data['price'];
+        }
+
+        if ($resolved === 'products' && isset($data['options']) && is_string($data['options'])) {
+            $options = json_decode($data['options'], true);
+            $data['options'] = json_last_error() === JSON_ERROR_NONE ? json_encode($options) : null;
         }
 
         foreach (['image', 'logo'] as $fileField) {

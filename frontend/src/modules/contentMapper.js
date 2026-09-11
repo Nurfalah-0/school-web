@@ -18,5 +18,9 @@ export function mapVacancy(item) {
 }
 
 export function mapProduct(item) {
-    return { ...item, id: item.id, nama: item.name, kategori: item.category || 'Lainnya', rating: Number(item.rating || 0), ulasan: Number(item.review_count || 0), harga: Number(item.base_price || 0), gambar: publicImage(item.image), deskripsi: item.description || item.short_description || '' };
+    let pilihan = item.options;
+    if (typeof pilihan === 'string') {
+        try { pilihan = JSON.parse(pilihan); } catch { pilihan = []; }
+    }
+    return { ...item, id: item.id, nama: item.name, kategori: item.category || 'Lainnya', rating: Number(item.rating || 0), ulasan: Number(item.review_count || 0), harga: Number(item.base_price || 0), gambar: publicImage(item.image), deskripsi: item.description || item.short_description || '', pilihan: Array.isArray(pilihan) ? pilihan : [] };
 }

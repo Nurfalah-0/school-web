@@ -1,6 +1,10 @@
 <template>
   <div class="detail-prestasi-page">
-    <div v-if="prestasi">
+    <div v-if="isLoading" class="detail-prestasi-empty">
+      <p class="detail-prestasi-empty-text">Memuat prestasi...</p>
+    </div>
+
+    <div v-else-if="prestasi">
       <AnimateOnScroll animation="fadeInDown">
         <div class="detail-prestasi-layout">
           <div class="detail-prestasi-main">
@@ -23,7 +27,7 @@
           </div>
           <AnimateOnScroll animation="fadeInRight" :delay="300">
             <aside class="detail-prestasi-sidebar">
-              <PrestasiLainnya :current-slug="slug" />
+              <PrestasiLainnya :items="prestasiLainnya" />
               <CtaPpdb />
             </aside>
           </AnimateOnScroll>
@@ -50,7 +54,7 @@ import { computed, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { getPublicContent } from '@/api/endpoints'
 import { mapAchievement } from '@/modules/contentMapper'
-import { getPrestasiBySlug, getPrestasiLainnya } from '@/data/prestasi'
+import { getAllPrestasi, getPrestasiBySlug } from '@/data/prestasi'
 import Breadcrumb from '../../berita/components/Breadcrumb.vue'
 import ArtikelHeader from '../../berita/components/ArtikelHeader.vue'
 import KontenArtikel from '../../berita/components/KontenArtikel.vue'
@@ -63,8 +67,10 @@ import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
 const route = useRoute()
 const slug = computed(() => route.params.slug)
-const prestasi = ref(null)
+const items = ref([])
 const isLoading = ref(true)
+const prestasi = computed(() => items.value.find(item => item.slug === slug.value) || getPrestasiBySlug(slug.value))
+const prestasiLainnya = computed(() => items.value.filter(item => item.slug !== slug.value).slice(0, 3))
 
 const breadcrumbItems = computed(() => [
   { label: 'Beranda', to: '/' },
@@ -80,21 +86,19 @@ const kontenArtikel = computed(() => {
 })
 
 watch(() => route.params.slug, async (currentSlug) => {
-  prestasi.value = null
+  items.value = []
   isLoading.value = true
 
   try {
     const response = await getPublicContent('achievements')
     const fetched = (response.data?.data || []).map(mapAchievement)
-    const apiPrestasi = fetched.find(item => item.slug === currentSlug)
-    prestasi.value = apiPrestasi || getPrestasiBySlug(currentSlug)
+    items.value = fetched.length ? fetched : getAllPrestasi()
   } catch (err) {
-    prestasi.value = getPrestasiBySlug(currentSlug)
+    items.value = getAllPrestasi()
     console.warn('Gagal memuat detail prestasi dari API:', err)
   } finally {
     isLoading.value = false
   }
-
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }, { immediate: true })
 

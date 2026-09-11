@@ -105,6 +105,18 @@
               <label>Stok Tersedia</label>
               <input v-model.number="form.stock" type="number" min="0" placeholder="Contoh: 25" />
             </div>
+            <div class="form-group full-width product-options-editor">
+              <div class="field-heading">
+                <label>Pilihan Produk <small>(Opsional)</small></label>
+                <button class="button secondary small" type="button" @click="addOptionGroup">+ Tambah Pilihan</button>
+              </div>
+              <p class="field-help">Tambahkan pilihan seperti Warna, Ukuran, Bahan, atau pilihan lain. Pisahkan nilainya dengan koma.</p>
+              <div v-for="(option, index) in form.pilihan" :key="index" class="product-option-row">
+                <input v-model="option.name" placeholder="Nama pilihan, contoh: Warna" />
+                <input v-model="option.values" placeholder="Nilai, contoh: Merah, Biru, Hitam" />
+                <button class="button small danger" type="button" @click="removeOptionGroup(index)">Hapus</button>
+              </div>
+            </div>
           </template>
 
           <!-- Status & Slug -->
@@ -230,6 +242,7 @@ const form = reactive({
   deadline: '',
   price: null,
   stock: null,
+  pilihan: [],
   website: '',
   address: '',
   slug: '',
@@ -248,7 +261,9 @@ function notify(text, kind = 'success') {
 
 function errorMessage(error) {
   const err = Object.values(error.response?.data?.errors || {}).flat().join(' ');
-  notify(err || error.response?.data?.message || 'Perubahan gagal disimpan.', 'error');
+  const message = err || error.response?.data?.message || '';
+  const isDatabaseError = /SQLSTATE|General error|insert into|update .* set/i.test(message);
+  notify(isDatabaseError ? 'Data gagal disimpan. Periksa kembali isian lalu coba lagi.' : (message || 'Perubahan gagal disimpan.'), 'error');
 }
 
 async function load() {
@@ -279,6 +294,7 @@ function reset() {
     deadline: '',
     price: null,
     stock: null,
+    pilihan: [],
     website: '',
     address: '',
     slug: '',
@@ -299,6 +315,7 @@ function edit(record) {
     deadline: record.deadline ? record.deadline.substring(0, 10) : '',
     price: record.price || null,
     stock: record.stock || null,
+    pilihan: normalizeOptions(record.options),
     website: record.website || '',
     address: record.address || '',
     slug: record.slug || '',
@@ -339,9 +356,30 @@ function buildPayload() {
       data.append('base_price', form.price);
     }
     if (form.stock !== null && form.stock !== '') data.append('stock', form.stock);
+    const options = form.pilihan
+      .map(option => ({ name: option.name.trim(), values: option.values.split(',').map(value => value.trim()).filter(Boolean) }))
+      .filter(option => option.name && option.values.length);
+    data.append('options', JSON.stringify(options));
   }
 
   return data;
+}
+
+function normalizeOptions(options) {
+  if (typeof options === 'string') {
+    try { options = JSON.parse(options); } catch { options = []; }
+  }
+  return Array.isArray(options)
+    ? options.map(option => ({ name: option.name || '', values: Array.isArray(option.values) ? option.values.join(', ') : (option.values || '') }))
+    : [];
+}
+
+function addOptionGroup() {
+  form.pilihan.push({ name: '', values: '' });
+}
+
+function removeOptionGroup(index) {
+  form.pilihan.splice(index, 1);
 }
 
 async function save() {

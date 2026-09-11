@@ -65,6 +65,25 @@
         </div>
       </div>
 
+      <form class="schedule-card" @submit.prevent="savePpdbSchedule">
+        <div>
+          <p class="eyebrow">Jadwal Pendaftaran</p>
+          <h3>Atur waktu buka dan tutup PPDB</h3>
+          <p class="schedule-help">Tombol pendaftaran aktif hanya di antara dua waktu ini.</p>
+        </div>
+        <div class="schedule-fields">
+          <label class="form-group">
+            <span>Mulai pendaftaran</span>
+            <input v-model="ppdbSchedule.registration_start" type="datetime-local" required />
+          </label>
+          <label class="form-group">
+            <span>Selesai pendaftaran</span>
+            <input v-model="ppdbSchedule.registration_end" type="datetime-local" required />
+          </label>
+          <button class="button primary" type="submit"><Save :size="15" /> Simpan Jadwal</button>
+        </div>
+      </form>
+
       <div class="table-wrap">
         <table>
           <thead>
@@ -75,7 +94,7 @@
               <th>Pilihan Jurusan</th>
               <th>Tgl Daftar</th>
               <th>Status</th>
-              <th>Aksi</th>
+              <th class="applications-action-column">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -94,7 +113,7 @@
                   {{ item.status_label || item.status }}
                 </span>
               </td>
-              <td class="actions">
+              <td class="actions applications-actions">
                 <button class="button small secondary" @click="viewAppDetail(item)">Detail</button>
                 <button
                   v-if="item.status !== 'diterima' && item.status !== 'Disetujui'"
@@ -744,11 +763,31 @@
             <div><span>Asal Sekolah:</span> <strong>{{ selectedApp.asal_sekolah || '-' }}</strong></div>
             <div><span>Status:</span> <span :class="['status-pill', getStatusClass(selectedApp.status)]">{{ selectedApp.status_label || selectedApp.status }}</span></div>
             <div class="full-width"><span>Alamat:</span> <strong>{{ selectedApp.alamat || '-' }}</strong></div>
-            <div v-if="selectedApp.berkas_url || selectedApp.berkas_path" class="full-width berkas-box">
-              <span>Berkas Terunggah:</span>
-              <a :href="selectedApp.berkas_url || ('/storage/' + selectedApp.berkas_path)" target="_blank" class="button small secondary">
-                <FileText :size="14" /> Lihat / Unduh Dokumen Berkas
-              </a>
+            <div class="full-width berkas-box">
+              <span>Dokumen Pendaftaran:</span>
+              <div class="document-links">
+                <a
+                  v-for="document in applicationDocuments"
+                  :key="document.key"
+                  v-if="selectedApp[`${document.key}_url`] || selectedApp[`${document.key}_path`]"
+                  :href="selectedApp[`${document.key}_url`] || ('/storage/' + selectedApp[`${document.key}_path`])"
+                  target="_blank"
+                  rel="noopener"
+                  class="button small secondary"
+                >
+                  <FileText :size="14" /> {{ document.label }}
+                </a>
+                <a
+                  v-if="selectedApp.berkas_url || selectedApp.berkas_path"
+                  :href="selectedApp.berkas_url || ('/storage/' + selectedApp.berkas_path)"
+                  target="_blank"
+                  rel="noopener"
+                  class="button small secondary"
+                >
+                  <FileText :size="14" /> Berkas Lama
+                </a>
+                <span v-if="!hasApplicationDocuments" class="empty-document">Belum ada dokumen.</span>
+              </div>
             </div>
           </div>
         </div>
@@ -866,8 +905,11 @@ import {
   updateSiteImage,
   updateCategory,
   updateUser,
+  getPpdbSchedule,
+  updatePpdbSchedule,
   addMajorFacility,
   deleteMajorFacility,
+  getRegistrationDetail,
 } from '../../../api/endpoints';
 
 const router = useRouter();
@@ -886,6 +928,14 @@ const usersList = ref([]);
 
 // Modals
 const selectedApp = ref(null);
+const applicationDocuments = [
+  { key: 'kk', label: 'Kartu Keluarga' },
+  { key: 'ktp_ayah', label: 'KTP Ayah' },
+  { key: 'ktp_ibu', label: 'KTP Ibu' },
+  { key: 'akta_kelahiran', label: 'Akta Kelahiran' },
+  { key: 'ijazah_menengah', label: 'Ijazah Menengah' },
+  { key: 'dokumen_lain', label: 'Dokumen Lain' },
+];
 const selectedMajorForFacility = ref(null);
 const majorFacilities = ref([]);
 const facilityForm = reactive({ name: '', description: '' });
@@ -904,6 +954,7 @@ const studentForm = reactive({ id: null, nisn: '', nis: '', name: '', email: '',
 const profileForm = reactive({ school_name: '', email: '', phone: '', website: '', headmaster_name: '', founded_year: null, address: '', vision: '', mission: '' });
 const categoryForm = reactive({ id: null, name: '', type: 'news' });
 const userForm = reactive({ id: null, name: '', email: '', password: '', phone: '', role: 'admin_sekolah', is_active: true });
+const ppdbSchedule = reactive({ registration_start: '', registration_end: '' });
 
 // Tabs config
 const tabs = computed(() => [
@@ -975,6 +1026,17 @@ function majorName(id) {
   return majors.value.find(m => m.id === id)?.name || '-';
 }
 
+function toDateTimeLocal(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  const pad = (number) => String(number).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function toIsoString(value) {
+  return value ? new Date(value).toISOString() : null;
+}
+
 // =============================================
 // LOADERS
 // =============================================
@@ -982,6 +1044,15 @@ async function loadApplications() {
   try {
     const response = await getRegistrations();
     applications.value = response.data?.data?.data || response.data?.data || [];
+  } catch (error) { errorMessage(error); }
+}
+
+async function loadPpdbSchedule() {
+  try {
+    const response = await getPpdbSchedule();
+    const schedule = response.data?.data || {};
+    ppdbSchedule.registration_start = toDateTimeLocal(schedule.registration_start);
+    ppdbSchedule.registration_end = toDateTimeLocal(schedule.registration_end);
   } catch (error) { errorMessage(error); }
 }
 
@@ -1037,8 +1108,30 @@ async function loadProfile() {
 // =============================================
 // PPDB ACTIONS
 // =============================================
-function viewAppDetail(item) {
+async function savePpdbSchedule() {
+  try {
+    await updatePpdbSchedule({
+      registration_start: toIsoString(ppdbSchedule.registration_start),
+      registration_end: toIsoString(ppdbSchedule.registration_end),
+    });
+    notify('Jadwal pendaftaran PPDB berhasil disimpan.');
+  } catch (error) { errorMessage(error); }
+}
+
+const hasApplicationDocuments = computed(() => {
+  if (!selectedApp.value) return false;
+  return applicationDocuments.some(({ key }) => selectedApp.value[`${key}_url`] || selectedApp.value[`${key}_path`])
+    || selectedApp.value.berkas_url || selectedApp.value.berkas_path;
+});
+
+async function viewAppDetail(item) {
   selectedApp.value = item;
+  try {
+    const response = await getRegistrationDetail(item.id);
+    selectedApp.value = response.data?.data || item;
+  } catch (error) {
+    errorMessage(error);
+  }
 }
 
 async function changeStatus(item, status) {
@@ -1462,6 +1555,7 @@ function logout() {
 onMounted(() => {
   Promise.all([
     loadApplications(),
+    loadPpdbSchedule(),
     loadStudents(),
     loadNews(),
     loadMajors(),
@@ -1621,6 +1715,32 @@ h2 {
   gap: 16px;
   margin-bottom: 24px;
   flex-wrap: wrap;
+}
+
+.applications-action-column { min-width: 235px; }
+.applications-actions { min-width: 235px; flex-wrap: wrap; }
+.document-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.empty-document { color: #64748b; font-size: 13px; }
+
+.schedule-card {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) 1.7fr;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 24px;
+  padding: 18px;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  background: #eff6ff;
+}
+
+.schedule-card h3 { margin: 0 0 6px; font-size: 16px; }
+.schedule-help { margin: 0; color: #64748b; font-size: 13px; }
+.schedule-fields { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+.schedule-fields .form-group { margin: 0; }
+
+@media (max-width: 800px) {
+  .schedule-card, .schedule-fields { grid-template-columns: 1fr; }
 }
 
 .heading-controls, .list-toolbar {

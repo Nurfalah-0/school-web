@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\PpdbRegistration;
+use App\Models\PpdbSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,12 +13,63 @@ use Illuminate\Support\Facades\Validator;
 class PpdbController extends Controller
 {
     /**
+     * [PUBLIC] Ambil jadwal pendaftaran PPDB.
+     * GET /api/ppdb/schedule
+     */
+    public function schedule()
+    {
+        $setting = PpdbSetting::current();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'registration_start' => $setting->registration_start?->toIso8601String(),
+                'registration_end' => $setting->registration_end?->toIso8601String(),
+                'is_open' => $setting->isOpen(),
+            ],
+        ]);
+    }
+
+    /**
+     * [ADMIN] Simpan jadwal pendaftaran PPDB.
+     * PUT /api/ppdb/schedule
+     */
+    public function updateSchedule(Request $request)
+    {
+        $validated = $request->validate([
+            'registration_start' => 'required|date',
+            'registration_end' => 'required|date|after:registration_start',
+        ]);
+
+        $setting = PpdbSetting::current();
+        $setting->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jadwal pendaftaran PPDB berhasil diperbarui.',
+            'data' => [
+                'registration_start' => $setting->registration_start?->toIso8601String(),
+                'registration_end' => $setting->registration_end?->toIso8601String(),
+                'is_open' => $setting->isOpen(),
+            ],
+        ]);
+    }
+
+    /**
      * [PUBLIC] Submit formulir pendaftaran PPDB dari halaman publik
      * POST /api/ppdb/apply
      */
     public function apply(Request $request)
     {
         try {
+            $schedule = PpdbSetting::current();
+            if (!$schedule->isOpen()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pendaftaran PPDB belum dibuka atau sudah ditutup.',
+                ], 403);
+            }
+
             $validator = Validator::make($request->all(), [
                 'nama'              => 'required|string|max:255',
                 'nisn'              => 'nullable|string|max:20',
@@ -30,6 +82,12 @@ class PpdbController extends Controller
                 'asal_sekolah'      => 'nullable|string|max:200',
                 'jalur_pendaftaran' => 'nullable|in:reguler,prestasi,bidikmisi',
                 'berkas'            => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+                'kk'                => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+                'ktp_ayah'          => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+                'ktp_ibu'           => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+                'akta_kelahiran'    => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+                'ijazah_menengah'   => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+                'dokumen_lain'      => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             ]);
 
             if ($validator->fails()) {
@@ -54,6 +112,14 @@ class PpdbController extends Controller
                 $data['berkas_url']  = Storage::url($path);
             }
 
+            foreach (['kk', 'ktp_ayah', 'ktp_ibu', 'akta_kelahiran', 'ijazah_menengah', 'dokumen_lain'] as $document) {
+                if ($request->hasFile($document)) {
+                    $path = $request->file($document)->store('ppdb-berkas', 'public');
+                    $data["{$document}_path"] = $path;
+                    $data["{$document}_url"] = Storage::url($path);
+                }
+            }
+
             $registration = PpdbRegistration::create($data);
 
             return response()->json([
@@ -62,7 +128,6 @@ class PpdbController extends Controller
                 'no_pendaftaran'  => $registration->no_pendaftaran,
                 'data'            => $registration,
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -102,7 +167,6 @@ class PpdbController extends Controller
                     'verified_at'     => $registration->verified_at?->format('d M Y'),
                 ],
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -135,9 +199,9 @@ class PpdbController extends Controller
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('nama', 'like', "%{$search}%")
-                      ->orWhere('nisn', 'like', "%{$search}%")
-                      ->orWhere('no_pendaftaran', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('nisn', 'like', "%{$search}%")
+                        ->orWhere('no_pendaftaran', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
                 });
             }
 
@@ -153,7 +217,6 @@ class PpdbController extends Controller
                 'success' => true,
                 'data'    => $registrations,
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -182,7 +245,6 @@ class PpdbController extends Controller
                 'success' => true,
                 'data'    => $registration,
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -221,7 +283,6 @@ class PpdbController extends Controller
                 'message' => "Pendaftaran atas nama {$registration->nama} telah DITERIMA.",
                 'data'    => $registration->fresh(),
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -260,7 +321,6 @@ class PpdbController extends Controller
                 'message' => "Pendaftaran atas nama {$registration->nama} telah DITOLAK.",
                 'data'    => $registration->fresh(),
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -299,7 +359,6 @@ class PpdbController extends Controller
                     'per_program' => $perProgram,
                 ],
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -334,7 +393,6 @@ class PpdbController extends Controller
                 'success' => true,
                 'message' => 'Data pendaftaran berhasil dihapus.',
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

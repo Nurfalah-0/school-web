@@ -1,7 +1,7 @@
 <template>
   <div class="ppdb-page">
     <AnimateOnScroll animation="fadeInDown">
-      <PpdbHero />
+      <PpdbHero :schedule="schedule" />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="100">
       <MengapaMemilihKami />
@@ -16,7 +16,7 @@
       <PersyaratanJadwal />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="500">
-      <FormDanStatus @submit-pendaftaran="handleSubmitPendaftaran" />
+      <FormDanStatus :schedule="schedule" @submit-pendaftaran="handleSubmitPendaftaran" />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="600">
       <FooterSection />
@@ -25,6 +25,8 @@
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue';
+import { getPpdbSchedule } from '../../../api/endpoints';
 import PpdbHero from '../components/PpdbHero.vue';
 import MengapaMemilihKami from '../components/MengapaMemilihKami.vue';
 import LangkahPendaftaran from '../components/LangkahPendaftaran.vue';
@@ -34,9 +36,20 @@ import FormDanStatus from '../components/FormDanStatus.vue';
 import FooterSection from '../../portal/components/FooterSection.vue';
 import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue';
 
+const schedule = ref({ registration_start: null, registration_end: null, is_open: true });
+
 const handleSubmitPendaftaran = (payload) => {
   console.log('Pendaftaran submitted:', payload);
 };
+
+onMounted(async () => {
+  try {
+    const response = await getPpdbSchedule();
+    schedule.value = response.data?.data || schedule.value;
+  } catch (error) {
+    // Keep the existing open state when the schedule service is unavailable.
+  }
+});
 </script>
 
 <style lang="scss" scoped>
