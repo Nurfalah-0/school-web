@@ -28,6 +28,7 @@
         </div>
 
         <div class="ppdb-hero-countdown">
+          <span class="ppdb-hero-countdown-label">{{ countdownLabel }}</span>
           <div class="ppdb-hero-count-box">
             <strong>{{ countdown.days }}</strong>
             <span>HARI</span>
@@ -108,16 +109,27 @@ const props = defineProps({
     type: Object,
     default: () => ({ registration_start: null, registration_end: null, is_open: true }),
   },
+  loading: { type: Boolean, default: false },
 });
 
-const isOpen = computed(() => props.schedule.is_open !== false);
+const isOpen = computed(() => !props.loading && props.schedule.is_open !== false);
+const startDate = computed(() => parseDate(props.schedule.registration_start));
+const endDate = computed(() => parseDate(props.schedule.registration_end));
 const scheduleMessage = computed(() => {
-  if (props.schedule.registration_start && new Date(props.schedule.registration_start) > new Date()) return 'Pendaftaran Belum Dibuka';
+  if (props.loading) return 'Memuat jadwal...';
+  if (startDate.value && startDate.value > new Date()) return 'Pendaftaran Belum Dibuka';
   return 'Pendaftaran Ditutup';
 });
 
-const countdown = ref({ days: 0, hours: 0, minutes: 0 });
+const countdown = ref({ days: null, hours: null, minutes: null });
+const countdownLabel = ref('Memuat jadwal...');
 let timer = null;
+
+function parseDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
 
 const scrollToSection = (selector) => {
   const el = document.querySelector(selector);
@@ -131,10 +143,30 @@ const scrollToSection = (selector) => {
 };
 
 const updateCountdown = () => {
-  const target = props.schedule.registration_start
-    ? new Date(props.schedule.registration_start).getTime()
-    : Date.now();
+  if (props.loading) {
+    countdown.value = { days: null, hours: null, minutes: null };
+    countdownLabel.value = 'Memuat jadwal...';
+    return;
+  }
+
   const now = Date.now();
+  const start = startDate.value?.getTime() || null;
+  const end = endDate.value?.getTime() || null;
+  let target = start;
+
+  if (start && now >= start && end && now <= end) {
+    target = end;
+    countdownLabel.value = 'Menuju penutupan';
+  } else if (start && now < start) {
+    countdownLabel.value = 'Menuju pembukaan';
+  } else if (end && now > end) {
+    target = now;
+    countdownLabel.value = 'Pendaftaran selesai';
+  } else {
+    target = now;
+    countdownLabel.value = 'Jadwal belum tersedia';
+  }
+
   const diff = Math.max(0, target - now);
 
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -146,7 +178,7 @@ const updateCountdown = () => {
 
 onMounted(() => {
   updateCountdown();
-  timer = setInterval(updateCountdown, 60000);
+  timer = setInterval(updateCountdown, 1000);
 });
 
 onUnmounted(() => {
@@ -315,10 +347,23 @@ onUnmounted(() => {
 }
 
 .ppdb-hero-countdown {
+  position: relative;
   display: flex;
+  align-items: flex-end;
   gap: 0.75rem;
   flex-wrap: wrap;
   margin-top: 0.3rem;
+}
+
+.ppdb-hero-countdown-label {
+  position: absolute;
+  top: -1.35rem;
+  left: 0;
+  color: #1e3a5f;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .ppdb-hero-count-box {

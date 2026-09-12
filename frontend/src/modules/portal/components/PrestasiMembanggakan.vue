@@ -17,7 +17,7 @@
             <span class="prestasi-icon" :style="{ background: iconBg(item.kategoriBadgeColor) }">
               <component :is="iconFor(item)" :size="20" color="#ffffff" />
             </span>
-            <span class="prestasi-year">{{ item.tahun }}</span>
+            <span class="prestasi-year">{{ item.tanggalDisplay || item.tahun }}</span>
           </div>
           <h3 class="prestasi-name">{{ item.judul }}</h3>
           <p class="prestasi-text">{{ item.deskripsiSingkat }}</p>

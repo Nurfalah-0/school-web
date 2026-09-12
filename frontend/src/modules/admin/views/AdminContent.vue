@@ -58,6 +58,11 @@
             <input v-model="form.category" :placeholder="currentDomain.categoryPlaceholder" />
           </div>
 
+          <div v-if="type === 'achievements'" class="form-group">
+            <label>Tanggal Prestasi</label>
+            <input v-model="form.achieved_at" type="date" />
+          </div>
+
           <!-- Specific Fields for Partners -->
           <template v-if="type === 'industry_partners'">
             <div class="form-group">
@@ -170,7 +175,7 @@
         <div v-if="records.length" class="record-list">
           <article v-for="record in records" :key="record.id" class="record-card">
             <div v-if="record.image_url || record.logo_url || record.image || record.logo" class="record-thumb">
-              <img :src="record.image_url || record.logo_url || ('/storage/' + (record.image || record.logo))" :alt="displayName(record)" />
+              <img :src="contentImageUrl(record.image_url || record.logo_url || record.image || record.logo)" :alt="displayName(record)" />
             </div>
             <div class="record-info">
               <div class="record-badge-row">
@@ -180,6 +185,9 @@
                 </span>
               </div>
               <h3>{{ displayName(record) }}</h3>
+              <time v-if="type === 'achievements' && (record.achieved_at || record.year)" class="record-date">
+                {{ formatContentDate(record.achieved_at || `${record.year}-01-01`) }}
+              </time>
               <p>{{ record.description || record.short_description || 'Belum ada deskripsi' }}</p>
               <div v-if="type === 'products' && record.price" class="price-tag">
                 <Banknote :size="14" style="vertical-align: middle; margin-right: 4px;" />Rp {{ Number(record.price).toLocaleString('id-ID') }}
@@ -219,6 +227,7 @@ import {
 import { createAdminContent, deleteAdminContent, getAdminContent, updateAdminContent } from '../../../api/endpoints';
 
 const router = useRouter();
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/api\/?$/, '');
 const type = ref('achievements');
 const records = ref([]);
 const notice = ref('');
@@ -248,10 +257,18 @@ const form = reactive({
   slug: '',
   status: 'published',
   description: '',
+  achieved_at: '',
   image: null,
 });
 
 const currentDomain = computed(() => domains.find(item => item.value === type.value) || domains[0]);
+
+function contentImageUrl(value) {
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value)) return value;
+  const path = String(value).replace(/^\/+/, '').replace(/^storage\/+/, '');
+  return `${API_BASE}/storage/${path}`;
+}
 
 function notify(text, kind = 'success') {
   notice.value = text;
@@ -283,6 +300,12 @@ function displayName(record) {
   return record.title || record.name || record.company_name || '-';
 }
 
+function formatContentDate(value) {
+  if (!value) return '-';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
 function reset() {
   Object.assign(form, {
     id: null,
@@ -300,6 +323,7 @@ function reset() {
     slug: '',
     status: 'published',
     description: '',
+    achieved_at: '',
     image: null,
   });
 }
@@ -321,6 +345,7 @@ function edit(record) {
     slug: record.slug || '',
     status: record.status || 'published',
     description: record.description || record.short_description || '',
+    achieved_at: record.achieved_at || '',
     image: null,
   });
   window.scrollTo({ top: 120, behavior: 'smooth' });
@@ -333,6 +358,7 @@ function buildPayload() {
   if (form.category) data.append(type.value === 'industry_partners' ? 'industry_type' : 'category', form.category);
   if (form.slug) data.append('slug', form.slug);
   if (form.description) data.append('description', form.description);
+  if (type.value === 'achievements' && form.achieved_at) data.append('achieved_at', form.achieved_at);
   if (form.status) data.append('status', form.status);
 
   if (type.value === 'job_vacancies') {
@@ -418,21 +444,42 @@ onMounted(load);
 <style scoped>
 .content-page {
   min-height: 100vh;
-  padding: 36px clamp(16px, 4vw, 64px);
-  background: #f4f6fa;
+  padding: 28px clamp(16px, 4vw, 64px) 64px;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(186, 230, 253, 0.5), transparent 24rem),
+    #f1f5f9;
   color: #0f172a;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 .page-header {
   max-width: 1320px;
-  margin: 0 auto 28px;
+  margin: 0 auto 18px;
+  padding: 30px 34px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
+  border: 1px solid rgba(147, 197, 253, 0.35);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(45, 212, 191, 0.24), transparent 18rem),
+    linear-gradient(120deg, #0f2747, #163f68 58%, #145b70);
+  box-shadow: 0 18px 40px rgba(15, 39, 71, 0.18);
 }
+
+.page-header .eyebrow { color: #7dd3fc; }
+.page-header h1 { color: #fff; letter-spacing: -0.03em; }
+.page-header .subtitle { max-width: 700px; color: #cbdced; line-height: 1.7; }
+
+.page-header .button.secondary {
+  background: rgba(255, 255, 255, 0.11);
+  color: #e0f2fe;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.page-header .button.secondary:hover { background: rgba(255, 255, 255, 0.2); }
 
 .eyebrow {
   margin: 0 0 6px;
@@ -476,7 +523,7 @@ h2 {
   justify-content: center;
   gap: 6px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 16px;
   font: inherit;
   font-size: 13px;
@@ -497,22 +544,25 @@ h2 {
 /* Domain Navigator */
 .domain-nav {
   max-width: 1320px;
-  margin: 0 auto 24px;
+  margin: 0 auto 18px;
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 2px;
+  padding: 7px;
+  border: 1px solid #dbe5ef;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
 }
 
 .domain-button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 0;
-  border-bottom: 3px solid transparent;
+  border: 1px solid transparent;
+  border-radius: 9px;
   background: transparent;
-  padding: 12px 18px;
+  padding: 11px 14px;
   color: #64748b;
   font: inherit;
   font-size: 14px;
@@ -522,15 +572,17 @@ h2 {
   transition: all 0.15s ease;
 }
 
-.domain-button:hover { color: #1e3a8a; }
+.domain-button:hover { color: #1e3a8a; background: #eff6ff; }
 .domain-button.active {
-  border-color: #1e3a8a;
-  color: #1e3a8a;
+  border-color: #2563eb;
+  color: #fff;
+  background: #1d4ed8;
+  box-shadow: 0 5px 12px rgba(29, 78, 216, 0.2);
 }
 
 .domain-button .badge {
-  background: #e0e7ff;
-  color: #1e3a8a;
+  background: rgba(255, 255, 255, 0.18);
+  color: inherit;
   border-radius: 9999px;
   padding: 2px 7px;
   font-size: 11px;
@@ -561,9 +613,9 @@ h2 {
 .editor, .records {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 18px;
   padding: 24px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.07);
 }
 
 .section-title {
@@ -572,6 +624,8 @@ h2 {
   align-items: center;
   margin-bottom: 20px;
 }
+
+.section-title h2 { letter-spacing: -0.02em; }
 
 /* Form */
 .form-grid {
@@ -604,7 +658,7 @@ input, textarea, select {
   box-sizing: border-box;
   width: 100%;
   border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 12px;
   color: #0f172a;
   background: #ffffff;
@@ -633,15 +687,16 @@ input:focus, textarea:focus, select:focus {
   display: flex;
   gap: 16px;
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  border-radius: 14px;
   padding: 16px;
   background: #fff;
   transition: all 0.15s ease;
 }
 
 .record-card:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  border-color: #93c5fd;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  transform: translateY(-2px);
 }
 
 .record-thumb {
@@ -701,6 +756,12 @@ input:focus, textarea:focus, select:focus {
   color: #64748b;
   margin: 0;
   line-height: 1.4;
+}
+
+.record-date {
+  color: #2563eb;
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .price-tag {

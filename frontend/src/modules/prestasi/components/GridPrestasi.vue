@@ -17,7 +17,7 @@
               {{ item.kategoriLabel }}
             </span>
             <h3 class="prestasi-card-title">{{ item.judul }}</h3>
-            <p class="prestasi-card-meta">{{ item.nama }} • {{ item.tahun }}</p>
+            <p class="prestasi-card-meta">{{ item.nama }} • {{ item.tanggalDisplay || item.tahun || '-' }}</p>
             <div class="prestasi-card-divider"></div>
             <router-link :to="`/prestasi/${item.slug}`" class="prestasi-card-link">Detail ></router-link>
           </div>

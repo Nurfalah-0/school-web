@@ -84,6 +84,16 @@ function mapMajor(item) {
     DKV: 'Palette'
   }
 
+  const curriculum = Array.isArray(item.curricula)
+    ? item.curricula.map((step) => ({
+      ...step,
+      kelas: step.class_name || step.kelas,
+      warna: step.color || step.warna || 'navy',
+      deskripsi: step.description || step.deskripsi || '',
+      tags: Array.isArray(step.tags) ? step.tags : [],
+    }))
+    : []
+
   return {
     ...fallback,
     ...item,
@@ -99,11 +109,7 @@ function mapMajor(item) {
       { icon: 'Handshake', judul: 'Visi Program', deskripsi: vision },
       { icon: 'Award', judul: 'Fasilitas Program', deskripsi: facilities }
     ],
-    kurikulum: [
-      { kelas: 'Kelas 10: Dasar Program', warna: 'navy', deskripsi: description, tags: [item.code || 'Dasar Keahlian'] },
-      { kelas: 'Kelas 11: Pengembangan Kompetensi', warna: 'teal', deskripsi: vision, tags: ['Kompetensi', item.code || 'Program Keahlian'] },
-      { kelas: 'Kelas 12: Spesialisasi & PKL', warna: 'gold', deskripsi: mission, tags: ['Spesialisasi', 'PKL'] }
-    ]
+    kurikulum: curriculum
   }
 }
 

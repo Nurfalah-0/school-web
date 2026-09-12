@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\MajorFacility;
+use App\Models\MajorCurriculum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,16 @@ class MajorController extends Controller
             $majors = DB::table('majors')
                 ->where('is_active', true)
                 ->get();
+
+            $curricula = MajorCurriculum::whereIn('major_id', $majors->pluck('id'))
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->get()
+                ->groupBy('major_id');
+
+            $majors->each(function ($major) use ($curricula) {
+                $major->curricula = $curricula->get($major->id, collect())->values();
+            });
 
             return response()->json([
                 'success' => true,
@@ -39,6 +50,10 @@ class MajorController extends Controller
 
             $students  = DB::table('students')->where('major_id', $id)->count();
             $facilities = DB::table('major_facilities')->where('major_id', $id)->get();
+            $curricula = MajorCurriculum::where('major_id', $id)
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->get();
 
             return response()->json([
                 'success' => true,
@@ -46,6 +61,7 @@ class MajorController extends Controller
                     'major'         => $major,
                     'student_count' => $students,
                     'facilities'    => $facilities,
+                    'curricula'     => $curricula,
                 ],
             ]);
         } catch (\Exception $e) {
@@ -299,5 +315,73 @@ class MajorController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    public function addCurriculum($id, Request $request)
+    {
+        $major = DB::table('majors')->where('id', $id)->first();
+        if (!$major) {
+            return response()->json(['success' => false, 'message' => 'Jurusan tidak ditemukan.'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'class_name'  => 'required|string|max:150',
+            'color'       => 'required|in:navy,teal,gold',
+            'description' => 'required|string',
+            'tags'        => 'nullable|array',
+            'tags.*'      => 'string|max:100',
+            'sort_order'  => 'nullable|integer|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $curriculum = MajorCurriculum::create(array_merge($validator->validated(), ['major_id' => $id]));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Silabus berhasil ditambahkan.',
+            'data' => $curriculum,
+        ], 201);
+    }
+
+    public function updateCurriculum($majorId, $curriculumId, Request $request)
+    {
+        $curriculum = MajorCurriculum::where('major_id', $majorId)->find($curriculumId);
+        if (!$curriculum) {
+            return response()->json(['success' => false, 'message' => 'Silabus tidak ditemukan.'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'class_name'  => 'sometimes|string|max:150',
+            'color'       => 'sometimes|in:navy,teal,gold',
+            'description' => 'sometimes|string',
+            'tags'        => 'nullable|array',
+            'tags.*'      => 'string|max:100',
+            'sort_order'  => 'nullable|integer|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $curriculum->update($validator->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Silabus berhasil diperbarui.',
+            'data' => $curriculum->fresh(),
+        ]);
+    }
+
+    public function removeCurriculum($majorId, $curriculumId)
+    {
+        $deleted = MajorCurriculum::where('major_id', $majorId)->where('id', $curriculumId)->delete();
+        if (!$deleted) {
+            return response()->json(['success' => false, 'message' => 'Silabus tidak ditemukan.'], 404);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Silabus berhasil dihapus.']);
     }
 }

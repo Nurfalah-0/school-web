@@ -146,6 +146,9 @@ export const deleteAdminContent = (type, id) => client.delete(`/admin/content/${
 // Major facilities management
 export const addMajorFacility = (majorId, data) => client.post(`/admin/majors/${majorId}/facilities`, data);
 export const deleteMajorFacility = (majorId, facilityId) => client.delete(`/admin/majors/${majorId}/facilities/${facilityId}`);
+export const addMajorCurriculum = (majorId, data) => client.post(`/admin/majors/${majorId}/curricula`, data);
+export const updateMajorCurriculum = (majorId, curriculumId, data) => client.put(`/admin/majors/${majorId}/curricula/${curriculumId}`, data);
+export const deleteMajorCurriculum = (majorId, curriculumId) => client.delete(`/admin/majors/${majorId}/curricula/${curriculumId}`);
 
 // User management endpoints
 export const getUsers = (params = {}) => client.get('/admin/users', { params });

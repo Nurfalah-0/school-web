@@ -157,6 +157,25 @@
             </div>
           </div>
 
+          <section class="admin-control-center section-card">
+            <div class="section-header">
+              <div>
+                <span class="section-kicker">Pusat Pengaturan</span>
+                <h2 class="section-title">Semua fitur admin dalam satu tempat</h2>
+                <p class="section-subtitle">Pilih area yang ingin diatur tanpa berpindah-pindah menu.</p>
+              </div>
+              <router-link to="/admin/manage" class="dashboard-control-link">Buka pusat kelola</router-link>
+            </div>
+            <div class="admin-control-grid">
+              <router-link v-for="control in adminControls" :key="control.label" :to="control.to" class="admin-control-card">
+                <component :is="control.icon" :size="22" :class="`admin-control-icon ${control.tone}`" />
+                <span class="admin-control-label">{{ control.label }}</span>
+                <small>{{ control.description }}</small>
+                <strong>{{ control.count }}</strong>
+              </router-link>
+            </div>
+          </section>
+
           <!-- Pendaftaran PPDB Table -->
           <div class="section-card">
             <div class="section-header">
@@ -518,6 +537,17 @@ const upcomingEvents = ref([
 ]);
 
 const userAvatar = 'https://images.unsplash.com/photo-1497215842964-222b430dc094?w=100&h=100&fit=crop&crop=face';
+
+const adminControls = [
+  { label: 'Pendaftaran PPDB', description: 'Jadwal & verifikasi', to: '/admin/manage?tab=applications', icon: UserPlus, tone: 'control-blue', count: 'Kelola' },
+  { label: 'Data Siswa', description: 'Tambah & perbarui', to: '/admin/manage?tab=students', icon: GraduationCap, tone: 'control-green', count: 'Kelola' },
+  { label: 'Jurusan & Silabus', description: 'Program & kurikulum', to: '/admin/manage?tab=majors', icon: Building2, tone: 'control-orange', count: 'Kelola' },
+  { label: 'Berita & Konten', description: 'Publikasi website', to: '/admin/manage?tab=news', icon: Newspaper, tone: 'control-purple', count: 'Kelola' },
+  { label: 'Gambar Website', description: 'Banner & visual', to: '/admin/manage?tab=images', icon: Image, tone: 'control-blue', count: 'Kelola' },
+  { label: 'Kategori', description: 'Kelompokkan konten', to: '/admin/manage?tab=categories', icon: Settings, tone: 'control-green', count: 'Kelola' },
+  { label: 'Pengguna Admin', description: 'Akun & hak akses', to: '/admin/manage?tab=users', icon: Users, tone: 'control-purple', count: 'Kelola' },
+  { label: 'Profil Sekolah', description: 'Identitas & informasi', to: '/admin/manage?tab=profile', icon: GearIcon, tone: 'control-orange', count: 'Kelola' },
+];
 
 const currentDate = computed(() => {
   return new Date().toLocaleDateString('id-ID', {
@@ -1002,6 +1032,85 @@ onMounted(() => {
   gap: 24px;
 }
 
+.admin-control-center {
+  padding: 28px;
+}
+
+.section-kicker {
+  display: block;
+  margin-bottom: 6px;
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-control-link {
+  color: #1d4ed8;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.admin-control-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.admin-control-card {
+  min-height: 132px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+  color: #1f2937;
+  text-decoration: none;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 5px 10px;
+  align-items: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.admin-control-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 8px 18px rgba(30, 64, 175, 0.1);
+  transform: translateY(-2px);
+}
+
+.admin-control-icon {
+  grid-row: span 2;
+  padding: 9px;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+}
+
+.control-blue { color: #1d4ed8; background: #dbeafe; }
+.control-green { color: #047857; background: #d1fae5; }
+.control-orange { color: #c2410c; background: #ffedd5; }
+.control-purple { color: #7e22ce; background: #f3e8ff; }
+
+.admin-control-label {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.admin-control-card small {
+  grid-column: 2;
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+.admin-control-card strong {
+  color: #2563eb;
+  font-size: 0.75rem;
+}
+
 .stat-card {
   background: #ffffff;
   border-radius: 20px;
@@ -1322,6 +1431,10 @@ onMounted(() => {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .admin-control-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 1023px) {
@@ -1349,6 +1462,20 @@ onMounted(() => {
 @media (max-width: 639px) {
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-control-center {
+    padding: 20px;
+  }
+
+  .admin-control-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-control-center .section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .welcome-section {

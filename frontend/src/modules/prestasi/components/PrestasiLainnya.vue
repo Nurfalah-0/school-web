@@ -22,7 +22,7 @@
         </div>
         <div class="prestasi-lainnya-body">
           <h4 class="prestasi-lainnya-name">{{ item.judul }}</h4>
-          <span class="prestasi-lainnya-date">{{ item.nama }} • {{ item.tahun }}</span>
+          <span class="prestasi-lainnya-date">{{ item.nama }} • {{ item.tanggalDisplay || item.tahun || '-' }}</span>
         </div>
       </router-link>
     </div>

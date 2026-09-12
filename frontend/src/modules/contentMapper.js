@@ -6,7 +6,8 @@ export function publicImage(path) {
 }
 
 export function mapAchievement(item) {
-    return { ...item, slug: item.slug, featured: item.is_featured, status: item.is_featured ? 'Terbaru' : null, kategori: (item.category || 'lainnya').toLowerCase(), kategoriLabel: item.category || 'Lainnya', kategoriBadgeColor: 'blue', judul: item.title, deskripsiSingkat: item.description || '', deskripsiLengkap: item.description || '', nama: item.organizer || 'SMK Nurul Jadid', tahun: item.year, gambar: publicImage(item.image), galeri: [] };
+    const date = item.achieved_at || (item.year ? `${item.year}-01-01` : item.created_at);
+    return { ...item, slug: item.slug, featured: item.is_featured, status: item.is_featured ? 'Terbaru' : null, kategori: (item.category || 'lainnya').toLowerCase(), kategoriLabel: item.category || 'Lainnya', kategoriBadgeColor: 'blue', judul: item.title, deskripsiSingkat: item.description || '', deskripsiLengkap: item.description || '', nama: item.organizer || 'SMK Nurul Jadid', tahun: item.year, tanggal: date, tanggalDisplay: date ? new Date(date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-', gambar: publicImage(item.image), galeri: [] };
 }
 
 export function mapGallery(item) {

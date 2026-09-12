@@ -1,7 +1,7 @@
 <template>
   <div class="ppdb-page">
     <AnimateOnScroll animation="fadeInDown">
-      <PpdbHero :schedule="schedule" />
+      <PpdbHero :schedule="schedule" :loading="scheduleLoading" />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="100">
       <MengapaMemilihKami />
@@ -37,6 +37,7 @@ import FooterSection from '../../portal/components/FooterSection.vue';
 import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue';
 
 const schedule = ref({ registration_start: null, registration_end: null, is_open: true });
+const scheduleLoading = ref(true);
 
 const handleSubmitPendaftaran = (payload) => {
   console.log('Pendaftaran submitted:', payload);
@@ -48,6 +49,8 @@ onMounted(async () => {
     schedule.value = response.data?.data || schedule.value;
   } catch (error) {
     // Keep the existing open state when the schedule service is unavailable.
+  } finally {
+    scheduleLoading.value = false;
   }
 });
 </script>
