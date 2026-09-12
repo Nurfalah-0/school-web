@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 class ContentController extends Controller
 {
     private const TABLES = [
-        'achievements' => ['title', 'slug', 'category', 'level', 'organizer', 'year', 'description', 'image', 'rank', 'is_featured', 'is_published'],
+        'achievements' => ['title', 'slug', 'category', 'level', 'organizer', 'year', 'achieved_at', 'description', 'image', 'rank', 'is_featured', 'is_published'],
         'galleries' => ['title', 'slug', 'category', 'description', 'image', 'alt_text', 'sort_order', 'is_featured', 'is_published'],
         'industry_partners' => ['company_name', 'slug', 'industry_type', 'address', 'city', 'phone', 'email', 'website', 'logo', 'description', 'is_active'],
         'job_vacancies' => ['title', 'slug', 'category', 'description', 'requirements', 'location', 'employment_type', 'salary_min', 'salary_max', 'deadline', 'is_remote', 'status'],
@@ -107,6 +107,7 @@ class ContentController extends Controller
         $rules['price'] = 'sometimes';
         $rules['short_description'] = 'sometimes|string';
         $rules['options'] = 'sometimes|nullable|json';
+        $rules['achieved_at'] = 'sometimes|nullable|date';
 
         $data = $request->validate($rules);
 

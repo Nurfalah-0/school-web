@@ -34,4 +34,9 @@ class Major extends Model
     {
         return $this->hasMany(Student::class, 'major_id');
     }
+
+    public function curricula()
+    {
+        return $this->hasMany(MajorCurriculum::class, 'major_id')->orderBy('sort_order')->orderBy('id');
+    }
 }

@@ -117,6 +117,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}',                            [MajorController::class, 'destroy']);
         Route::post('/{id}/facilities',                   [MajorController::class, 'addFacility']);
         Route::delete('/{majorId}/facilities/{facilityId}', [MajorController::class, 'removeFacility']);
+        Route::post('/{id}/curricula',                    [MajorController::class, 'addCurriculum']);
+        Route::put('/{majorId}/curricula/{curriculumId}', [MajorController::class, 'updateCurriculum']);
+        Route::delete('/{majorId}/curricula/{curriculumId}', [MajorController::class, 'removeCurriculum']);
     });
 
     // ── Berita — manage ──────────────────────

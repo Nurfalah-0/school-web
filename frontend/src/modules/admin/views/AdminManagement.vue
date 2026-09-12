@@ -283,6 +283,10 @@
           <input v-model="newsForm.category" placeholder="Contoh: Prestasi, Kegiatan, Pengumuman, Akademik" />
         </div>
         <div class="form-group">
+          <label>Tanggal Berita</label>
+          <input v-model="newsForm.published_at" type="datetime-local" />
+        </div>
+        <div class="form-group">
           <label>Foto Utama Berita</label>
           <input
             type="file"
@@ -426,7 +430,7 @@
             <span><Users :size="14" style="vertical-align: middle; margin-right: 4px;" /> Kapasitas: <strong>{{ item.capacity || item.student_count || 0 }} Siswa</strong></span>
           </div>
           <div class="major-card-actions">
-            <button class="button small primary" @click="openFacilityModal(item)"><Building2 :size="13" /> Kelola Fasilitas</button>
+            <button class="button small primary" @click="openFacilityModal(item)"><Building2 :size="13" /> Fasilitas &amp; Silabus</button>
             <button class="button small secondary" @click="editMajor(item)"><Edit2 :size="13" /> Edit</button>
             <button class="button small danger" @click="removeMajor(item.id)"><Trash2 :size="13" /> Hapus</button>
           </div>
@@ -943,6 +947,39 @@
             </div>
             <p v-else class="empty">Belum ada fasilitas untuk jurusan ini.</p>
           </div>
+
+          <div class="facility-list curriculum-admin-list">
+            <h4>{{ curriculumForm.id ? 'Edit Silabus' : 'Tambah Silabus' }}</h4>
+            <form class="facility-form curriculum-form" @submit.prevent="saveCurriculum">
+              <input v-model="curriculumForm.class_name" required placeholder="Contoh: Kelas 10: Dasar Keahlian" />
+              <select v-model="curriculumForm.color" required>
+                <option value="navy">Navy</option>
+                <option value="teal">Teal</option>
+                <option value="gold">Gold</option>
+              </select>
+              <input v-model.number="curriculumForm.sort_order" type="number" min="0" placeholder="Urutan" />
+              <input v-model="curriculumForm.tags_text" placeholder="Tag dipisah koma: K3, Praktik, PKL" />
+              <textarea v-model="curriculumForm.description" required rows="3" placeholder="Deskripsi tahap pembelajaran"></textarea>
+              <div class="form-actions">
+                <button class="button primary small" type="submit"><Save :size="14" /> {{ curriculumForm.id ? 'Simpan' : 'Tambah' }}</button>
+                <button v-if="curriculumForm.id" class="button secondary small" type="button" @click="resetCurriculum">Batal</button>
+              </div>
+            </form>
+            <div v-if="majorCurricula.length" class="facility-items">
+              <div v-for="curriculum in majorCurricula" :key="curriculum.id" class="facility-item">
+                <div>
+                  <strong>{{ curriculum.class_name }}</strong>
+                  <p>{{ curriculum.description }}</p>
+                  <small>{{ (curriculum.tags || []).join(', ') || 'Tanpa tag' }}</small>
+                </div>
+                <div class="actions">
+                  <button class="button small secondary" @click="editCurriculum(curriculum)"><Edit2 :size="13" /> Edit</button>
+                  <button class="button small danger" @click="removeCurriculum(curriculum.id)"><Trash2 :size="13" /> Hapus</button>
+                </div>
+              </div>
+            </div>
+            <p v-else class="empty">Belum ada silabus. Tambahkan jalur kurikulum untuk jurusan ini.</p>
+          </div>
         </div>
         <div class="modal-footer">
           <button class="button secondary" @click="selectedMajorForFacility = null">Tutup</button>
@@ -955,7 +992,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import {
   LayoutDashboard,
   Palette,
@@ -1020,11 +1057,15 @@ import {
   updatePpdbSchedule,
   addMajorFacility,
   deleteMajorFacility,
+  addMajorCurriculum,
+  updateMajorCurriculum,
+  deleteMajorCurriculum,
   getRegistrationDetail,
 } from '../../../api/endpoints';
 
 const router = useRouter();
-const activeTab = ref('applications');
+const route = useRoute();
+const activeTab = ref(route.query.tab || 'applications');
 const message = ref('');
 const messageType = ref('success');
 
@@ -1050,6 +1091,8 @@ const applicationDocuments = [
 const selectedMajorForFacility = ref(null);
 const majorFacilities = ref([]);
 const facilityForm = reactive({ name: '', description: '' });
+const majorCurricula = ref([]);
+const curriculumForm = reactive({ id: null, class_name: '', color: 'navy', description: '', tags_text: '', sort_order: 0 });
 
 // Filter state
 const appFilter = reactive({ search: '', status: '' });
@@ -1058,7 +1101,7 @@ const studentMajorFilter = ref(null);
 const selectedSectionFilter = ref('');
 
 // Forms
-const newsForm = reactive({ id: null, title: '', category: '', excerpt: '', content: '', image: null });
+const newsForm = reactive({ id: null, title: '', category: '', excerpt: '', content: '', published_at: '', image: null });
 const majorForm = reactive({ id: null, code: '', name: '', capacity: null, description: '', vision: '', mission: '', image: null, image_url: '', is_active: true });
 const imageForm = reactive({ id: null, key: '', title: '', section: '', alt_text: '', image_url: '', file: null });
 const studentForm = reactive({ id: null, nisn: '', nis: '', name: '', email: '', phone: '', class: '', gender: '', major_id: null, address: '' });
@@ -1325,7 +1368,7 @@ async function removeStudent(id) {
 // BERITA ACTIONS
 // =============================================
 function resetNews() {
-  Object.assign(newsForm, { id: null, title: '', category: '', excerpt: '', content: '', image: null });
+  Object.assign(newsForm, { id: null, title: '', category: '', excerpt: '', content: '', published_at: '', image: null });
 }
 
 function editNews(item) {
@@ -1335,6 +1378,7 @@ function editNews(item) {
     category: item.category || '',
     excerpt: item.excerpt || '',
     content: item.content || '',
+    published_at: toDateTimeLocal(item.published_at),
     image: null,
   });
   window.scrollTo({ top: 150, behavior: 'smooth' });
@@ -1359,6 +1403,7 @@ async function saveNews() {
     data.append('category', newsForm.category);
     data.append('excerpt', newsForm.excerpt);
     data.append('content', newsForm.content);
+    if (newsForm.published_at) data.append('published_at', new Date(newsForm.published_at).toISOString());
 
     let newsId = newsForm.id;
     if (newsForm.id) {
@@ -1477,11 +1522,14 @@ async function openFacilityModal(major) {
   selectedMajorForFacility.value = major;
   facilityForm.name = '';
   facilityForm.description = '';
+  resetCurriculum();
   try {
     const res = await getMajorDetail(major.id);
     majorFacilities.value = res.data?.data?.facilities || [];
+    majorCurricula.value = res.data?.data?.curricula || [];
   } catch (e) {
     majorFacilities.value = [];
+    majorCurricula.value = [];
   }
 }
 
@@ -1506,6 +1554,58 @@ async function removeFacility(facilityId) {
     await deleteMajorFacility(selectedMajorForFacility.value.id, facilityId);
     notify('Fasilitas dihapus.');
     majorFacilities.value = majorFacilities.value.filter(f => f.id !== facilityId);
+  } catch (error) { errorMessage(error); }
+}
+
+function resetCurriculum() {
+  Object.assign(curriculumForm, { id: null, class_name: '', color: 'navy', description: '', tags_text: '', sort_order: 0 });
+}
+
+function editCurriculum(item) {
+  Object.assign(curriculumForm, {
+    id: item.id,
+    class_name: item.class_name || '',
+    color: item.color || 'navy',
+    description: item.description || '',
+    tags_text: Array.isArray(item.tags) ? item.tags.join(', ') : '',
+    sort_order: item.sort_order || 0,
+  });
+}
+
+function curriculumPayload() {
+  return {
+    class_name: curriculumForm.class_name,
+    color: curriculumForm.color,
+    description: curriculumForm.description,
+    tags: curriculumForm.tags_text.split(',').map((tag) => tag.trim()).filter(Boolean),
+    sort_order: Number(curriculumForm.sort_order) || 0,
+  };
+}
+
+async function saveCurriculum() {
+  if (!selectedMajorForFacility.value) return;
+  try {
+    const majorId = selectedMajorForFacility.value.id;
+    if (curriculumForm.id) {
+      await updateMajorCurriculum(majorId, curriculumForm.id, curriculumPayload());
+      notify('Silabus berhasil diperbarui.');
+    } else {
+      await addMajorCurriculum(majorId, curriculumPayload());
+      notify('Silabus berhasil ditambahkan.');
+    }
+    const res = await getMajorDetail(majorId);
+    majorCurricula.value = res.data?.data?.curricula || [];
+    resetCurriculum();
+  } catch (error) { errorMessage(error); }
+}
+
+async function removeCurriculum(curriculumId) {
+  if (!window.confirm('Hapus silabus ini?')) return;
+  try {
+    await deleteMajorCurriculum(selectedMajorForFacility.value.id, curriculumId);
+    majorCurricula.value = majorCurricula.value.filter((item) => item.id !== curriculumId);
+    if (curriculumForm.id === curriculumId) resetCurriculum();
+    notify('Silabus berhasil dihapus.');
   } catch (error) { errorMessage(error); }
 }
 
@@ -1759,21 +1859,43 @@ onMounted(() => {
 <style scoped>
 .admin-page {
   min-height: 100vh;
-  padding: 36px clamp(16px, 4vw, 64px);
-  background: #f4f6fa;
+  padding: 28px clamp(16px, 4vw, 64px) 64px;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(186, 230, 253, 0.52), transparent 24rem),
+    #f1f5f9;
   color: #111827;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 .admin-header {
   max-width: 1320px;
-  margin: 0 auto 28px;
+  margin: 0 auto 18px;
+  padding: 30px 34px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
+  border: 1px solid rgba(147, 197, 253, 0.35);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(45, 212, 191, 0.24), transparent 18rem),
+    linear-gradient(120deg, #0f2747, #163f68 58%, #145b70);
+  box-shadow: 0 18px 40px rgba(15, 39, 71, 0.18);
 }
+
+.admin-header .eyebrow { color: #7dd3fc; }
+.admin-header h1 { color: #fff; letter-spacing: -0.03em; }
+.admin-header .subtitle { max-width: 700px; color: #cbdced; line-height: 1.7; }
+
+.admin-header .button.secondary {
+  background: rgba(255, 255, 255, 0.11);
+  color: #e0f2fe;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.admin-header .button.secondary:hover { background: rgba(255, 255, 255, 0.2); }
+.admin-header .button.danger { background: #fee2e2; color: #991b1b; }
 
 .eyebrow {
   margin: 0 0 6px;
@@ -1817,7 +1939,7 @@ h2 {
   justify-content: center;
   gap: 6px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 16px;
   font: inherit;
   font-size: 13px;
@@ -1842,12 +1964,15 @@ h2 {
 /* Tabs */
 .tabs {
   max-width: 1320px;
-  margin: 0 auto 24px;
+  margin: 0 auto 18px;
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 2px;
+  padding: 7px;
+  border: 1px solid #dbe5ef;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
 }
 
 .tab {
@@ -1855,9 +1980,10 @@ h2 {
   align-items: center;
   gap: 6px;
   border: 0;
-  border-bottom: 3px solid transparent;
+  border: 1px solid transparent;
+  border-radius: 9px;
   background: transparent;
-  padding: 12px 16px;
+  padding: 11px 14px;
   color: #64748b;
   font: inherit;
   font-size: 14px;
@@ -1867,10 +1993,12 @@ h2 {
   transition: all 0.15s ease;
 }
 
-.tab:hover { color: #1e3a8a; }
+.tab:hover { color: #1e3a8a; background: #eff6ff; }
 .tab.active {
-  border-color: #1e3a8a;
-  color: #1e3a8a;
+  border-color: #2563eb;
+  color: #fff;
+  background: #1d4ed8;
+  box-shadow: 0 5px 12px rgba(29, 78, 216, 0.2);
 }
 
 .tab-badge {
@@ -1882,8 +2010,8 @@ h2 {
 }
 
 .tab.active .tab-badge {
-  background: #e0e7ff;
-  color: #1e3a8a;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
 }
 
 /* Panel */
@@ -1892,9 +2020,9 @@ h2 {
   margin: 0 auto;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 18px;
   padding: clamp(20px, 3vw, 32px);
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.07);
 }
 
 .section-heading {
@@ -1905,6 +2033,8 @@ h2 {
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
+
+.section-heading h2 { letter-spacing: -0.02em; }
 
 .applications-action-column { min-width: 235px; }
 .applications-actions { min-width: 235px; flex-wrap: wrap; }
@@ -1982,11 +2112,11 @@ h2 {
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 28px;
+  gap: 18px;
+  margin-bottom: 30px;
   background: #f8fafc;
-  padding: 20px;
-  border-radius: 10px;
+  padding: 24px;
+  border-radius: 15px;
   border: 1px solid #e2e8f0;
 }
 
@@ -2014,7 +2144,7 @@ input, textarea, select {
   box-sizing: border-box;
   width: 100%;
   border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 12px;
   color: #0f172a;
   background: #ffffff;
@@ -2190,12 +2320,19 @@ tbody tr:hover {
 
 .major-admin-card {
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  border-radius: 14px;
   padding: 20px;
   background: #fff;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.major-admin-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.09);
 }
 
 .major-card-header {

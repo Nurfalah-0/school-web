@@ -77,6 +77,7 @@ class NewsController extends Controller
                 'featured_image' => 'nullable|image|max:5120',
                 'category' => 'nullable|string|max:100',
                 'author_id' => 'nullable|integer',
+                'published_at' => 'nullable|date',
             ]);
 
             if ($validator->fails()) {
@@ -90,7 +91,7 @@ class NewsController extends Controller
             $data['slug'] = Str::slug($request->title);
             $data['author_id'] = $request->author_id ?? Auth::id();
             $data['published'] = true;
-            $data['published_at'] = now();
+            $data['published_at'] = $request->filled('published_at') ? $request->published_at : now();
             $data['created_at'] = now();
             $data['updated_at'] = now();
 
@@ -132,6 +133,7 @@ class NewsController extends Controller
                 'excerpt' => 'nullable|string|max:500',
                 'featured_image' => 'nullable|image|max:5120',
                 'category' => 'nullable|string|max:100',
+                'published_at' => 'nullable|date',
             ]);
 
             if ($validator->fails()) {
