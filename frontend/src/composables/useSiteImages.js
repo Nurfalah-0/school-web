@@ -27,6 +27,18 @@ export function useSiteImages() {
     return found
   }
 
+  const getImageUrl = (image) => {
+    if (!image) return ''
+
+    const rawUrl = image.image_url || image.url || (image.image_path ? `/storage/${image.image_path}` : '')
+    if (!rawUrl) return ''
+    if (/^https?:\/\//i.test(rawUrl)) return rawUrl
+
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+    const serverUrl = apiUrl.replace(/\/api\/?$/, '')
+    return `${serverUrl}${rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`}`
+  }
+
   const fetchImages = async () => {
     try {
       loading.value = true
@@ -67,6 +79,7 @@ export function useSiteImages() {
     imagesBySection,
     getImagesBySection,
     getImageByKey,
+    getImageUrl,
     fetchImages,
   }
 }

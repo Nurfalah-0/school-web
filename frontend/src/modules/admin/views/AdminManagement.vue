@@ -691,7 +691,7 @@
     <!-- ============================================= -->
     <!-- TAB 8: PROFIL SEKOLAH                         -->
     <!-- ============================================= -->
-    <section v-else class="panel">
+    <section v-else-if="activeTab === 'profile'" class="panel">
       <div class="section-heading">
         <div>
           <p class="eyebrow">Identitas Sekolah</p>
@@ -781,6 +781,71 @@
         </div>
         <div class="form-actions full-width">
           <button class="button primary" type="submit"><Save :size="15" /> Simpan Profil Sekolah</button>
+        </div>
+      </form>
+    </section>
+
+    <section v-else-if="activeTab === 'profile-page'" class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Halaman Publik</p>
+          <h2>Kelola Detail Profil Sekolah</h2>
+          <p class="panel-help">Konten ini khusus untuk halaman Profil Sekolah yang berdiri sendiri.</p>
+        </div>
+      </div>
+      <form class="form-grid" @submit.prevent="saveProfilePage">
+        <div class="form-group full-width">
+          <label>Judul Halaman Profil</label>
+          <input v-model="profilePageForm.profile_page_title" placeholder="Profil SMK Nurul Jadid" />
+        </div>
+        <div class="form-group full-width">
+          <label>Deskripsi Lengkap Sekolah</label>
+          <textarea v-model="profilePageForm.profile_page_content" rows="7" placeholder="Tuliskan profil sekolah secara lengkap"></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label>Gambar Profil Sekolah</label>
+          <input type="file" accept="image/*" @change="profilePageImage.file = $event.target.files[0]" />
+          <small class="form-help">Gambar ini digunakan pada halaman Profil Sekolah.</small>
+        </div>
+        <div class="form-actions full-width">
+          <button class="button primary" type="submit"><Save :size="15" /> Simpan Detail Profil</button>
+          <button class="button secondary" type="button" @click="saveProfilePageImage"><Upload :size="15" /> Upload Gambar</button>
+        </div>
+      </form>
+    </section>
+
+    <section v-else-if="activeTab === 'vision-mission-page'" class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Halaman Publik</p>
+          <h2>Kelola Detail Visi &amp; Misi</h2>
+          <p class="panel-help">Konten ini khusus untuk halaman Visi &amp; Misi Sekolah yang berdiri sendiri.</p>
+        </div>
+      </div>
+      <form class="form-grid" @submit.prevent="saveVisionMissionPage">
+        <div class="form-group full-width">
+          <label>Pembuka Halaman</label>
+          <textarea v-model="visionMissionForm.vision_page_intro" rows="4" placeholder="Tuliskan pengantar halaman visi dan misi"></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label>Visi Lengkap</label>
+          <textarea v-model="visionMissionForm.vision_page_content" rows="7" placeholder="Tuliskan visi sekolah secara lengkap"></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label>Misi Lengkap</label>
+          <textarea v-model="visionMissionForm.mission_page_content" rows="10" placeholder="Tuliskan misi sekolah. Gunakan baris baru atau nomor untuk setiap poin"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Gambar Visi</label>
+          <input type="file" accept="image/*" @change="visionMissionImages.vision.file = $event.target.files[0]" />
+        </div>
+        <div class="form-group">
+          <label>Gambar Misi</label>
+          <input type="file" accept="image/*" @change="visionMissionImages.mission.file = $event.target.files[0]" />
+        </div>
+        <div class="form-actions full-width">
+          <button class="button primary" type="submit"><Save :size="15" /> Simpan Detail Visi &amp; Misi</button>
+          <button class="button secondary" type="button" @click="saveVisionMissionImages"><Upload :size="15" /> Upload Gambar</button>
         </div>
       </form>
     </section>
@@ -948,6 +1013,7 @@ import {
   updateSchoolProfile,
   updateStudent,
   updateSiteImage,
+  uploadSiteImage,
   updateCategory,
   updateUser,
   getPpdbSchedule,
@@ -997,6 +1063,10 @@ const majorForm = reactive({ id: null, code: '', name: '', capacity: null, descr
 const imageForm = reactive({ id: null, key: '', title: '', section: '', alt_text: '', image_url: '', file: null });
 const studentForm = reactive({ id: null, nisn: '', nis: '', name: '', email: '', phone: '', class: '', gender: '', major_id: null, address: '' });
 const profileForm = reactive({ school_name: '', nsm: '', npsn: '', npwp: '', profile_title_line1: '', profile_description: '', email: '', phone: '', website: '', headmaster_name: '', founded_year: null, operating_year: null, accreditation: '', foundation_name: '', address: '', village: '', district: '', city: '', vision: '', mission: '' });
+const profilePageForm = reactive({ profile_page_title: '', profile_page_content: '' });
+const visionMissionForm = reactive({ vision_page_intro: '', vision_page_content: '', mission_page_content: '' });
+const profilePageImage = reactive({ file: null });
+const visionMissionImages = reactive({ vision: { file: null }, mission: { file: null } });
 const categoryForm = reactive({ id: null, name: '', type: 'news' });
 const userForm = reactive({ id: null, name: '', email: '', password: '', phone: '', role: 'admin_sekolah', is_active: true });
 const ppdbSchedule = reactive({ registration_start: '', registration_end: '' });
@@ -1011,6 +1081,8 @@ const tabs = computed(() => [
   { id: 'categories', label: 'Kategori', icon: Tag, count: categories.value.length },
   { id: 'users', label: 'Pengguna & Admin', icon: Users, count: usersList.value.length },
   { id: 'profile', label: 'Profil Sekolah', icon: Settings, count: '' },
+  { id: 'profile-page', label: 'Detail Profil', icon: FileText, count: '' },
+  { id: 'vision-mission-page', label: 'Detail Visi & Misi', icon: Building2, count: '' },
 ]);
 
 // Filtered lists
@@ -1146,7 +1218,10 @@ async function loadUsers() {
 async function loadProfile() {
   try {
     const response = await getSchoolProfile();
-    Object.assign(profileForm, response.data?.data || {});
+    const profile = response.data?.data || {};
+    Object.assign(profileForm, profile);
+    Object.assign(profilePageForm, profile);
+    Object.assign(visionMissionForm, profile);
   } catch (error) { errorMessage(error); }
 }
 
@@ -1589,6 +1664,75 @@ async function saveProfile() {
     await updateSchoolProfile({ ...profileForm });
     notify('Profil sekolah berhasil diperbarui.');
   } catch (error) { errorMessage(error); }
+}
+
+async function saveProfilePage() {
+  try {
+    await updateSchoolProfile({ ...profilePageForm });
+    notify('Detail halaman profil berhasil diperbarui.');
+  } catch (error) { errorMessage(error); }
+}
+
+async function saveVisionMissionPage() {
+  try {
+    await updateSchoolProfile({ ...visionMissionForm });
+    notify('Detail halaman visi dan misi berhasil diperbarui.');
+  } catch (error) { errorMessage(error); }
+}
+
+async function saveManagedPageImage(imageFormData, key, title, section, altText) {
+  if (!imageFormData.file) {
+    notify(`Pilih file untuk ${title.toLowerCase()} terlebih dahulu.`, 'error');
+    return;
+  }
+
+  const existingImage = images.value.find((image) => image.key === key);
+  try {
+    if (existingImage) {
+      const data = new FormData();
+      data.append('image', imageFormData.file);
+      await uploadSiteImage(existingImage.id, data);
+    } else {
+      const data = new FormData();
+      data.append('key', key);
+      data.append('title', title);
+      data.append('section', section);
+      data.append('alt_text', altText);
+      data.append('image', imageFormData.file);
+      await createSiteImage(data);
+    }
+
+    imageFormData.file = null;
+    notify(`${title} berhasil diupload.`);
+    await loadImages();
+  } catch (error) { errorMessage(error); }
+}
+
+async function saveProfilePageImage() {
+  await saveManagedPageImage(
+    profilePageImage,
+    'school_profile_image',
+    'Gambar profil sekolah',
+    'about',
+    'Gambar profil SMK Nurul Jadid'
+  );
+}
+
+async function saveVisionMissionImages() {
+  await saveManagedPageImage(
+    visionMissionImages.vision,
+    'vision_image',
+    'Gambar visi sekolah',
+    'about',
+    'Gambar visi sekolah'
+  );
+  await saveManagedPageImage(
+    visionMissionImages.mission,
+    'mission_image',
+    'Gambar misi sekolah',
+    'about',
+    'Gambar misi sekolah'
+  );
 }
 
 function logout() {

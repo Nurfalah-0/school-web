@@ -11,6 +11,7 @@ import prestasiRoutes from '../modules/prestasi/routes';
 import lowonganRoutes from '../modules/lowongan/routes';
 import galeriRoutes from '../modules/galeri/routes';
 import staticRoutes from '../modules/static/routes';
+import profilRoutes from '../modules/profil/routes';
 
 const routes = [
   ...portalRoutes,
@@ -24,6 +25,7 @@ const routes = [
   ...prestasiRoutes,
   ...lowonganRoutes,
   ...galeriRoutes,
+  ...profilRoutes,
   ...staticRoutes,
 ];
 

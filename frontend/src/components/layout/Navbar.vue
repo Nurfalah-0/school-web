@@ -19,16 +19,52 @@
       </button>
 
       <div :class="['navbar-menu', { open: isMenuOpen }]" id="navbar-menu">
-        <router-link
+        <div
           v-for="item in menuItems"
           :key="item.label"
-          :to="item.to"
-          class="nav-link"
-          :class="{ active: isActive(item) }"
-          @click="closeMenu"
+          class="nav-item"
+          :class="{ 'has-dropdown': !!item.children, 'active-group': isGroupActive(item) }"
         >
-          {{ item.label }}
-        </router-link>
+          <template v-if="item.children">
+            <button
+              class="nav-link nav-trigger"
+              type="button"
+              @click="toggleDropdown(item.label)"
+              @mouseenter="handleTriggerMouseEnter(item)"
+              @mouseleave="handleTriggerMouseLeave(item)"
+            >
+              {{ item.label }}
+              <span class="caret">▾</span>
+            </button>
+
+            <div
+              :class="['dropdown-menu', { open: openDropdown === item.label } ]"
+              @mouseenter="handleDropdownMouseEnter(item)"
+              @mouseleave="handleDropdownMouseLeave(item)"
+            >
+              <router-link
+                v-for="child in item.children"
+                :key="child.label"
+                :to="child.to"
+                class="dropdown-link"
+                :class="{ active: isActive(child) }"
+                @click="closeMenu"
+              >
+                {{ child.label }}
+              </router-link>
+            </div>
+          </template>
+
+          <router-link
+            v-else
+            :to="item.to"
+            class="nav-link"
+            :class="{ active: isActive(item) }"
+            @click="closeMenu"
+          >
+            {{ item.label }}
+          </router-link>
+        </div>
 
         <router-link class="nav-cta nav-cta-mobile" :to="ctaLink" @click="closeMenu">
           {{ ctaLabel }}
@@ -60,6 +96,13 @@ const props = defineProps({
     type: Array,
     default: () => [
       { label: 'Dashboard', to: '/' },
+      {
+        label: 'Profil',
+        children: [
+          { label: 'SMK Nurul Jadid', to: '/profil' },
+          { label: 'Visi & Misi Sekolah', to: '/profil/visi-misi' },
+        ],
+      },
       { label: 'Jurusan', to: '/jurusan' },
       { label: 'Prestasi', to: '/prestasi' },
       { label: 'TEFA', to: '/tefa-store' },
@@ -80,6 +123,10 @@ const props = defineProps({
 
 const route = useRoute();
 const isMenuOpen = ref(false);
+const openDropdown = ref(null);
+const dropdownCloseTimers = ref({});
+const triggerHoverState = ref({});
+const dropdownHoverState = ref({});
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -87,11 +134,67 @@ const toggleMenu = () => {
 
 const closeMenu = () => {
   isMenuOpen.value = false;
+  openDropdown.value = null;
+};
+
+const clearDropdownTimer = (label) => {
+  if (dropdownCloseTimers.value[label]) {
+    clearTimeout(dropdownCloseTimers.value[label]);
+    delete dropdownCloseTimers.value[label];
+  }
+};
+
+const scheduleDropdownClose = (label) => {
+  clearDropdownTimer(label);
+  dropdownCloseTimers.value[label] = setTimeout(() => {
+    const isTriggerHovered = !!triggerHoverState.value[label];
+    const isDropdownHovered = !!dropdownHoverState.value[label];
+
+    if (!isTriggerHovered && !isDropdownHovered && openDropdown.value === label) {
+      openDropdown.value = null;
+    }
+  }, 180);
+};
+
+const handleDropdownMouseEnter = (item) => {
+  dropdownHoverState.value[item.label] = true;
+  clearDropdownTimer(item.label);
+  openDropdown.value = item.label;
+};
+
+const handleDropdownMouseLeave = (item) => {
+  dropdownHoverState.value[item.label] = false;
+  scheduleDropdownClose(item.label);
+};
+
+const handleTriggerMouseEnter = (item) => {
+  if (!item.children) return;
+  triggerHoverState.value[item.label] = true;
+  clearDropdownTimer(item.label);
+  openDropdown.value = item.label;
+};
+
+const handleTriggerMouseLeave = (item) => {
+  if (!item.children) return;
+  triggerHoverState.value[item.label] = false;
+  scheduleDropdownClose(item.label);
+};
+
+const toggleDropdown = (label) => {
+  openDropdown.value = openDropdown.value === label ? null : label;
+};
+
+const isGroupActive = (item) => {
+  if (!item.children) return false;
+  return item.children.some((child) => isActive(child));
 };
 
 const isActive = (item) => {
   const target = item.to;
   if (typeof target === 'string') {
+    if (target === '/profil') {
+      return route.path === '/profil'
+    }
     if (target === '/jurusan') {
       return route.path === '/jurusan' || route.path.startsWith('/jurusan/')
     }
@@ -169,25 +272,46 @@ const isActive = (item) => {
   gap: 2rem;
 }
 
-.nav-link {
+.nav-item {
+  position: relative;
+}
+
+.nav-link,
+.nav-trigger {
   color: #334155;
-  font-weight: 600;
   text-decoration: none;
   position: relative;
   transition: color 0.2s ease;
+  background: transparent;
+  border: none;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0;
+}
+
+.nav-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .nav-link:hover,
-.nav-link:focus {
+.nav-link:focus,
+.nav-trigger:hover,
+.nav-trigger:focus {
   color: #0f172a;
 }
 
-.nav-link.active {
-  color: #0f172a;
+.nav-link.active,
+.dropdown-link.active {
+  color: #1e40af;
   font-weight: 700;
 }
 
-.nav-link.active::after {
+.nav-link.active::after,
+.active-group > .nav-trigger::after,
+.dropdown-link.active::after {
   content: '';
   position: absolute;
   left: 0;
@@ -195,6 +319,55 @@ const isActive = (item) => {
   bottom: -0.35rem;
   height: 2px;
   background: #1e40af;
+}
+
+.caret {
+  font-size: 0.8rem;
+  color: inherit;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  left: 0;
+  min-width: 220px;
+  padding: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 1rem;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  z-index: 60;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  margin-top: 0.25rem;
+}
+
+.dropdown-menu.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.dropdown-link {
+  position: relative;
+  color: #334155;
+  text-decoration: none;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.75rem;
+  font-weight: 800;
+}
+
+.dropdown-link:hover,
+.dropdown-link:focus {
+  color: #0f172a;
+  background: #f8fafc;
 }
 
 .nav-actions {
@@ -210,7 +383,7 @@ const isActive = (item) => {
   border-radius: 9999px;
   background: #1e40af;
   color: #ffffff;
-  font-weight: 700;
+  font-weight: 800;
   text-decoration: none;
   transition: background-color 0.2s ease;
 }
@@ -293,10 +466,35 @@ const isActive = (item) => {
     z-index: 49;
   }
 
-  .nav-link {
+  .nav-item {
+    width: 100%;
+  }
+
+  .nav-link,
+  .nav-trigger {
+    width: 100%;
     padding: 0.8rem 1rem;
     border-radius: 0.85rem;
     background: #f8fafc;
+    justify-content: space-between;
+  }
+
+  .dropdown-menu {
+    position: static;
+    margin-top: 0.5rem;
+    min-width: 0;
+    width: 100%;
+    background: #f8fafc;
+    box-shadow: none;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .dropdown-menu:not(.open) {
+    display: none;
   }
 
   .nav-cta-mobile {
