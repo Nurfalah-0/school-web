@@ -42,7 +42,7 @@ class ChatbotController extends Controller
      * School context prompts
      */
     private $contextPrompts = [
-        'general' => 'Anda adalah asisten virtual untuk SMK Nurul Jadid. Anda membantu menjawab pertanyaan tentang sekolah, program studi, PPDB, kegiatan sekolah, dan informasi umum lainnya. Jika butuh kontak langsung atau konfirmasi, hubungi WhatsApp resmi +6282335585491 atau email smknurja.paiton@gmail.com. Jawab dengan ramah dan informatif.',
+        'general' => 'Anda adalah chatbot resmi SMK Nurul Jadid. Jawab hanya pertanyaan tentang SMK Nurul Jadid, seperti profil sekolah, jurusan, PPDB atau SPMB, persyaratan, jadwal, biaya, kegiatan, fasilitas, dan kontak resmi. Gunakan hanya informasi dalam konteks atau knowledge base dan jangan mengarang detail. Jika informasi belum tersedia, arahkan pengguna ke WhatsApp resmi +6282335585491 atau email smknurja.paiton@gmail.com. Jika pertanyaan tidak berkaitan dengan SMK Nurul Jadid, jawab singkat: "Maaf, saya hanya dapat membantu informasi tentang SMK Nurul Jadid." Jawab dalam bahasa Indonesia dengan ramah.',
         'ppdb' => 'Anda adalah asisten khusus PPDB SMK Nurul Jadid. Anda membantu calon siswa dan orang tua dengan informasi tentang pendaftaran, persyaratan, jalur masuk, jadwal, dan biaya pendidikan. Untuk konfirmasi atau pertanyaan langsung, arahkan ke WhatsApp resmi +6282335585491.',
         'academic' => 'Anda adalah asisten akademik SMK Nurul Jadid. Anda membantu dengan informasi tentang kurikulum, jadwal pelajaran, ujian, nilai, dan kegiatan akademik lainnya.',
         'bkk' => 'Anda adalah asisten Bursa Kerja Khusus SMK Nurul Jadid. Anda membantu dengan informasi tentang lowongan kerja, pelatihan, magang, dan karir setelah lulus.',
@@ -503,10 +503,13 @@ class ChatbotController extends Controller
     private function callAiApi($message, $context, $conversation)
     {
         $startTime = microtime(true);
+        $provider = config('app.ai_provider', 'google');
 
         try {
-            // Pilih AI provider (bisa dikonfigurasi)
-            $provider = config('app.ai_provider', 'openai');
+            if ($provider === 'google') {
+                return $this->callGeminiApi($message, $context, $conversation, $startTime);
+            }
+
             $apiKey = config('app.ai_api_key');
 
             if (!$apiKey) {
@@ -616,6 +619,99 @@ class ChatbotController extends Controller
             // Fallback response
             return [
                 'response' => 'Maaf, terjadi kesalahan saat memproses pertanyaan Anda. Silakan coba lagi nanti atau hubungi admin sekolah.',
+                'model' => 'fallback',
+                'tokens_used' => 0,
+                'response_time' => $responseTime,
+                'provider' => 'fallback',
+            ];
+        }
+    }
+
+    private function callGeminiApi($message, $context, $conversation, $startTime)
+    {
+        $apiKey = config('services.gemini.key');
+        $model = config('services.gemini.model', 'gemini-2.0-flash');
+        $systemPrompt = $this->contextPrompts['general'] . "\n\nFokus percakapan saat ini: " . ($this->contextPrompts[$context] ?? 'informasi umum sekolah');
+
+        try {
+            if (!$apiKey) {
+                throw new \Exception('GEMINI_API_KEY belum dikonfigurasi');
+            }
+
+            $contents = [];
+            foreach ($this->getConversationHistoryForApi($conversation->id, 5) as $historyMessage) {
+                $contents[] = [
+                    'role' => $historyMessage['sender'] === 'user' ? 'user' : 'model',
+                    'parts' => [['text' => $historyMessage['message']]],
+                ];
+            }
+            $contents[] = [
+                'role' => 'user',
+                'parts' => [['text' => $message]],
+            ];
+
+            $response = Http::timeout(30)->post(
+                "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}",
+                [
+                    'systemInstruction' => ['parts' => [['text' => $systemPrompt]]],
+                    'contents' => $contents,
+                    'generationConfig' => [
+                        'temperature' => 0.3,
+                        'maxOutputTokens' => 700,
+                    ],
+                ]
+            );
+
+            $responseTime = microtime(true) - $startTime;
+            if ($response->failed()) {
+                throw new \Exception('Gemini API request failed: ' . $response->body());
+            }
+
+            $responseData = $response->json();
+            $aiResponse = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? '';
+            if ($aiResponse === '') {
+                throw new \Exception('Gemini mengembalikan jawaban kosong');
+            }
+
+            $tokensUsed = $responseData['usageMetadata']['totalTokenCount'] ?? 0;
+            AiApiLog::create([
+                'api_provider' => 'google',
+                'endpoint' => "models/{$model}:generateContent",
+                'request_data' => ['message' => substr($message, 0, 200), 'model' => $model],
+                'response_data' => ['response' => substr($aiResponse, 0, 500)],
+                'status_code' => $response->status(),
+                'response_time' => $responseTime,
+                'tokens_used' => $tokensUsed,
+                'cost' => 0,
+                'user_id' => $conversation->user_id,
+                'ip_address' => request()->ip(),
+            ]);
+
+            return [
+                'response' => $aiResponse,
+                'model' => $model,
+                'tokens_used' => $tokensUsed,
+                'response_time' => $responseTime,
+                'provider' => 'google',
+            ];
+        } catch (\Exception $e) {
+            $responseTime = microtime(true) - $startTime;
+            AiApiLog::create([
+                'api_provider' => 'google',
+                'endpoint' => "models/{$model}:generateContent",
+                'request_data' => ['message' => substr($message, 0, 200)],
+                'response_data' => null,
+                'status_code' => 500,
+                'response_time' => $responseTime,
+                'tokens_used' => 0,
+                'cost' => 0,
+                'user_id' => $conversation->user_id,
+                'ip_address' => request()->ip(),
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return [
+                'response' => 'Maaf, layanan chatbot sedang tidak tersedia. Untuk informasi SMK Nurul Jadid, silakan hubungi WhatsApp +6282335585491 atau email smknurja.paiton@gmail.com.',
                 'model' => 'fallback',
                 'tokens_used' => 0,
                 'response_time' => $responseTime,

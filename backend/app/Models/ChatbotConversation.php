@@ -62,7 +62,7 @@ class ChatbotConversation extends Model
      */
     public function messages()
     {
-        return $this->hasMany(ChatbotMessage::class);
+        return $this->hasMany(ChatbotMessage::class, 'conversation_id');
     }
 
     /**

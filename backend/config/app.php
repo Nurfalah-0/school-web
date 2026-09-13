@@ -98,6 +98,9 @@ return [
     'cipher' => 'AES-256-CBC',
 
     'key' => env('APP_KEY'),
+    'ai_provider' => env('AI_PROVIDER', 'google'),
+    'ai_api_key' => env('AI_API_KEY'),
+    'gemini_model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
 
     'previous_keys' => [
         ...array_filter(

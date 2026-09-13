@@ -40,6 +40,12 @@ export function useChatbot() {
   const quickReplies = ref(['Jurusan apa saja?', 'Cara daftar SPMB', 'Info kontak', 'Berita terbaru'])
   const isFirstOpen = computed(() => messages.value.length === 0)
 
+  async function startConversation() {
+    const { data } = await client.post('/chatbot/start', { context: 'general' })
+    sessionId.value = data.session_id
+    sessionStorage.setItem(SESSION_KEY, sessionId.value)
+  }
+
   function toggle() {
     isOpen.value = !isOpen.value
     try {
@@ -93,17 +99,19 @@ export function useChatbot() {
     isTyping.value = true
 
     try {
-      const apiMessages = messages.value.map(m => ({
-        role: m.role === 'bot' ? 'assistant' : 'user',
-        content: m.content
-      }))
+      try {
+        await client.get(`/chatbot/${sessionId.value}/history`)
+      } catch (error) {
+        if (error.response?.status !== 404) throw error
+        await startConversation()
+      }
 
-      const { data } = await client.post('/chat', {
-        messages: apiMessages,
-        sessionId: sessionId.value
+      const { data } = await client.post(`/chatbot/${sessionId.value}/message`, {
+        message: userMsg,
+        context: 'general'
       })
 
-      addBotMessage(data.message)
+      addBotMessage(data.bot_response?.message || data.message)
     } catch (error) {
       addBotMessage('Maaf, sedang ada gangguan koneksi. Silakan coba lagi atau hubungi kami di WhatsApp +62 823-3558-5491.')
     } finally {

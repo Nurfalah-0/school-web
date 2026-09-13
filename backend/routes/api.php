@@ -24,6 +24,10 @@ Route::get('/sanctum/csrf-cookie', function () {
 // =============================================
 //  AUTH — Publik
 // =============================================
+Route::get('/login', function () {
+    return response()->json(['message' => 'Unauthenticated.'], 401);
+})->name('login');
+
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login',    [AuthController::class, 'login']);
@@ -65,6 +69,14 @@ Route::prefix('ppdb')->group(function () {
     Route::post('/apply', [PpdbController::class, 'apply']);
     // Cek status pendaftaran by nomor pendaftaran atau NISN
     Route::get('/status/{identifier}', [PpdbController::class, 'checkStatus']);
+});
+
+Route::prefix('chatbot')->group(function () {
+    Route::post('/start',               [ChatbotController::class, 'startConversation']);
+    Route::post('/{sessionId}/message', [ChatbotController::class, 'sendMessage']);
+    Route::get('/{sessionId}/history',  [ChatbotController::class, 'getConversationHistory']);
+    Route::post('/{sessionId}/end',     [ChatbotController::class, 'endConversation']);
+    Route::get('/kb/search',            [ChatbotController::class, 'searchKnowledgeBase']);
 });
 
 // =============================================
@@ -158,16 +170,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // ── Chatbot ───────────────────────────────
-    Route::prefix('chatbot')->group(function () {
-        Route::post('/start',                    [ChatbotController::class, 'startConversation']);
-        Route::post('/{sessionId}/message',      [ChatbotController::class, 'sendMessage']);
-        Route::get('/{sessionId}/history',       [ChatbotController::class, 'getConversationHistory']);
-        Route::post('/{sessionId}/end',          [ChatbotController::class, 'endConversation']);
-        Route::get('/kb/search',                 [ChatbotController::class, 'searchKnowledgeBase']);
-
-        Route::middleware(['role:superadmin,admin_sekolah'])->group(function () {
-            Route::get('/statistics', [ChatbotController::class, 'getStatistics']);
-        });
+    Route::middleware(['role:superadmin,admin_sekolah'])->prefix('chatbot')->group(function () {
+        Route::get('/statistics', [ChatbotController::class, 'getStatistics']);
     });
 
     // ── Security Monitoring ───────────────────

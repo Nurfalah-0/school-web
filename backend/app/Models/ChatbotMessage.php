@@ -51,7 +51,7 @@ class ChatbotMessage extends Model
      */
     public function conversation()
     {
-        return $this->belongsTo(ChatbotConversation::class);
+        return $this->belongsTo(ChatbotConversation::class, 'conversation_id');
     }
 
     /**
