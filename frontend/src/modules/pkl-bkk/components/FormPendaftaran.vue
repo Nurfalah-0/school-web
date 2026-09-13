@@ -140,7 +140,7 @@ const errorMessage = ref('');
 
 onMounted(async () => {
   try {
-    const res = await getMajors();
+    const res = await getMajors({ summary: 1 });
     const list = res.data?.data || [];
     if (list.length > 0) {
       majorOptions.value = list.map(m => m.name || m.nama);

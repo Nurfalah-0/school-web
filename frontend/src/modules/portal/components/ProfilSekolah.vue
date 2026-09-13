@@ -168,14 +168,39 @@ const finalLabImage = computed(() => {
 
 @media (min-width: 768px) {
   .profil-grid {
-    grid-template-columns: 0.65fr 0.65fr 1.7fr;
-    gap: 2.5rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .profil-col-left {
+    grid-row: 1 / 2;
+  }
+
+  .profil-col-center {
+    grid-row: 1 / 2;
+  }
+
+  .profil-col-right {
+    grid-column: 1 / 3;
   }
 }
 
 @media (min-width: 1024px) {
   .profil-grid {
+    grid-template-columns: 0.65fr 0.65fr 1.7fr;
     gap: 3rem;
+  }
+
+  .profil-col-left {
+    grid-row: auto;
+  }
+
+  .profil-col-center {
+    grid-row: auto;
+  }
+
+  .profil-col-right {
+    grid-column: auto;
   }
 }
 

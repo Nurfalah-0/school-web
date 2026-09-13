@@ -84,7 +84,7 @@ const galeri = computed(() => {
 <style lang="scss" scoped>
 .galeri-sekolah {
   background: #f8fafc;
-  padding: 6rem 0 2rem;
+  padding: 4rem 0 2rem;
   position: relative;
 }
 
@@ -140,9 +140,17 @@ const galeri = computed(() => {
   .galeri-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .item-height-1, .item-height-2, .item-height-3, .item-height-4 {
+    height: 240px;
+  }
 }
 
 @media (max-width: 639px) {
+  .galeri-inner {
+    padding: 2rem 1.25rem 1.5rem;
+  }
+
   .galeri-header {
     flex-direction: column;
     align-items: flex-start;
@@ -150,12 +158,13 @@ const galeri = computed(() => {
   }
 
   .galeri-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
   }
 
   .galeri-item {
-    height: 16rem !important;
+    height: 160px !important;
+    border-radius: 1rem;
   }
 }
 

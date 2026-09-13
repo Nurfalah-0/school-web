@@ -124,7 +124,7 @@ function kategoriColor(kategori) {
 }
 
 async function loadBerita() {
-  const response = await getNews(1, 100);
+  const response = await getNews(1, 12, { summary: 1 });
   const articles = response.data?.data?.data || response.data?.data || [];
   beritaList.value = articles.map(mapNews);
 }

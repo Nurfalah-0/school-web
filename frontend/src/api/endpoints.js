@@ -52,7 +52,7 @@ export const updateStudent = (id, data) => client.put(`/admin/students/${id}`, d
 export const deleteStudent = (id) => client.delete(`/admin/students/${id}`);
 
 // Major endpoints
-export const getMajors = () => client.get('/majors');
+export const getMajors = (options = {}) => client.get('/majors', { params: options });
 export const getMajorDetail = (id) => client.get(`/majors/${id}`);
 
 // PPDB endpoints
@@ -77,7 +77,9 @@ export const deleteRegistration = (id) => client.delete(`/ppdb/applications/${id
 export const getRegistrationDetail = (id) => client.get(`/ppdb/applications/${id}`);
 
 // News endpoints
-export const getNews = (page = 1, perPage = 10) => client.get('/news', { params: { page, per_page: perPage } });
+export const getNews = (page = 1, perPage = 10, options = {}) => client.get('/news', {
+  params: { page, per_page: perPage, ...options },
+});
 export const getNewsDetail = (id) => client.get(`/news/${id}`);
 export const createNews = (data) => client.post('/admin/news', data, {
   headers: { 'Content-Type': 'multipart/form-data' },

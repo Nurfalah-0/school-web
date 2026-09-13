@@ -182,7 +182,19 @@ class PpdbController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = PpdbRegistration::latest();
+            $query = PpdbRegistration::query()->select([
+                'id',
+                'no_pendaftaran',
+                'nama',
+                'nisn',
+                'email',
+                'phone',
+                'program',
+                'alamat',
+                'asal_sekolah',
+                'status',
+                'created_at',
+            ])->latest();
 
             // Filter by status
             if ($request->filled('status')) {

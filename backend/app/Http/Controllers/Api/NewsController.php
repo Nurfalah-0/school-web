@@ -17,6 +17,20 @@ class NewsController extends Controller
         try {
             $query = DB::table('news')->where('published', true);
 
+            if ($request->boolean('summary')) {
+                $query->select([
+                    'id',
+                    'slug',
+                    'title',
+                    'excerpt',
+                    'category',
+                    'featured_image',
+                    'published',
+                    'published_at',
+                    'created_at',
+                ]);
+            }
+
             if ($request->has('search')) {
                 $search = $request->input('search');
                 $query->where(function ($q) use ($search) {
@@ -31,7 +45,7 @@ class NewsController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $news
-            ]);
+            ])->header('Cache-Control', 'public, max-age=30, stale-while-revalidate=60');
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

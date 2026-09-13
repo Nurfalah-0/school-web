@@ -79,8 +79,8 @@ const heroImg = computed(() => {
 
 .hero-section {
   position: relative;
-  padding: 100px 0 100px;
-  min-height: 760px;
+  padding: 80px 0;
+  min-height: min(760px, 90vh);
   background: linear-gradient(90deg, #ffffff 0%, #bfdbfe 45%, #1e3a8a 100%);
 }
 
@@ -272,13 +272,13 @@ const heroImg = computed(() => {
 @media (max-width: 1100px) {
   .hero-section {
     background: linear-gradient(180deg, #ffffff 0%, #bfdbfe 50%, #1e3a8a 100%);
-    padding-top: 80px;
-    padding-bottom: 80px;
+    padding: 60px 0;
+    min-height: unset;
   }
 
   .hero-inner {
     grid-template-columns: 1fr;
-    gap: 3rem;
+    gap: 2.5rem;
   }
 
   .hero-copy {
@@ -306,12 +306,12 @@ const heroImg = computed(() => {
   }
 
   .hero-card-wrap {
-    max-width: 420px;
+    max-width: 480px;
     margin: 0 auto;
   }
 
   .hero-card img {
-    height: 360px;
+    height: 380px;
   }
 
   .hero-stat-top {
@@ -327,8 +327,7 @@ const heroImg = computed(() => {
 
 @media (max-width: 760px) {
   .hero-section {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
+    padding: 3rem 0;
   }
 
   .hero-copy {
@@ -336,22 +335,37 @@ const heroImg = computed(() => {
   }
 
   .hero-card img {
-    height: 280px;
+    height: 260px;
+  }
+
+  .hero-card {
+    min-height: unset;
   }
 
   .hero-stat-card {
-    padding: 14px 18px;
-    gap: 0.75rem;
+    padding: 12px 14px;
+    gap: 0.6rem;
+    border-radius: 16px;
   }
 
   .hero-stat-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.1rem;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
   }
 
   .hero-stat-text strong {
-    font-size: 1.1rem;
+    font-size: 1rem;
+  }
+
+  .hero-stat-text p {
+    font-size: 0.8rem;
+  }
+
+  .hero-actions .button-primary,
+  .hero-actions .button-secondary {
+    padding: 14px 22px;
+    font-size: 0.95rem;
   }
 }
 </style>

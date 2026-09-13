@@ -13,27 +13,45 @@ use Illuminate\Support\Str;
 
 class MajorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
             $majors = DB::table('majors')
                 ->where('is_active', true)
+                ->when($request->boolean('summary'), function ($query) {
+                    $query->select([
+                        'id',
+                        'slug',
+                        'code',
+                        'name',
+                        'description',
+                        'image',
+                        'is_active',
+                    ]);
+                })
                 ->get();
 
-            $curricula = MajorCurriculum::whereIn('major_id', $majors->pluck('id'))
-                ->orderBy('sort_order')
-                ->orderBy('id')
-                ->get()
-                ->groupBy('major_id');
+            if (!$request->boolean('summary')) {
+                $curricula = MajorCurriculum::whereIn('major_id', $majors->pluck('id'))
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->get()
+                    ->groupBy('major_id');
 
-            $majors->each(function ($major) use ($curricula) {
-                $major->curricula = $curricula->get($major->id, collect())->values();
-            });
+                $majors->each(function ($major) use ($curricula) {
+                    $major->curricula = $curricula->get($major->id, collect())->values();
+                });
+            }
 
             return response()->json([
                 'success' => true,
                 'data'    => $majors,
-            ]);
+            ])->header(
+                'Cache-Control',
+                $request->boolean('summary')
+                    ? 'public, max-age=60, stale-while-revalidate=120'
+                    : 'private, no-cache'
+            );
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }

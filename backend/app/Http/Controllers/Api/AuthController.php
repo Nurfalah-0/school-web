@@ -130,7 +130,7 @@ class AuthController extends Controller
             }
 
             // Cek credentials
-            if (!Auth::attempt($request->only('email', 'password'))) {
+            if (!Hash::check($request->password, $user->password)) {
                 $user->increment('login_attempts');
                 RateLimiter::hit($key);
                 return response()->json(['message' => 'Email atau password salah'], 401);

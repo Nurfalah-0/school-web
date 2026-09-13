@@ -190,30 +190,44 @@ const isActive = (item) => {
   .nav-toggle {
     display: inline-flex;
   }
-}
 
-@media (max-width: 760px) {
   .nav-links.open {
+    display: flex;
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     margin: 0.75rem auto;
-    width: min(95%, 420px);
+    width: min(95%, 480px);
     flex-direction: column;
     gap: 0.9rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.96);
+    padding: 1.25rem 1.5rem;
+    background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(16px);
     border-radius: 24px;
     border: 1px solid rgba(4, 45, 134, 0.12);
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
+    box-shadow: 0 16px 40px rgba(4, 45, 134, 0.12);
+    z-index: 1000;
   }
 
+  .nav-link {
+    padding: 0.5rem 0;
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(4, 45, 134, 0.06);
+  }
+
+  .nav-link:last-child {
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 760px) {
   .nav-actions {
     display: none;
+  }
+
+  .nav-links.open {
+    width: min(95%, 360px);
   }
 }
 </style>

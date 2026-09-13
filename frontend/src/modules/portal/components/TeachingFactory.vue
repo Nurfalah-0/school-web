@@ -275,15 +275,19 @@ defineProps({
 }
 
 @media (max-width: 767px) {
+  .teaching-factory-inner {
+    padding: 1.75rem 1.25rem;
+  }
+
   .teaching-factory-split {
-    border-radius: 2rem;
+    border-radius: 1.5rem;
     flex-direction: row;
   }
 
   .teaching-factory-split-img {
     width: 50%;
-    aspect-ratio: 16/9;
-    height: auto;
+    height: 200px;
+    object-fit: cover;
   }
 }
 </style>

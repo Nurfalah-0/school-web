@@ -80,7 +80,7 @@ const normalizeImageUrl = (value) => {
 
 onMounted(async () => {
   try {
-    const response = await getMajors();
+    const response = await getMajors({ summary: 1 });
     const items = response.data?.data || [];
 
     if (items.length > 0) {

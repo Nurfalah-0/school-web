@@ -20,8 +20,7 @@ const showNavbar = computed(() => route.meta.hideNavbar !== true);
 
 <style scoped>
 .main-layout {
-  padding-top: var(--nav-height);
-  min-height: calc(100vh - var(--nav-height));
+  min-height: 100vh;
   overflow: visible;
   background: #f8f7fb;
 }

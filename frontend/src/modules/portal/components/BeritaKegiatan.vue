@@ -91,7 +91,7 @@ const daftarBerita = computed(() => beritaDatabase.value.slice(1, 4));
 
 onMounted(async () => {
   try {
-    const response = await getNews(1, 4);
+    const response = await getNews(1, 4, { summary: 1 });
     const articles = response.data?.data?.data || response.data?.data || [];
     beritaDatabase.value = articles.map(mapNews);
   } catch {

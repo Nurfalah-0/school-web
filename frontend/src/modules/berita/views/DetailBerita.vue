@@ -76,7 +76,7 @@ async function loadArticle(slug) {
   try {
     const [detailResponse, listResponse] = await Promise.allSettled([
       getNewsDetail(slug),
-      getNews(1, 12),
+      getNews(1, 6, { summary: 1 }),
     ]);
 
     if (

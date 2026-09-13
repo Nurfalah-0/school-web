@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PpdbRegistration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class SchoolController extends Controller
 {
@@ -128,7 +129,8 @@ class SchoolController extends Controller
     public function getDashboardStats()
     {
         try {
-            $totalStudents      = DB::table('students')->count();
+            $stats = Cache::remember('dashboard:stats', now()->addSeconds(30), function () {
+                $totalStudents      = DB::table('students')->count();
             $totalMajors        = DB::table('majors')->where('is_active', true)->count();
             $totalUsers         = DB::table('users')->count();
             $totalNews          = DB::table('news')->where('published', true)->count();
@@ -154,18 +156,16 @@ class SchoolController extends Controller
                 // Tabel belum ada atau kolom berbeda
             }
 
-            return response()->json([
-                'success' => true,
-                'data'    => [
+                return [
                     'total_students'       => $totalStudents,
-                    'total_majors'         => $totalMajors,
-                    'total_users'          => $totalUsers,
-                    'total_news'           => $totalNews,
+                    'total_majors'        => $totalMajors,
+                    'total_users'         => $totalUsers,
+                    'total_news'          => $totalNews,
                     'total_industry_partners' => $totalIndustry,
-                    'total_achievements'   => $totalAchievements,
-                    'total_galleries'      => $totalGalleries,
-                    'total_products'       => $totalProducts,
-                    'total_job_vacancies'  => $totalJobVacancies,
+                    'total_achievements'  => $totalAchievements,
+                    'total_galleries'     => $totalGalleries,
+                    'total_products'      => $totalProducts,
+                    'total_job_vacancies' => $totalJobVacancies,
                     'active_security_alerts' => $activeAlerts,
                     'ppdb' => [
                         'total'    => $ppdbTotal,
@@ -173,8 +173,13 @@ class SchoolController extends Controller
                         'diterima' => $ppdbDiterima,
                         'ditolak'  => $ppdbDitolak,
                     ],
-                ],
-            ]);
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data'    => $stats,
+            ])->header('Cache-Control', 'private, max-age=15');
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
