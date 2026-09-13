@@ -219,7 +219,9 @@ onMounted(async () => {
 
 <style scoped>
 .profil-page {
-  min-height: 100vh;
+  min-height: calc(100vh - var(--nav-height, 60px));
+  width: 100%;
+  overflow-x: clip;
   background: linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
 }
 
@@ -442,6 +444,7 @@ h3 {
 
 .principal-section {
   width: min(1180px, 100%);
+  box-sizing: border-box;
   margin: 2.5rem auto 0;
   padding: 0 1.25rem 4rem;
 }
