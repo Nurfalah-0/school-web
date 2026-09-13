@@ -448,7 +448,7 @@ h3 {
 
 .principal-card {
   display: grid;
-  grid-template-columns: 0.9fr 1.3fr;
+  grid-template-columns: 1.05fr 1.25fr;
   gap: 2rem;
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(148, 163, 184, 0.18);
@@ -499,7 +499,7 @@ h3 {
 }
 
 .principal-photo {
-  width: min(100%, 360px);
+  width: min(100%, 400px);
   height: 100%;
   min-height: 280px;
   object-fit: cover;
