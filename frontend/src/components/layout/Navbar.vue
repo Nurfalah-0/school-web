@@ -99,8 +99,9 @@ const props = defineProps({
       {
         label: 'Profil',
         children: [
-          { label: 'SMK Nurul Jadid', to: '/profil' },
-          { label: 'Visi & Misi Sekolah', to: '/profil/visi-misi' },
+          { label: 'SMK Nurul Jadid', to: { path: '/profil', hash: '#profil-sekolah' } },
+          { label: 'Visi & Misi Sekolah', to: { path: '/profil', hash: '#visi-misi' } },
+          { label: 'Kepala Sekolah', to: { path: '/profil', hash: '#kepala-sekolah' } },
         ],
       },
       { label: 'Jurusan', to: '/jurusan' },

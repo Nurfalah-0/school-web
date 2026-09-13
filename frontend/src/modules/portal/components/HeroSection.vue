@@ -19,7 +19,7 @@
           <router-link class="button-primary" to="/ppdb"
             >Daftar PPDB Sekarang</router-link
           >
-          <a class="button-secondary" href="#profil">Lihat Profil</a>
+          <router-link class="button-secondary" to="/profil#profil-sekolah">Lihat Profil</router-link>
         </div>
       </div>
 

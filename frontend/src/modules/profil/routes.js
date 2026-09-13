@@ -8,12 +8,10 @@ export default [
   },
   {
     path: '/profil/sekolah',
-    name: 'ProfilSekolahDetail',
-    component: ProfilSekolahPage,
+    redirect: { path: '/profil', hash: '#profil-sekolah' },
   },
   {
     path: '/profil/visi-misi',
-    name: 'VisiMisiSekolah',
-    component: () => import('./views/VisiMisiSekolahPage.vue'),
+    redirect: to => ({ path: '/profil', hash: '#visi-misi' }),
   },
 ];

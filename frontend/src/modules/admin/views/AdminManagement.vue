@@ -731,6 +731,27 @@
           <label>Nama Kepala Sekolah</label>
           <input v-model="profileForm.headmaster_name" placeholder="Nama Kepala Sekolah beserta gelar" />
         </div>
+        <div class="form-group full-width">
+          <label>Teks Sambutan</label>
+          <textarea v-model="profileForm.headmaster_message_body" rows="7" placeholder="Tulis sambutan kepala sekolah."></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label>Teks Pemberitahuan Utama</label>
+          <textarea v-model="profileForm.headmaster_message_statement" rows="3" placeholder="SMK Nurul Jadid Pusat Keunggulan, Mencetak Wirausaha, Menghadirkan Industri di Sekolah."></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label>Kata Penutup</label>
+          <textarea v-model="profileForm.headmaster_message_closing" rows="2" placeholder="Contoh: Terima kasih atas perhatian dan dukungan semua pihak."></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label>Foto Kepala Sekolah</label>
+          <input type="file" accept="image/*" @change="headmasterPhoto.file = $event.target.files[0]" />
+          <small class="form-help">Upload foto kepala sekolah untuk ditampilkan di halaman profil.</small>
+        </div>
+        <div class="form-actions full-width">
+          <button class="button primary" type="submit"><Save :size="15" /> Simpan Profil Sekolah</button>
+          <button class="button secondary" type="button" @click="saveHeadmasterPhoto"><Upload :size="15" /> Upload Foto</button>
+        </div>
         <div class="form-group">
           <label>Email Resmi Sekolah</label>
           <input v-model="profileForm.email" type="email" placeholder="info@smknuruljadid.sch.id" />
@@ -1105,10 +1126,36 @@ const newsForm = reactive({ id: null, title: '', category: '', excerpt: '', cont
 const majorForm = reactive({ id: null, code: '', name: '', capacity: null, description: '', vision: '', mission: '', image: null, image_url: '', is_active: true });
 const imageForm = reactive({ id: null, key: '', title: '', section: '', alt_text: '', image_url: '', file: null });
 const studentForm = reactive({ id: null, nisn: '', nis: '', name: '', email: '', phone: '', class: '', gender: '', major_id: null, address: '' });
-const profileForm = reactive({ school_name: '', nsm: '', npsn: '', npwp: '', profile_title_line1: '', profile_description: '', email: '', phone: '', website: '', headmaster_name: '', founded_year: null, operating_year: null, accreditation: '', foundation_name: '', address: '', village: '', district: '', city: '', vision: '', mission: '' });
+const profileForm = reactive({
+  school_name: '',
+  nsm: '',
+  npsn: '',
+  npwp: '',
+  profile_title_line1: '',
+  profile_description: '',
+  email: '',
+  phone: '',
+  website: '',
+  headmaster_name: '',
+  headmaster_message: '',
+  headmaster_message_body: '',
+  headmaster_message_statement: '',
+  headmaster_message_closing: '',
+  founded_year: null,
+  operating_year: null,
+  accreditation: '',
+  foundation_name: '',
+  address: '',
+  village: '',
+  district: '',
+  city: '',
+  vision: '',
+  mission: ''
+});
 const profilePageForm = reactive({ profile_page_title: '', profile_page_content: '' });
 const visionMissionForm = reactive({ vision_page_intro: '', vision_page_content: '', mission_page_content: '' });
 const profilePageImage = reactive({ file: null });
+const headmasterPhoto = reactive({ file: null });
 const visionMissionImages = reactive({ vision: { file: null }, mission: { file: null } });
 const categoryForm = reactive({ id: null, name: '', type: 'news' });
 const userForm = reactive({ id: null, name: '', email: '', password: '', phone: '', role: 'admin_sekolah', is_active: true });
@@ -1197,6 +1244,28 @@ function toIsoString(value) {
   return value ? new Date(value).toISOString() : null;
 }
 
+function splitHeadmasterMessage(value) {
+  const text = (value || '').replace(/\*\*/g, '').replace(/\r\n?/g, '\n').trim();
+  const defaultStatement = 'SMK Nurul Jadid Pusat Keunggulan, Mencetak Wirausaha, Menghadirkan Industri di Sekolah.';
+
+  if (!text) {
+    return { body: '', statement: defaultStatement, closing: '' };
+  }
+
+  const statementPattern = /SMK Nurul Jadid Pusat Keunggulan, Mencetak Wirausaha, Menghadirkan Industri di Sekolah\.?/i;
+  const statementMatch = text.match(statementPattern);
+  if (statementMatch) {
+    const statement = statementMatch[0];
+    return {
+      body: text.slice(0, statementMatch.index).trim(),
+      statement,
+      closing: text.slice(statementMatch.index + statement.length).trim(),
+    };
+  }
+
+  return { body: text, statement: defaultStatement, closing: '' };
+}
+
 // =============================================
 // LOADERS
 // =============================================
@@ -1262,7 +1331,14 @@ async function loadProfile() {
   try {
     const response = await getSchoolProfile();
     const profile = response.data?.data || {};
-    Object.assign(profileForm, profile);
+    const messageParts = splitHeadmasterMessage(profile.headmaster_message);
+
+    Object.assign(profileForm, {
+      ...profile,
+      headmaster_message_body: messageParts.body,
+      headmaster_message_statement: messageParts.statement,
+      headmaster_message_closing: messageParts.closing,
+    });
     Object.assign(profilePageForm, profile);
     Object.assign(visionMissionForm, profile);
   } catch (error) { errorMessage(error); }
@@ -1761,7 +1837,20 @@ async function removeUser(id) {
 // =============================================
 async function saveProfile() {
   try {
-    await updateSchoolProfile({ ...profileForm });
+    const payload = {
+      ...profileForm,
+      headmaster_message: [
+        profileForm.headmaster_message_body,
+        profileForm.headmaster_message_statement,
+        profileForm.headmaster_message_closing,
+      ].filter(Boolean).join('\n'),
+    };
+
+    delete payload.headmaster_message_body;
+    delete payload.headmaster_message_statement;
+    delete payload.headmaster_message_closing;
+
+    await updateSchoolProfile(payload);
     notify('Profil sekolah berhasil diperbarui.');
   } catch (error) { errorMessage(error); }
 }
@@ -1778,6 +1867,16 @@ async function saveVisionMissionPage() {
     await updateSchoolProfile({ ...visionMissionForm });
     notify('Detail halaman visi dan misi berhasil diperbarui.');
   } catch (error) { errorMessage(error); }
+}
+
+async function saveHeadmasterPhoto() {
+  await saveManagedPageImage(
+    headmasterPhoto,
+    'headmaster_photo',
+    'Foto kepala sekolah',
+    'about',
+    'Foto kepala sekolah SMK Nurul Jadid'
+  );
 }
 
 async function saveManagedPageImage(imageFormData, key, title, section, altText) {
