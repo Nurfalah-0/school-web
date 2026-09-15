@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\PpdbController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProfileMenuItemController;
+use App\Http\Controllers\Api\ContactController;
 
 // =============================================
 //  CSRF TOKEN — untuk SPA
@@ -61,6 +62,9 @@ Route::get('/content/{type}', [ContentController::class, 'index']);
 // Kategori dinamis
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/profile-menu-items', [ProfileMenuItemController::class, 'index']);
+
+// Pesan kontak publik
+Route::post('/contact', [ContactController::class, 'send']);
 
 // =============================================
 //  PPDB — Publik (tidak perlu login)
