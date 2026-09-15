@@ -1,355 +1,335 @@
 <template>
-  <div class="admin-login-page">
-    <header class="admin-topbar">
-      <div class="admin-topbar-inner">
-        <div class="admin-brand">
-          <img :src="logoSrc" alt="Logo SMK" class="admin-brand-logo" />
-          <div class="admin-brand-text-wrap">
-            <span class="admin-brand-name">SMK Nurul Jadid</span>
-            <span class="admin-brand-subtitle">Admin Portal</span>
-          </div>
+  <div class="login-page">
+    <!-- Panel Kiri: Hero -->
+    <div class="login-hero" aria-hidden="true">
+      <div class="login-hero-overlay"></div>
+      <div class="login-hero-body">
+        <div class="login-hero-brand">
+          <img :src="logoSrc" alt="Logo SMK Nurul Jadid" class="login-hero-logo" />
+          <span class="login-hero-school">SMK Nurul Jadid</span>
         </div>
-        <nav class="admin-topbar-nav">
-          <router-link to="/support" class="admin-topbar-link"
-            >Support</router-link
-          >
-          <router-link to="/portal-guide" class="admin-topbar-link"
-            >Portal Guide</router-link
-          >
-          <router-link to="/admin/contact" class="admin-topbar-btn"
-            >Contact Admin</router-link
-          >
-        </nav>
-      </div>
-    </header>
-
-    <div class="admin-login-grid">
-      <div class="admin-hero-panel">
-        <div class="admin-hero-overlay"></div>
-        <div class="admin-hero-vignette"></div>
-        <div class="admin-hero-content">
-          <span class="admin-hero-badge">
-            <span class="admin-hero-badge-dot"></span>
-            ADMIN PORTAL ACCESS
+        <div class="login-hero-text">
+          <span class="login-hero-badge">
+            <span class="login-hero-dot"></span>
+            ADMIN PORTAL
           </span>
-          <h1 class="admin-hero-title">
-            Empowering<br />the Future<br />workforce<br />through Digital<br />Innovation.
+          <h1 class="login-hero-title">
+            Kelola Sekolah<br />dengan Mudah &<br />Efisien.
           </h1>
-          <p class="admin-hero-desc">
-            Manage scholastic records, faculty configurations, and systemic
-            operations with unparalleled clarity and speed.
+          <p class="login-hero-desc">
+            Satu platform untuk mengelola data siswa, pendaftaran, berita, dan seluruh operasional SMK Nurul Jadid.
           </p>
-          <div class="admin-hero-indicators">
-            <span class="admin-hero-indicator active"></span>
-            <span class="admin-hero-indicator"></span>
-            <span class="admin-hero-indicator"></span>
-          </div>
         </div>
-      </div>
-
-      <div class="admin-form-panel">
-        <div class="admin-form-card">
-          <div class="admin-form-header">
-            <h2 class="admin-form-title">Admin Login</h2>
-            <p class="admin-form-desc">
-              Please enter your credentials to access the portal.
-            </p>
+        <div class="login-hero-stats">
+          <div class="login-hero-stat">
+            <strong>1200+</strong>
+            <span>Siswa Aktif</span>
           </div>
-
-          <div v-if="globalError" class="admin-alert">
-            {{ globalError }}
+          <div class="login-hero-stat-divider"></div>
+          <div class="login-hero-stat">
+            <strong>85+</strong>
+            <span>Guru & Staff</span>
           </div>
-
-          <form class="admin-form" @submit.prevent="handleLogin">
-            <!-- Preset Quick Login Pills -->
-            <div class="preset-accounts-box">
-              <span class="preset-title">Pilih Akun Demo / Cepat:</span>
-              <div class="preset-chips">
-                <button
-                  v-for="acc in presetAccounts"
-                  :key="acc.email"
-                  type="button"
-                  class="preset-chip"
-                  :class="{ active: email === acc.email }"
-                  @click="selectPreset(acc)"
-                >
-                  {{ acc.label }}
-                </button>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="email">Email Administrator</label>
-              <div class="input-wrap">
-                <Mail :size="20" color="#64748b" />
-                <input
-                  id="email"
-                  v-model="email"
-                  type="email"
-                  class="form-input"
-                  placeholder="admin@smknuruljadid.sch.id"
-                  autocomplete="username"
-                  required
-                />
-              </div>
-              <p v-if="errors.email" class="form-error">{{ errors.email }}</p>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="password">Password</label>
-              <div class="input-wrap">
-                <Lock :size="20" color="#64748b" />
-                <input
-                  id="password"
-                  v-model="password"
-                  :type="showPassword ? 'text' : 'password'"
-                  class="form-input"
-                  placeholder="Masukkan password"
-                  autocomplete="current-password"
-                  required
-                />
-                <button
-                  type="button"
-                  class="input-icon-btn"
-                  @click="showPassword = !showPassword"
-                  :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                >
-                  <Eye v-if="!showPassword" :size="20" color="#64748b" />
-                  <EyeOff v-else :size="20" color="#64748b" />
-                </button>
-              </div>
-              <p v-if="errors.password" class="form-error">
-                {{ errors.password }}
-              </p>
-            </div>
-
-            <div class="form-row">
-              <label class="check-label">
-                <input v-model="rememberMe" type="checkbox" />
-                <span class="check-box"></span>
-                <span class="check-text">Remember Me</span>
-              </label>
-              <router-link to="/admin/forgot-password" class="forgot-link"
-                >Forgot Password?</router-link
-              >
-            </div>
-
-            <button
-              type="submit"
-              class="submit-btn"
-              :disabled="isLoading || isRateLimited"
-            >
-              <span v-if="isLoading" class="spinner"></span>
-              <span>{{
-                isLoading
-                  ? "Signing In..."
-                  : isRateLimited
-                    ? "Coba lagi nanti"
-                    : "Sign In ke Dashboard"
-              }}</span>
-            </button>
-          </form>
-
-          <div class="admin-form-footer">
-            <div class="admin-form-footer-links">
-              <router-link to="/support" class="footer-link">
-                <HelpCircle :size="16" color="#64748b" />
-                Support
-              </router-link>
-              <span class="footer-dot"></span>
-              <router-link to="/portal-guide" class="footer-link">
-                <BookOpen :size="16" color="#64748b" />
-                Portal Guide
-              </router-link>
-            </div>
+          <div class="login-hero-stat-divider"></div>
+          <div class="login-hero-stat">
+            <strong>5</strong>
+            <span>Program Keahlian</span>
           </div>
         </div>
       </div>
     </div>
 
-    <footer class="admin-footer">
-      <span>© 2026 SMK Nurul Jadid. Empowering the future workforce.</span>
-      <div class="admin-footer-links">
-        <router-link to="/privacy" class="admin-footer-link"
-          >Privacy Policy</router-link
-        >
-        <router-link to="/terms" class="admin-footer-link"
-          >Terms of Service</router-link
-        >
-        <router-link to="/security" class="admin-footer-link"
-          >Security</router-link
-        >
+    <!-- Panel Kanan: Form -->
+    <div class="login-form-panel">
+      <div class="login-form-wrap">
+        <!-- Header mobile: brand -->
+        <div class="login-mobile-brand">
+          <img :src="logoSrc" alt="Logo" class="login-mobile-logo" />
+          <div>
+            <strong>SMK Nurul Jadid</strong>
+            <span>Admin Portal</span>
+          </div>
+        </div>
+
+        <div class="login-form-header">
+          <h2 class="login-form-title">Selamat Datang</h2>
+          <p class="login-form-desc">Masuk untuk mengakses dashboard admin.</p>
+        </div>
+
+        <!-- Alert error -->
+        <div v-if="globalError" class="login-alert" role="alert">
+          <AlertTriangle :size="16" />
+          <span>{{ globalError }}</span>
+        </div>
+
+        <!-- Quick login -->
+        <div class="login-quick">
+          <span class="login-quick-label">Login Cepat</span>
+          <div class="login-quick-chips">
+            <button
+              v-for="acc in presetAccounts"
+              :key="acc.email"
+              type="button"
+              class="login-quick-chip"
+              :class="{ active: email === acc.email }"
+              @click="selectPreset(acc)"
+            >
+              {{ acc.label }}
+            </button>
+          </div>
+        </div>
+
+        <form class="login-form" @submit.prevent="handleLogin" novalidate>
+          <!-- Email -->
+          <div class="login-field">
+            <label class="login-label" for="email">Email</label>
+            <div class="login-input-wrap" :class="{ error: errors.email }">
+              <Mail :size="18" class="login-input-icon" />
+              <input
+                id="email"
+                v-model="email"
+                type="email"
+                class="login-input"
+                placeholder="admin@smknuruljadid.sch.id"
+                autocomplete="username"
+                required
+              />
+            </div>
+            <span v-if="errors.email" class="login-field-error">{{ errors.email }}</span>
+          </div>
+
+          <!-- Password -->
+          <div class="login-field">
+            <label class="login-label" for="password">Password</label>
+            <div class="login-input-wrap" :class="{ error: errors.password }">
+              <Lock :size="18" class="login-input-icon" />
+              <input
+                id="password"
+                v-model="password"
+                :type="showPassword ? 'text' : 'password'"
+                class="login-input"
+                placeholder="Masukkan password"
+                autocomplete="current-password"
+                required
+              />
+              <button
+                type="button"
+                class="login-eye-btn"
+                @click="showPassword = !showPassword"
+                :aria-label="showPassword ? 'Sembunyikan password' : 'Tampilkan password'"
+              >
+                <Eye v-if="!showPassword" :size="18" />
+                <EyeOff v-else :size="18" />
+              </button>
+            </div>
+            <span v-if="errors.password" class="login-field-error">{{ errors.password }}</span>
+          </div>
+
+          <!-- Remember & Forgot -->
+          <div class="login-row">
+            <label class="login-check">
+              <input v-model="rememberMe" type="checkbox" />
+              <span class="login-check-box"></span>
+              <span>Ingat saya</span>
+            </label>
+            <router-link to="/admin/forgot-password" class="login-forgot">Lupa password?</router-link>
+          </div>
+
+          <!-- Submit -->
+          <button
+            type="submit"
+            class="login-submit"
+            :disabled="isLoading || isRateLimited"
+          >
+            <span v-if="isLoading" class="login-spinner"></span>
+            <LogIn v-else :size="18" />
+            <span>{{ isLoading ? 'Memproses...' : isRateLimited ? 'Coba lagi nanti' : 'Masuk ke Dashboard' }}</span>
+          </button>
+        </form>
+
+        <div class="login-back">
+          <router-link to="/" class="login-back-link">
+            <ArrowLeft :size="15" />
+            Kembali ke Beranda
+          </router-link>
+        </div>
       </div>
-    </footer>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
-import { Mail, Lock, Eye, EyeOff, HelpCircle, BookOpen } from "lucide-vue-next";
-import { loginUser } from "@/api/endpoints";
-import logoSrc from "@/assets/logo.webp";
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { Mail, Lock, Eye, EyeOff, LogIn, ArrowLeft, AlertTriangle } from 'lucide-vue-next'
+import { loginUser } from '@/api/endpoints'
+import logoSrc from '@/assets/logo.webp'
 
-const router = useRouter();
+const router = useRouter()
 
 const presetAccounts = [
   { label: 'Superadmin', email: 'superadmin@smknuruljadid.sch.id' },
-  { label: 'Admin Sekolah', email: 'admin@smknuruljadid.sch.id' },
+  { label: 'Admin', email: 'admin@smknuruljadid.sch.id' },
   { label: 'Tata Usaha', email: 'tu@smknuruljadid.sch.id' },
   { label: 'Admin PPDB', email: 'ppdb@smknuruljadid.sch.id' },
   { label: 'Admin BKK', email: 'bkk@smknuruljadid.sch.id' },
-];
+]
 
-function selectPreset(acc) {
-  email.value = acc.email;
-  password.value = 'password123';
-  errors.email = '';
-  errors.password = '';
-  globalError.value = '';
-}
+const email = ref('')
+const password = ref('')
+const showPassword = ref(false)
+const rememberMe = ref(false)
+const isLoading = ref(false)
+const globalError = ref('')
+const errors = reactive({ email: '', password: '' })
 
-const email = ref("");
-const password = ref("");
-const showPassword = ref(false);
-const rememberMe = ref(false);
-const isLoading = ref(false);
-const globalError = ref("");
-const errors = reactive({ email: "", password: "" });
-
-let failedAttempts = Number(sessionStorage.getItem("admin_login_failed") || 0);
-let rateLimitedUntil = Number(
-  sessionStorage.getItem("admin_login_limited_until") || 0,
-);
-const isRateLimited = ref(rateLimitedUntil > Date.now());
+let failedAttempts = Number(sessionStorage.getItem('admin_login_failed') || 0)
+let rateLimitedUntil = Number(sessionStorage.getItem('admin_login_limited_until') || 0)
+const isRateLimited = ref(rateLimitedUntil > Date.now())
 
 onMounted(() => {
-  document.body.style.overflow = "hidden";
-  document.documentElement.style.overflow = "hidden";
-  const savedEmail = localStorage.getItem("admin_remember_email");
-  if (savedEmail) email.value = savedEmail;
+  const savedEmail = localStorage.getItem('admin_remember_email')
+  if (savedEmail) email.value = savedEmail
   if (isRateLimited.value) {
     const check = setInterval(() => {
       if (Date.now() >= rateLimitedUntil) {
-        isRateLimited.value = false;
-        sessionStorage.removeItem("admin_login_limited_until");
-        clearInterval(check);
+        isRateLimited.value = false
+        sessionStorage.removeItem('admin_login_limited_until')
+        clearInterval(check)
       }
-    }, 1000);
+    }, 1000)
   }
-});
+})
 
-onUnmounted(() => {
-  document.body.style.overflow = "";
-  document.documentElement.style.overflow = "";
-});
+function selectPreset(acc) {
+  email.value = acc.email
+  password.value = 'password123'
+  errors.email = ''
+  errors.password = ''
+  globalError.value = ''
+}
 
 function validate() {
-  errors.email = "";
-  errors.password = "";
-  let valid = true;
+  errors.email = ''
+  errors.password = ''
+  let valid = true
   if (!email.value.trim()) {
-    errors.email = "Email wajib diisi.";
-    valid = false;
+    errors.email = 'Email wajib diisi.'
+    valid = false
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-    errors.email = "Format email tidak valid.";
-    valid = false;
+    errors.email = 'Format email tidak valid.'
+    valid = false
   }
   if (!password.value) {
-    errors.password = "Password wajib diisi.";
-    valid = false;
+    errors.password = 'Password wajib diisi.'
+    valid = false
   }
-  return valid;
+  return valid
 }
 
 async function handleLogin() {
-  globalError.value = "";
-  if (!validate()) return;
-  if (isRateLimited.value) return;
+  globalError.value = ''
+  if (!validate() || isRateLimited.value) return
 
-  isLoading.value = true;
+  isLoading.value = true
   try {
-    const res = await loginUser({
-      email: email.value.trim(),
-      password: password.value,
-    });
+    const res = await loginUser({ email: email.value.trim(), password: password.value })
+    const token = res.data?.access_token
+    if (!token) throw new Error('Token tidak ditemukan.')
 
-    const token = res.data?.access_token;
-    if (!token) throw new Error("Token tidak ditemukan.");
+    const storage = rememberMe.value ? localStorage : sessionStorage
+    storage.setItem('auth_token', token)
+    storage.setItem('admin_token', token)
+    if (res.data?.user) storage.setItem('user_info', JSON.stringify(res.data.user))
+    if (rememberMe.value) localStorage.setItem('admin_remember_email', email.value.trim())
+    else localStorage.removeItem('admin_remember_email')
 
-    const storage = rememberMe.value ? localStorage : sessionStorage;
-    storage.setItem("auth_token", token);
-    storage.setItem("admin_token", token);
-    storage.setItem("admin_email", email.value.trim());
-    if (rememberMe.value)
-      localStorage.setItem("admin_remember_email", email.value.trim());
-    else localStorage.removeItem("admin_remember_email");
-
-    if (res.data?.user) {
-      storage.setItem("user_info", JSON.stringify(res.data.user));
-    }
-
-    sessionStorage.removeItem("admin_login_failed");
-    sessionStorage.removeItem("admin_login_limited_until");
-
-    router.push("/admin/dashboard");
+    sessionStorage.removeItem('admin_login_failed')
+    sessionStorage.removeItem('admin_login_limited_until')
+    router.push('/admin/dashboard')
   } catch (err) {
-    failedAttempts += 1;
-    sessionStorage.setItem("admin_login_failed", failedAttempts);
-
+    failedAttempts += 1
+    sessionStorage.setItem('admin_login_failed', failedAttempts)
     if (failedAttempts >= 5) {
-      const until = Date.now() + 60 * 1000;
-      rateLimitedUntil = until;
-      isRateLimited.value = true;
-      sessionStorage.setItem("admin_login_limited_until", String(until));
-      globalError.value =
-        "Terlalu banyak percobaan. Coba lagi dalam beberapa menit.";
+      const until = Date.now() + 60 * 1000
+      rateLimitedUntil = until
+      isRateLimited.value = true
+      sessionStorage.setItem('admin_login_limited_until', String(until))
+      globalError.value = 'Terlalu banyak percobaan. Coba lagi dalam 1 menit.'
     } else {
-      globalError.value =
-        err.response?.data?.message ||
-        "Email atau password salah. Silakan coba lagi.";
+      globalError.value = err.response?.data?.message || 'Email atau password salah.'
     }
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.admin-login-page {
-  height: 100vh;
-  height: 100dvh;
-  width: 100%;
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  background: #f1f5f9;
+  overflow-x: hidden;
+
+  > * {
+    min-width: 0;
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+}
+
+/* ── Hero Panel ── */
+.login-hero {
+  display: none;
+  position: relative;
+  background-image: url('https://images.unsplash.com/photo-1497215842964-222b430dc094?w=1600&q=80');
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+
+  @media (min-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+}
+
+.login-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(4, 45, 134, 0.92) 0%,
+    rgba(10, 20, 60, 0.97) 100%
+  );
+}
+
+.login-hero-body {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  background: #f8f7fb;
-  overflow: hidden;
-}
-
-.admin-topbar {
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 1.25rem 2.5rem;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.admin-topbar-inner {
-  max-width: 1440px;
-  margin: 0 auto;
-  height: auto;
-  display: flex;
-  align-items: center;
   justify-content: space-between;
+  height: 100%;
+  padding: 2.5rem;
+  gap: 2rem;
 }
 
-.admin-brand {
+.login-hero-brand {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.admin-brand-logo {
+.login-hero-logo {
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 0.75rem;
@@ -357,276 +337,231 @@ async function handleLogin() {
   flex-shrink: 0;
 }
 
-.admin-brand-text-wrap {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-
-.admin-brand-name {
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+.login-hero-school {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   font-weight: 700;
-  font-size: 1.25rem;
-  color: #1e3a8a;
-  display: block;
-  line-height: 1.2;
-}
-
-.admin-brand-subtitle {
-  font-size: 0.75rem;
-  color: #64748b;
-  display: block;
-  margin-top: -0.125rem;
-}
-
-.admin-topbar-nav {
-  display: flex;
-  align-items: center;
-  gap: 2.5rem;
-}
-
-.admin-topbar-link {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #334155;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.admin-topbar-link:hover {
-  color: #1e3a8a;
-}
-
-.admin-topbar-btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 9999px;
-  background: #1e3a8a;
+  font-size: 1.1rem;
   color: #ffffff;
-  font-weight: 600;
-  font-size: 0.875rem;
-  text-decoration: none;
-  transition: background 0.2s;
 }
 
-.admin-topbar-btn:hover {
-  background: #16264d;
-}
-
-.admin-login-grid {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 45fr) minmax(0, 55fr);
-  overflow: hidden;
-}
-
-.admin-hero-panel {
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-  background-image: url("https://images.unsplash.com/photo-1497215842964-222b430dc094?w=1600&q=80");
-  background-size: cover;
-  background-position: center;
-}
-
-.admin-hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(10, 15, 46, 0.95),
-    rgba(30, 58, 138, 0.85),
-    rgba(30, 58, 138, 0.7)
-  );
-  z-index: 1;
-}
-
-.admin-hero-vignette {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at center,
-    rgba(59, 130, 246, 0.08) 0%,
-    transparent 70%
-  );
-  z-index: 2;
-  pointer-events: none;
-}
-
-.admin-hero-content {
-  position: relative;
-  height: 100%;
+.login-hero-text {
   display: flex;
   flex-direction: column;
+  gap: 1.25rem;
+  flex: 1;
   justify-content: center;
-  padding: 1.5rem;
-  z-index: 3;
-  color: #ffffff;
-  overflow: hidden;
-  gap: 0.75rem;
 }
 
-.admin-hero-badge {
+.login-hero-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1.25rem;
+  padding: 0.45rem 1rem;
   border-radius: 9999px;
-  background: rgba(30, 58, 138, 0.5);
+  background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 0.75rem;
+  color: #bfdbfe;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   width: fit-content;
-  flex-shrink: 0;
 }
 
-.admin-hero-badge-dot {
-  width: 0.5rem;
-  height: 0.5rem;
+.login-hero-dot {
+  width: 0.45rem;
+  height: 0.45rem;
   border-radius: 9999px;
-  background: #ffffff;
+  background: #60a5fa;
   flex-shrink: 0;
 }
 
-.admin-hero-title {
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+.login-hero-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   font-weight: 900;
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
-  line-height: 1.02;
-  margin: 0;
+  font-size: clamp(1.75rem, 2.8vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
   color: #ffffff;
-  letter-spacing: -0.02em;
-  overflow-wrap: break-word;
-  max-width: 100%;
-  flex-shrink: 0;
+  margin: 0;
 }
 
-.admin-hero-desc {
-  margin-top: 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: rgba(191, 219, 254, 0.9);
-  max-width: 100%;
-  font-weight: 500;
-  flex-shrink: 0;
+.login-hero-desc {
+  color: rgba(191, 219, 254, 0.85);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 28rem;
 }
 
-.admin-hero-indicators {
+.login-hero-stats {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  padding: 1rem clamp(1rem, 2vw, 1.5rem);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  backdrop-filter: blur(8px);
+  flex-wrap: wrap;
+}
+
+.login-hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+
+  strong {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  span {
+    font-size: 0.75rem;
+    color: rgba(191, 219, 254, 0.8);
+    font-weight: 500;
+  }
+}
+
+.login-hero-stat-divider {
+  width: 1px;
+  height: 2.5rem;
+  background: rgba(255, 255, 255, 0.15);
   flex-shrink: 0;
 }
 
-.admin-hero-indicator {
-  height: 4px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.3);
-  flex-shrink: 0;
-}
-
-.admin-hero-indicator.active {
-  width: 2rem;
-  background: #ffffff;
-}
-
-.admin-hero-indicator:not(.active) {
-  width: 1rem;
-}
-
-.admin-form-panel {
-  height: 100%;
+/* ── Form Panel ── */
+.login-form-panel {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(2rem, 5vh, 4rem) 1.5rem;
+  min-height: 100vh;
+  padding: clamp(1.25rem, 5vw, 2.5rem) clamp(1rem, 5vw, 2rem);
+  background: #f1f5f9;
   overflow: hidden;
-  background: #f8f7fb;
+  box-sizing: border-box;
 }
 
-.admin-form-card {
-  background: #ffffff;
-  border-radius: 1.25rem;
-  padding: 1.5rem;
+.login-form-wrap {
   width: 100%;
-  max-width: 380px;
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.08);
-}
-
-.admin-form-header {
-  margin-bottom: 1.75rem;
-}
-
-.admin-form-title {
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-  font-weight: 900;
-  font-size: 1.875rem;
-  color: #0f172a;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.admin-form-desc {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: #64748b;
-  line-height: 1.5;
-}
-
-.admin-alert {
-  background: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
-  border-radius: 0.75rem;
-  padding: 0.75rem 1rem;
-  font-size: 0.875rem;
-  margin-bottom: 1.25rem;
-}
-
-.admin-form {
+  max-width: min(420px, 100%);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
-.preset-accounts-box {
-  background: #f1f5f9;
+/* Brand mobile only */
+.login-mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+
+  img {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.6rem;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  strong {
+    display: block;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #0f172a;
+  }
+
+  span {
+    display: block;
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+}
+
+.login-form-header {
+  .login-form-title {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    color: #0f172a;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.02em;
+  }
+
+  .login-form-desc {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+/* Alert */
+.login-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
   border-radius: 0.75rem;
-  padding: 0.75rem;
+  color: #991b1b;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Quick login */
+.login-quick {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
-.preset-title {
-  font-size: 0.75rem;
+.login-quick-label {
+  font-size: 0.72rem;
   font-weight: 700;
-  color: #475569;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
 }
 
-.preset-chips {
+.login-quick-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.4rem;
+  min-width: 0;
 }
 
-.preset-chip {
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
+.login-quick-chip {
+  padding: 0.35rem 0.85rem;
   border-radius: 9999px;
-  padding: 0.25rem 0.65rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
   color: #334155;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   &:hover {
-    background: #e0e7ff;
-    border-color: #818cf8;
+    border-color: #93c5fd;
+    background: #eff6ff;
     color: #1e3a8a;
   }
 
@@ -637,37 +572,58 @@ async function handleLogin() {
   }
 }
 
-.form-group {
+/* Form */
+.login-form {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.25rem;
+  padding: clamp(1.25rem, 5vw, 1.75rem);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1.25rem;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
 }
 
-.form-label {
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.login-label {
   font-size: 0.875rem;
   font-weight: 700;
   color: #0f172a;
 }
 
-.input-wrap {
+.login-input-wrap {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border-radius: 1rem;
-  background: #eef0fc;
-  border: 1px solid transparent;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: #ffffff;
+  }
+
+  &.error {
+    border-color: #fca5a5;
+    background: #fff5f5;
+  }
 }
 
-.input-wrap:focus-within {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+.login-input-icon {
+  color: #94a3b8;
+  flex-shrink: 0;
 }
 
-.form-input {
+.login-input {
   flex: 1;
   border: none;
   background: transparent;
@@ -675,220 +631,161 @@ async function handleLogin() {
   color: #0f172a;
   outline: none;
   min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
 }
 
-.form-input::placeholder {
-  color: #94a3b8;
-}
-
-.input-icon-btn {
+.login-eye-btn {
   display: grid;
   place-items: center;
   border: none;
   background: transparent;
   cursor: pointer;
-  padding: 0.25rem;
-  color: inherit;
+  color: #94a3b8;
+  padding: 0.2rem;
   flex-shrink: 0;
-}
+  transition: color 0.15s;
 
-.form-error {
-  font-size: 0.8rem;
-  color: #991b1b;
-  margin: 0;
-}
-
-.form-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.check-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  cursor: pointer;
-  font-size: 0.875rem;
-  color: #334155;
-}
-
-.check-label input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.check-box {
-  width: 1.1rem;
-  height: 1.1rem;
-  border-radius: 0.35rem;
-  border: 2px solid #cbd5e1;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  transition: all 0.15s ease;
-}
-
-.check-label input:checked + .check-box {
-  background: #1e3a8a;
-  border-color: #1e3a8a;
-}
-
-.check-label input:checked + .check-box::after {
-  content: "";
-  width: 0.35rem;
-  height: 0.65rem;
-  border: solid #ffffff;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.forgot-link {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #1e3a8a;
-  text-decoration: none;
-}
-
-.forgot-link:hover {
-  text-decoration: underline;
-}
-
-.submit-btn {
-  margin-top: 0.5rem;
-  width: 100%;
-  padding: 1.1rem;
-  border: none;
-  border-radius: 9999px;
-  background: #1e3a8a;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 1.125rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: background 0.2s ease;
-  flex-shrink: 0;
-}
-
-.submit-btn:hover:not(:disabled) {
-  background: #16264d;
-}
-
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.spinner {
-  width: 1.1rem;
-  height: 1.1rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #ffffff;
-  border-radius: 9999px;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+  &:hover {
+    color: #475569;
   }
 }
 
-.admin-form-footer {
-  margin-top: 1.25rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid #e2e8f0;
+.login-field-error {
+  font-size: 0.8rem;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+/* Remember & Forgot */
+.login-row {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.login-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #334155;
+  user-select: none;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.login-check-box {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 0.3rem;
+  border: 1.5px solid #cbd5e1;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+
+  .login-check input:checked + & {
+    background: #1e3a8a;
+    border-color: #1e3a8a;
+
+    &::after {
+      content: '';
+      width: 0.3rem;
+      height: 0.55rem;
+      border: solid #ffffff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+}
+
+.login-forgot {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Submit */
+.login-submit {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 4px 16px rgba(30, 58, 138, 0.3);
+
+  &:hover:not(:disabled) {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.login-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 9999px;
+  animation: spin 0.7s linear infinite;
   flex-shrink: 0;
 }
 
-.admin-form-footer-links {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-.footer-link {
+/* Back link */
+.login-back {
+  display: flex;
+  justify-content: center;
+}
+
+.login-back-link {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   font-size: 0.875rem;
   color: #64748b;
   text-decoration: none;
-}
+  font-weight: 500;
+  transition: color 0.2s;
 
-.footer-link:hover {
-  color: #1e3a8a;
-}
-
-.footer-dot {
-  width: 0.25rem;
-  height: 0.25rem;
-  border-radius: 9999px;
-  background: #cbd5e1;
-  flex-shrink: 0;
-}
-
-.admin-footer {
-  background: #f8f7fb;
-  border-top: 1px solid #e2e8f0;
-  padding: 1rem 2.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.875rem;
-  color: #94a3b8;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.admin-footer-links {
-  display: flex;
-  gap: 2rem;
-}
-
-.admin-footer-link {
-  font-size: 0.875rem;
-  color: #94a3b8;
-  text-decoration: none;
-}
-
-.admin-footer-link:hover {
-  color: #1e3a8a;
-}
-
-@media (max-width: 640px) {
-  .admin-topbar {
-    padding: 1rem 1.25rem;
-  }
-
-  .admin-topbar-nav {
-    gap: 1rem;
-  }
-
-  .admin-topbar-link {
-    display: none;
-  }
-
-  .admin-form-panel {
-    padding: 1.5rem 1rem;
-  }
-
-  .admin-form-card {
-    padding: 2rem 1.25rem;
-  }
-
-  .admin-footer {
-    padding: 1rem;
-    flex-direction: column;
-    align-items: flex-start;
+  &:hover {
+    color: #1e3a8a;
   }
 }
+
 </style>

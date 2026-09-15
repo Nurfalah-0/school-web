@@ -125,16 +125,18 @@ watch(() => route.query.kategori, (val) => {
 .lowongan-layout {
   max-width: 80rem;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 1.5rem 1.25rem;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 @media (min-width: 768px) {
   .lowongan-layout {
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 260px 1fr;
     gap: 2rem;
+    padding: 2rem 1.5rem;
+    align-items: start;
   }
 }
 

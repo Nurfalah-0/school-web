@@ -739,7 +739,8 @@ onMounted(() => {
 <style scoped>
 .dashboard-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: #f9fafb;
   font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
 }
@@ -852,9 +853,10 @@ onMounted(() => {
 .main-wrapper {
   flex: 1;
   margin-left: 280px;
-  min-height: 100vh;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 /* Header */
@@ -958,6 +960,7 @@ onMounted(() => {
 .header-user-text {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .header-user-name {
@@ -1000,7 +1003,7 @@ onMounted(() => {
 }
 
 .welcome-title {
-  font-size: 42px;
+  font-size: clamp(1.5rem, 3vw, 2.625rem);
   font-weight: 700;
   color: #1e3a8a;
   margin: 0 0 8px;
@@ -1028,7 +1031,7 @@ onMounted(() => {
 /* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 24px;
 }
 
@@ -1115,7 +1118,7 @@ onMounted(() => {
   background: #ffffff;
   border-radius: 20px;
   padding: 24px;
-  height: 180px;
+  min-height: 140px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   display: flex;
@@ -1209,8 +1212,10 @@ onMounted(() => {
 .section-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 24px;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .section-title {
@@ -1435,6 +1440,10 @@ onMounted(() => {
   .admin-control-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .section-header {
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 1023px) {
@@ -1459,32 +1468,70 @@ onMounted(() => {
   }
 }
 
+@media (max-width: 640px) {
+  .header-user-text {
+    display: none;
+  }
+
+  .header-divider {
+    display: none;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal-actions-left {
+    flex-direction: column;
+  }
+
+  .modal-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 639px) {
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+    min-height: unset;
+  }
+
+  .stat-value {
+    font-size: 28px;
   }
 
   .admin-control-center {
-    padding: 20px;
+    padding: 16px;
   }
 
   .admin-control-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
-  .admin-control-center .section-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 10px;
+  .admin-control-card {
+    min-height: unset;
+    padding: 14px;
   }
 
   .welcome-section {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
   }
 
-  .welcome-title {
-    font-size: 28px;
+  .date-badge {
+    font-size: 0.8rem;
   }
 
   .dashboard-header {
@@ -1497,6 +1544,19 @@ onMounted(() => {
 
   .dashboard-body {
     padding: 16px;
+  }
+
+  .section-card {
+    padding: 20px 16px;
+  }
+
+  .table-filter-pills {
+    gap: 6px;
+  }
+
+  .filter-pill-btn {
+    padding: 5px 10px;
+    font-size: 0.75rem;
   }
 }
 

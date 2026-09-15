@@ -106,6 +106,12 @@ defineProps({
   }
 }
 
+@media (min-width: 768px) {
+  .langkah-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (min-width: 1024px) {
   .langkah-grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));

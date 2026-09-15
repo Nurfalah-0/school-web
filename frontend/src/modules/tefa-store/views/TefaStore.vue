@@ -622,7 +622,7 @@ function checkoutWhatsApp() {
 }
 
 /* Responsive */
-@media (max-width: 639px) {
+@media (max-width: 767px) {
   .cart-sidebar {
     width: 100%;
     max-width: 100%;
@@ -631,10 +631,21 @@ function checkoutWhatsApp() {
   .cart-bar-inner {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
 
   .cart-bar-btn {
     justify-content: center;
+  }
+
+  .portofolio-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .cart-bar-inner {
+    flex-wrap: wrap;
   }
 }
 

@@ -140,17 +140,24 @@ watchEffect(() => {
 .detail-berita-layout {
   max-width: 84rem;
   margin: 0 auto;
-  padding: 3rem 1.5rem;
+  padding: 2rem 1.25rem;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 @media (min-width: 768px) {
   .detail-berita-layout {
+    grid-template-columns: 1fr 280px;
+    gap: 3rem;
+    padding: 3rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .detail-berita-layout {
     grid-template-columns: 1fr 300px;
     gap: 4rem;
-    padding-top: 3rem;
   }
 }
 
@@ -180,12 +187,14 @@ watchEffect(() => {
 .detail-berita-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 @media (max-width: 767px) {
   .detail-berita-sidebar {
-    margin-top: 3rem;
+    margin-top: 1rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e2e8f0;
   }
 }
 

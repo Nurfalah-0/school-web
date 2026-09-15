@@ -571,14 +571,22 @@ onUnmounted(() => {
   transform: scale(1.02);
 }
 
+@media (max-width: 1023px) {
+  .ppdb-hero-blob-wrap {
+    max-width: 480px;
+    transform: none;
+    margin: 0 auto;
+  }
+}
+
 @media (max-width: 767px) {
   .ppdb-hero {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
   }
 
   .ppdb-hero-inner {
-    gap: 2.5rem;
+    gap: 2rem;
   }
 
   .ppdb-hero-copy {
@@ -588,23 +596,47 @@ onUnmounted(() => {
 
   .ppdb-hero-badge {
     margin: 0 auto;
+    font-size: 0.75rem;
   }
 
   .ppdb-hero-desc {
     margin: 0 auto;
+    font-size: 0.95rem;
   }
 
-  .ppdb-hero-chip-row,
-  .ppdb-hero-countdown,
-  .ppdb-hero-actions {
+  .ppdb-hero-chip-row {
     justify-content: center;
   }
 
+  .ppdb-hero-countdown {
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .ppdb-hero-count-box {
+    min-width: 4.5rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .ppdb-hero-count-box strong {
+    font-size: 1.4rem;
+  }
+
+  .ppdb-hero-actions {
+    justify-content: center;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ppdb-btn-primary,
+  .ppdb-btn-secondary {
+    width: 100%;
+    justify-content: center;
+    margin: 0;
+  }
+
   .ppdb-hero-float-card {
-    position: static;
-    margin-bottom: 1rem;
-    width: fit-content;
-    margin-inline: auto;
+    display: none;
   }
 
   .ppdb-hero-blob-wrap {
@@ -614,7 +646,7 @@ onUnmounted(() => {
   }
 
   .ppdb-hero-img {
-    height: 320px;
+    height: 260px;
   }
 }
 </style>

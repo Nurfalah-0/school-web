@@ -103,10 +103,16 @@ onUnmounted(() => {
 .tefa-hero {
   position: relative;
   width: 100%;
-  border-radius: 48px;
+  border-radius: 24px;
   overflow: hidden;
   min-height: 500px;
   background: #0f172a;
+}
+
+@media (min-width: 768px) {
+  .tefa-hero {
+    border-radius: 48px;
+  }
 }
 
 .tefa-hero-inner {

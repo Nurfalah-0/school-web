@@ -104,7 +104,7 @@ const isActive = (item) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
+  padding: 1rem clamp(1rem, 4vw, 2rem);
   gap: 1rem;
 }
 

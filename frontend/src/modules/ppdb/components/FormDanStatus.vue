@@ -835,19 +835,32 @@ onMounted(async () => {
 
 @media (max-width: 767px) {
   .form-section {
-    padding-top: 4rem;
-    padding-bottom: 5rem;
+    padding-top: 3rem;
+    padding-bottom: 4rem;
   }
 
   .form-card-main,
   .form-status-card,
   .form-help-card {
     border-radius: 1.3rem;
+    padding: 1.5rem 1.25rem;
+  }
+
+  .form-main-title {
+    font-size: 1.5rem;
   }
 
   .form-status-row {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .form-status-badge {
+    font-size: 0.6rem;
+  }
+
+  .documents-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

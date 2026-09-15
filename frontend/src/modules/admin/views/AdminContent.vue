@@ -455,7 +455,7 @@ onMounted(load);
 .page-header {
   max-width: 1320px;
   margin: 0 auto 18px;
-  padding: 30px 34px;
+  padding: clamp(16px, 3vw, 30px) clamp(16px, 3vw, 34px);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -608,6 +608,10 @@ h2 {
   display: grid;
   grid-template-columns: minmax(320px, 0.8fr) minmax(380px, 1.2fr);
   gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .workspace { grid-template-columns: 1fr; }
 }
 
 .editor, .records {
@@ -787,7 +791,8 @@ input:focus, textarea:focus, select:focus {
 
 @media (max-width: 900px) {
   .workspace { grid-template-columns: 1fr; }
-  .record-card { flex-direction: column; }
-  .record-actions { flex-direction: row; justify-content: flex-end; }
+  .record-card { flex-wrap: wrap; }
+  .record-thumb { width: 100%; height: 160px; }
+  .record-actions { flex-direction: row; justify-content: flex-end; width: 100%; }
 }
 </style>

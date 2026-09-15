@@ -1,49 +1,57 @@
 <template>
   <aside class="filter-card">
-    <div class="filter-header">
+    <div class="filter-header" @click="toggleMobile">
       <SlidersHorizontal :size="18" color="#1e3a8a" />
       <span class="filter-title">Filter</span>
+      <ChevronDown class="filter-toggle-icon" :class="{ rotated: mobileOpen }" />
     </div>
 
-    <div class="filter-group">
-      <p class="filter-label">Kategori Pekerjaan</p>
-      <label v-for="item in kategoriList" :key="item.value" class="filter-check">
-        <input
-          type="checkbox"
-          :value="item.value"
-          :checked="modelKategori.includes(item.value)"
-          @change="toggleKategori(item.value)"
-        />
-        <span class="filter-check-box"></span>
-        <span class="filter-check-label">{{ item.label }}</span>
-        <span class="filter-check-count">({{ getCount(item.value) }})</span>
-      </label>
-    </div>
+    <div class="filter-body" :class="{ 'filter-body--open': mobileOpen }">
+      <div class="filter-group">
+        <p class="filter-label">Kategori Pekerjaan</p>
+        <label v-for="item in kategoriList" :key="item.value" class="filter-check">
+          <input
+            type="checkbox"
+            :value="item.value"
+            :checked="modelKategori.includes(item.value)"
+            @change="toggleKategori(item.value)"
+          />
+          <span class="filter-check-box"></span>
+          <span class="filter-check-label">{{ item.label }}</span>
+          <span class="filter-check-count">({{ getCount(item.value) }})</span>
+        </label>
+      </div>
 
-    <div class="filter-group">
-      <p class="filter-label">Tipe Pekerjaan</p>
-      <label v-for="item in tipeList" :key="item.value" class="filter-check">
-        <input
-          type="checkbox"
-          :value="item.value"
-          :checked="modelTipe.includes(item.value)"
-          @change="toggleTipe(item.value)"
-        />
-        <span class="filter-check-box"></span>
-        <span class="filter-check-label">{{ item.label }}</span>
-      </label>
-    </div>
+      <div class="filter-group">
+        <p class="filter-label">Tipe Pekerjaan</p>
+        <label v-for="item in tipeList" :key="item.value" class="filter-check">
+          <input
+            type="checkbox"
+            :value="item.value"
+            :checked="modelTipe.includes(item.value)"
+            @change="toggleTipe(item.value)"
+          />
+          <span class="filter-check-box"></span>
+          <span class="filter-check-label">{{ item.label }}</span>
+        </label>
+      </div>
 
-    <button v-if="hasFilter" type="button" class="filter-reset" @click="reset">
-      Reset Filter
-    </button>
+      <button v-if="hasFilter" type="button" class="filter-reset" @click="reset">
+        Reset Filter
+      </button>
+    </div>
   </aside>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { SlidersHorizontal } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
+import { SlidersHorizontal, ChevronDown } from 'lucide-vue-next'
 import { kategoriList, tipeList } from '@/data/lowongan'
+
+const mobileOpen = ref(false)
+function toggleMobile() {
+  if (window.innerWidth < 768) mobileOpen.value = !mobileOpen.value
+}
 
 const props = defineProps({
   modelKategori: {
@@ -104,6 +112,7 @@ const hasFilter = computed(() => props.modelKategori.length > 0 || props.modelTi
   padding: 1.5rem;
   position: sticky;
   top: 5rem;
+  align-self: start;
 }
 
 .filter-header {
@@ -111,6 +120,46 @@ const hasFilter = computed(() => props.modelKategori.length > 0 || props.modelTi
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
+}
+
+.filter-toggle-icon {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+  display: none;
+}
+
+.filter-toggle-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.filter-body {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .filter-card {
+    position: static;
+    margin-bottom: 0;
+  }
+
+  .filter-header {
+    cursor: pointer;
+    margin-bottom: 0;
+    user-select: none;
+  }
+
+  .filter-toggle-icon {
+    display: block;
+  }
+
+  .filter-body {
+    display: none;
+    margin-top: 1.25rem;
+  }
+
+  .filter-body--open {
+    display: block;
+  }
 }
 
 .filter-title {
@@ -201,10 +250,5 @@ const hasFilter = computed(() => props.modelKategori.length > 0 || props.modelTi
   background: #f8fafc;
 }
 
-@media (max-width: 767px) {
-  .filter-card {
-    position: static;
-    margin-bottom: 1rem;
-  }
-}
+
 </style>
