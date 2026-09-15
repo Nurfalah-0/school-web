@@ -171,7 +171,7 @@ watch(() => isOpen.value, (newVal) => {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
-  z-index: 50;
+  z-index: 1100;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -265,9 +265,18 @@ watch(() => isOpen.value, (newVal) => {
     bottom: auto;
     right: auto;
     width: 100%;
-    height: 100%;
-    max-height: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
     border-radius: 0;
+  }
+
+  .chatbot-widget {
+    right: 0;
+    bottom: 0;
+  }
+
+  .chat-fab {
+    margin: 0.75rem;
   }
 }
 
