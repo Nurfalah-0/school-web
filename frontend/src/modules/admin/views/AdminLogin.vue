@@ -246,7 +246,7 @@ async function handleLogin() {
 
     sessionStorage.removeItem('admin_login_failed')
     sessionStorage.removeItem('admin_login_limited_until')
-    router.push('/admin/dashboard')
+    router.push('/admin/manage')
   } catch (err) {
     failedAttempts += 1
     sessionStorage.setItem('admin_login_failed', failedAttempts)

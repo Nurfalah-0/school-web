@@ -14,13 +14,7 @@ export default [
   },
   {
     path: '/admin',
-    redirect: '/admin/dashboard',
-    meta: { hideNavbar: true, blankLayout: true },
-  },
-  {
-    path: '/admin/dashboard',
-    name: 'AdminDashboard',
-    component: () => import('./views/AdminDashboard.vue'),
+    redirect: '/admin/manage',
     meta: { hideNavbar: true, blankLayout: true },
   },
   {

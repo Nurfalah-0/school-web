@@ -60,7 +60,7 @@ const menuItems = computed(() => {
   }
 
   return [
-    { label: 'Dashboard', to: '/' },
+    { label: 'Beranda', to: '/' },
     { label: 'Jurusan', to: { path: '/', hash: '#lowongan' } },
     { label: 'Prestasi', to: { path: '/', hash: '#alumni' } },
     { label: 'TEFA', to: '/tefa-store' },

@@ -53,6 +53,10 @@ function isAdminRoute(to) {
   return to.path.startsWith('/admin') || to.path === '/login'
 }
 
+function isProtectedRoute(to) {
+  return to.matched.some(record => record.meta.requiresAuth)
+}
+
 function isAdminLoginRoute(to) {
   return to.path === '/admin/login' || to.path === '/admin/forgot-password' || to.path === '/login'
 }
@@ -62,14 +66,20 @@ function getAdminToken() {
 }
 
 router.beforeEach((to, from, next) => {
+  const token = getAdminToken()
+
+  if (isProtectedRoute(to) && !token) {
+    next('/login')
+    return
+  }
+
   if (isAdminRoute(to)) {
-    const token = getAdminToken()
     if (!token && !isAdminLoginRoute(to)) {
       next('/login')
       return
     }
     if (token && isAdminLoginRoute(to)) {
-      next('/admin/dashboard')
+      next('/admin/manage')
       return
     }
   }

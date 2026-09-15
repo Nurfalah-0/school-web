@@ -10,7 +10,7 @@
       </div>
       <div class="login-header">
         <router-link to="/" class="back-link">← Kembali ke Beranda</router-link>
-        <h2>Masuk ke Dashboard</h2>
+        <h2>Masuk ke Pusat Admin</h2>
         <p>Masuk untuk mengelola data pendaftaran dan kemitraan SMK.</p>
       </div>
 
@@ -83,7 +83,7 @@
           class="button-primary login-btn"
           :disabled="isLoading"
         >
-          {{ isLoading ? "Memproses..." : "Masuk ke Dashboard" }}
+          {{ isLoading ? "Memproses..." : "Masuk ke Pusat Admin" }}
         </button>
       </form>
     </div>
@@ -142,7 +142,7 @@ const handleLogin = async () => {
       }
 
       // Redirect to dashboard
-      router.push("/admin/dashboard");
+      router.push("/admin/manage");
     } else {
       errorMessage.value = "Response tidak valid dari server";
     }
