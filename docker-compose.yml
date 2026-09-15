@@ -11,7 +11,6 @@ services:
       - "3306:3306"
     volumes:
       - dbdata:/var/lib/mysql
-      # Auto-import database saat pertama kali dinyalakan (opsional)
       - ./mysql-init:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
@@ -25,8 +24,6 @@ services:
     image: phpmyadmin:latest
     container_name: lomba_phpmyadmin
     restart: unless-stopped
-    ports:
-      - "8081:80"
     environment:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
@@ -113,8 +110,6 @@ services:
     image: nginx:alpine
     container_name: lomba_backend_nginx
     restart: unless-stopped
-    ports:
-      - "8000:80"
     volumes:
       - ./backend:/var/www
       - ./backend/nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -129,10 +124,22 @@ services:
       dockerfile: Dockerfile
     container_name: lomba_frontend
     restart: unless-stopped
-    ports:
-      - "80:80"
     depends_on:
       - backend_nginx
+
+  # 5. Reverse Proxy (Gateway Utama)
+  reverse_proxy:
+    image: nginx:alpine
+    container_name: lomba_proxy
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend_nginx
+      - phpmyadmin
 
 volumes:
   dbdata:
