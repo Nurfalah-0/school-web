@@ -66,13 +66,14 @@
           </router-link>
         </div>
 
-        <router-link class="nav-cta nav-cta-mobile" :to="ctaLink" @click="closeMenu">
-          {{ ctaLabel }}
-        </router-link>
       </div>
 
-      <router-link class="nav-cta nav-cta-desktop" :to="ctaLink">
-        {{ ctaLabel }}
+      <router-link
+        class="nav-contact button-secondary"
+        :to="{ path: '/', hash: '#kontak' }"
+        @click="closeMenu"
+      >
+        Contact
       </router-link>
     </div>
   </nav>
@@ -95,7 +96,6 @@ const props = defineProps({
   menuItems: {
     type: Array,
     default: () => [
-      { label: 'Dashboard', to: '/' },
       {
         label: 'Profil',
         children: [
@@ -111,14 +111,6 @@ const props = defineProps({
       { label: 'PKL & BKK', to: '/pkl-bkk' },
       { label: 'News', to: '/berita' },
     ],
-  },
-  ctaLink: {
-    type: [String, Object],
-    default: '/ppdb',
-  },
-  ctaLabel: {
-    type: String,
-    default: 'Daftar PPDB',
   },
 });
 
@@ -237,6 +229,7 @@ const isActive = (item) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
   gap: 1rem;
   width: min(1200px, calc(100% - 2rem));
   margin: 0 auto;
@@ -270,7 +263,19 @@ const isActive = (item) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   gap: 2rem;
+}
+
+.nav-contact {
+  position: relative;
+  z-index: 1;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .nav-item {
@@ -440,6 +445,15 @@ const isActive = (item) => {
 }
 
 @media (max-width: 760px) {
+  .nav-contact {
+    margin-left: auto;
+    margin-right: 0.25rem;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 760px) {
   .nav-inner {
     width: min(100%, calc(100% - 1.5rem));
     padding: 0.75rem 0;
@@ -455,6 +469,7 @@ const isActive = (item) => {
     top: 100%;
     left: 0;
     right: 0;
+    transform: none;
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
