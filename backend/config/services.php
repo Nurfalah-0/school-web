@@ -40,4 +40,9 @@ return [
         'model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
     ],
 
+    'contact' => [
+        'admin_email' => env('CONTACT_ADMIN_EMAIL', 'smknurja.paiton@gmail.com'),
+        'staff_email' => env('CONTACT_STAFF_EMAIL', 'info@smknuruljadid.sch.id'),
+    ],
+
 ];

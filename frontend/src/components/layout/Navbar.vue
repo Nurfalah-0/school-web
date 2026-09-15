@@ -78,7 +78,7 @@
 
       <router-link
         class="nav-contact button-secondary"
-        :to="{ path: '/', hash: '#kontak' }"
+        to="/contact"
         @click="closeMenu"
       >
         Contact

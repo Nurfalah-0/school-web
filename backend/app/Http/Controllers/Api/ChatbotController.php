@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Models\ChatbotConversation;
@@ -613,7 +614,7 @@ class ChatbotController extends Controller
                 'cost' => 0,
                 'user_id' => $conversation->user_id,
                 'ip_address' => request()->ip(),
-                'error_message' => $e->getMessage(),
+                'error_message' => substr($e->getMessage(), 0, 250),
             ]);
 
             // Fallback response
@@ -631,7 +632,14 @@ class ChatbotController extends Controller
     {
         $apiKey = config('services.gemini.key');
         $model = config('services.gemini.model', 'gemini-2.0-flash');
-        $systemPrompt = $this->contextPrompts['general'] . "\n\nFokus percakapan saat ini: " . ($this->contextPrompts[$context] ?? 'informasi umum sekolah');
+        $majorNames = DB::table('majors')
+            ->where('is_active', true)
+            ->pluck('name')
+            ->implode(', ');
+        $systemPrompt = $this->contextPrompts['general']
+            . "\n\nFokus percakapan saat ini: " . ($this->contextPrompts[$context] ?? 'informasi umum sekolah')
+            . "\n\nDaftar jurusan aktif yang tersedia: " . ($majorNames ?: 'Belum ada data jurusan.')
+            . "\nJawab setiap pertanyaan dengan lengkap. Jika diminta daftar, tampilkan semua item yang relevan dalam poin-poin dan jangan mengakhiri jawaban di tengah kalimat.";
 
         try {
             if (!$apiKey) {
@@ -657,7 +665,7 @@ class ChatbotController extends Controller
                     'contents' => $contents,
                     'generationConfig' => [
                         'temperature' => 0.3,
-                        'maxOutputTokens' => 700,
+                        'maxOutputTokens' => 1200,
                     ],
                 ]
             );
@@ -668,7 +676,11 @@ class ChatbotController extends Controller
             }
 
             $responseData = $response->json();
-            $aiResponse = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? '';
+            $parts = $responseData['candidates'][0]['content']['parts'] ?? [];
+            $aiResponse = collect($parts)
+                ->pluck('text')
+                ->filter()
+                ->implode("\n");
             if ($aiResponse === '') {
                 throw new \Exception('Gemini mengembalikan jawaban kosong');
             }
@@ -707,7 +719,7 @@ class ChatbotController extends Controller
                 'cost' => 0,
                 'user_id' => $conversation->user_id,
                 'ip_address' => request()->ip(),
-                'error_message' => $e->getMessage(),
+                'error_message' => substr($e->getMessage(), 0, 250),
             ]);
 
             return [

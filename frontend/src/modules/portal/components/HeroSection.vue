@@ -133,6 +133,10 @@ const heroImg = computed(() => {
   display: inline;
 }
 
+.hero-accent + .hero-highlight {
+  margin-left: 0.16em;
+}
+
 .hero-description {
   max-width: 600px;
   color: #1e293b;
@@ -330,6 +334,45 @@ const heroImg = computed(() => {
     padding: 3rem 0;
   }
 
+  .hero-inner {
+    width: min(100% - 1.5rem, 100%);
+    justify-items: center;
+  }
+
+  .hero-copy {
+    width: 100%;
+    text-align: center;
+    align-items: center;
+  }
+
+  .hero-title {
+    max-width: 100%;
+    font-size: clamp(2.25rem, 10.5vw, 3.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    overflow-wrap: normal;
+  }
+
+  .hero-card-wrap {
+    width: min(calc(100% - 1rem), 540px);
+    margin: 0 auto;
+    padding: 1rem 0 2.5rem;
+  }
+
+  .hero-card {
+    border-radius: 2rem;
+  }
+
+  .hero-stat-top {
+    top: 0;
+    left: 0;
+  }
+
+  .hero-stat-bottom {
+    right: 0;
+    bottom: 0;
+  }
+
   .hero-copy {
     gap: 14px;
   }
@@ -364,8 +407,19 @@ const heroImg = computed(() => {
 
   .hero-actions .button-primary,
   .hero-actions .button-secondary {
+    width: 100%;
     padding: 14px 22px;
     font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-title {
+    font-size: clamp(2rem, 10.5vw, 2.75rem);
+  }
+
+  .hero-stat-card {
+    max-width: calc(100% - 0.5rem);
   }
 }
 </style>
