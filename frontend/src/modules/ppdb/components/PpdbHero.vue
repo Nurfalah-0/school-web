@@ -41,6 +41,10 @@
             <strong>{{ countdown.minutes }}</strong>
             <span>MENIT</span>
           </div>
+          <div class="ppdb-hero-count-box">
+            <strong>{{ countdown.seconds }}</strong>
+            <span>DETIK</span>
+          </div>
         </div>
 
         <div class="ppdb-hero-actions">
@@ -121,7 +125,7 @@ const scheduleMessage = computed(() => {
   return 'Pendaftaran Ditutup';
 });
 
-const countdown = ref({ days: null, hours: null, minutes: null });
+const countdown = ref({ days: null, hours: null, minutes: null, seconds: null });
 const countdownLabel = ref('Memuat jadwal...');
 let timer = null;
 
@@ -144,7 +148,7 @@ const scrollToSection = (selector) => {
 
 const updateCountdown = () => {
   if (props.loading) {
-    countdown.value = { days: null, hours: null, minutes: null };
+    countdown.value = { days: null, hours: null, minutes: null, seconds: null };
     countdownLabel.value = 'Memuat jadwal...';
     return;
   }
@@ -172,8 +176,9 @@ const updateCountdown = () => {
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-  countdown.value = { days, hours, minutes };
+  countdown.value = { days, hours, minutes, seconds };
 };
 
 onMounted(() => {

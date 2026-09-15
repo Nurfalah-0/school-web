@@ -11,10 +11,11 @@
             loading="lazy"
           />
           <span v-else class="image-empty">Gambar profil belum diupload</span>
+          <span class="image-caption">SMK Nurul Jadid</span>
         </div>
 
         <div class="hero-copy">
-          <p class="eyebrow">Profil Sekolah</p>
+          <p class="eyebrow"><span class="eyebrow-line"></span> Profil Sekolah</p>
           <h1>{{ profileTitle }}</h1>
           <p class="lead">{{ profileDescription }}</p>
 
@@ -26,7 +27,7 @@
 
       <section id="visi-misi" class="vision-mission-section section-anchor">
         <div class="section-header">
-          <p class="eyebrow">Visi &amp; Misi</p>
+          <p class="eyebrow"><span class="eyebrow-line"></span> Visi &amp; Misi</p>
           <h2>{{ schoolName }}</h2>
           <p class="section-intro">
             {{ schoolProfile.vision_page_intro || schoolProfile.profile_description || 'Komitmen kami menyiapkan lulusan yang beriman, cakap, dan siap menghadapi tantangan masa depan.' }}
@@ -40,7 +41,7 @@
               <span v-else class="image-empty">Gambar visi belum diupload</span>
             </div>
             <div class="text-panel">
-              <span class="badge">Visi</span>
+              <span class="badge">01 <b>Visi</b></span>
               <h3>Visi Sekolah</h3>
               <p>{{ schoolProfile.vision_page_content || schoolProfile.vision || defaultVision }}</p>
             </div>
@@ -52,7 +53,7 @@
               <span v-else class="image-empty">Gambar misi belum diupload</span>
             </div>
             <div class="text-panel">
-              <span class="badge">Misi</span>
+              <span class="badge">02 <b>Misi</b></span>
               <h3>Misi Sekolah</h3>
               <div class="mission-list" v-if="missionList.length">
                 <div v-for="(item, index) in missionList" :key="index" class="mission-item">
@@ -82,7 +83,7 @@
           </div>
 
           <div class="principal-text">
-            <p class="eyebrow">Kepala Sekolah</p>
+            <p class="eyebrow"><span class="eyebrow-line"></span> Kepala Sekolah</p>
             <h2>{{ headmasterName }}</h2>
             <div class="principal-message">
               <p
@@ -222,11 +223,14 @@ onMounted(async () => {
   min-height: calc(100vh - var(--nav-height, 60px));
   width: 100%;
   overflow-x: clip;
-  background: linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
+  background:
+    radial-gradient(circle at 8% 12%, rgba(242, 127, 83, 0.12), transparent 22rem),
+    radial-gradient(circle at 92% 44%, rgba(36, 126, 132, 0.1), transparent 24rem),
+    #f6f3ee;
 }
 
 .profil-content {
-  padding: 4rem 1.25rem 5rem;
+  padding: 3.5rem 1.25rem 5rem;
 }
 
 .section-anchor {
@@ -241,14 +245,28 @@ onMounted(async () => {
 
 .hero-box {
   display: grid;
-  grid-template-columns: 1.1fr 1.2fr;
+  grid-template-columns: 1.05fr 1.2fr;
   gap: 2.25rem;
   align-items: stretch;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 2rem;
-  padding: 2rem;
-  box-shadow: 0 35px 80px rgba(15, 23, 42, 0.08);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #102f3b;
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+  box-shadow: 0 30px 70px rgba(16, 47, 59, 0.2);
+}
+
+.hero-box::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 18rem;
+  height: 18rem;
+  right: -7rem;
+  bottom: -9rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
 }
 
 .vision-mission-section {
@@ -257,8 +275,8 @@ onMounted(async () => {
 }
 
 .section-header {
-  margin-bottom: 1.5rem;
-  padding: 1.5rem 1rem 0;
+  margin-bottom: 1.75rem;
+  padding: 1.75rem 0.5rem 0;
 }
 
 .eyebrow {
@@ -267,14 +285,27 @@ onMounted(async () => {
   font-weight: 800;
   letter-spacing: 0.18rem;
   text-transform: uppercase;
-  color: #2563eb;
+  color: #ef7954;
+}
+
+.eyebrow-line {
+  display: inline-block;
+  width: 2rem;
+  height: 2px;
+  margin: 0 0.55rem 0.2rem 0;
+  background: currentColor;
 }
 
 h1,
 h2,
 h3 {
   margin: 0;
-  color: #0f172a;
+  color: #102f3b;
+}
+
+.hero-copy h1,
+.hero-copy .lead {
+  color: #fff;
 }
 
 h1 {
@@ -307,22 +338,47 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  justify-content: center;
+  padding: 2.25rem 2.25rem 2.25rem 1.25rem;
+}
+
+.hero-copy .eyebrow {
+  color: #f5a083;
 }
 
 .detail-copy {
-  background: #f8fafc;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.09);
+  border-left: 3px solid #ef7954;
+  border-radius: 0 0.75rem 0.75rem 0;
   padding: 1rem 1.1rem;
+}
+
+.detail-copy p {
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .hero-image-wrap,
 .image-panel {
   overflow: hidden;
-  border-radius: 1.5rem;
+  position: relative;
+  border-radius: 1rem;
   min-height: 420px;
-  background: #dfeafc;
+  background: #d9d2c7;
   height: 100%;
+}
+
+.image-caption {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.35rem;
+  background: rgba(16, 47, 59, 0.82);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
 }
 
 .hero-image,
@@ -354,11 +410,11 @@ h3 {
   display: grid;
   grid-template-columns: 1.1fr 1.15fr;
   gap: 2rem;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 2rem;
-  padding: 1.5rem;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.06);
+  background: #fffdf9;
+  border: 1px solid rgba(16, 47, 59, 0.1);
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+  box-shadow: 0 20px 50px rgba(16, 47, 59, 0.08);
 }
 
 .mission-card {
@@ -374,7 +430,7 @@ h3 {
   flex-direction: column;
   justify-content: center;
   gap: 0.85rem;
-  padding: 0.5rem 0;
+  padding: 0.75rem 1rem;
 }
 
 .badge {
@@ -382,12 +438,17 @@ h3 {
   width: fit-content;
   padding: 0.45rem 0.8rem;
   border-radius: 999px;
-  background: #dbeafe;
-  color: #1d4ed8;
+  gap: 0.45rem;
+  background: #fbe3d9;
+  color: #c55337;
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.08rem;
   text-transform: uppercase;
+}
+
+.badge b {
+  color: #102f3b;
 }
 
 .mission-list {
@@ -400,9 +461,9 @@ h3 {
   align-items: flex-start;
   gap: 0.8rem;
   padding: 0.9rem 1rem;
-  background: #f8fafc;
-  border-radius: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: #f5f0e9;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(16, 47, 59, 0.08);
 }
 
 .mission-number {
@@ -412,8 +473,8 @@ h3 {
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: #102f3b;
+  color: #fff;
   font-weight: 800;
 }
 
@@ -453,11 +514,11 @@ h3 {
   display: grid;
   grid-template-columns: 1.05fr 1.25fr;
   gap: 2rem;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 2rem;
+  background: #102f3b;
+  border: 1px solid rgba(16, 47, 59, 0.18);
+  border-radius: 1.5rem;
   padding: 2rem;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 25px 60px rgba(16, 47, 59, 0.18);
   align-items: center;
 }
 
@@ -467,6 +528,16 @@ h3 {
   gap: 0.9rem;
 }
 
+.principal-text h2,
+.principal-body,
+.principal-closing {
+  color: #fff;
+}
+
+.principal-text .eyebrow {
+  color: #f5a083;
+}
+
 .principal-message {
   display: flex;
   flex-direction: column;
@@ -474,7 +545,7 @@ h3 {
   margin: 0;
   font-size: 1.03rem;
   line-height: 1.9;
-  color: #475569;
+  color: rgba(255, 255, 255, 0.76);
 }
 
 .principal-closing {
@@ -490,7 +561,7 @@ h3 {
 
 .principal-statement {
   margin: 0;
-  color: #1d4ed8;
+  color: #f5a083;
   font-weight: 800;
 }
 
@@ -506,7 +577,7 @@ h3 {
   height: 100%;
   min-height: 280px;
   object-fit: cover;
-  border-radius: 1.5rem;
+  border-radius: 1rem;
   box-shadow: 0 22px 50px rgba(15, 23, 42, 0.12);
   border: 1px solid rgba(148, 163, 184, 0.14);
   background: #e2e8f0;
