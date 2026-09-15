@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\SiteImageController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\PpdbController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ProfileMenuItemController;
 
 // =============================================
 //  CSRF TOKEN — untuk SPA
@@ -59,6 +60,7 @@ Route::get('/content/{type}', [ContentController::class, 'index']);
 
 // Kategori dinamis
 Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/profile-menu-items', [ProfileMenuItemController::class, 'index']);
 
 // =============================================
 //  PPDB — Publik (tidak perlu login)
@@ -208,6 +210,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/',              [CategoryController::class, 'store']);
         Route::put('/{category}',     [CategoryController::class, 'update']);
         Route::delete('/{category}',  [CategoryController::class, 'destroy']);
+    });
+
+    // ── Menu Profil (admin) ───────────────────
+    Route::middleware(['role:superadmin,admin_sekolah'])->prefix('admin/profile-menu-items')->group(function () {
+        Route::get('/', [ProfileMenuItemController::class, 'index']);
+        Route::post('/', [ProfileMenuItemController::class, 'store']);
+        Route::put('/{profileMenuItem}', [ProfileMenuItemController::class, 'update']);
+        Route::delete('/{profileMenuItem}', [ProfileMenuItemController::class, 'destroy']);
     });
 
     // ── User Management (superadmin) ─────────

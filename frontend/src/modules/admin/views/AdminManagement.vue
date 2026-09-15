@@ -74,11 +74,11 @@
         <div class="schedule-fields">
           <label class="form-group">
             <span>Mulai pendaftaran</span>
-            <input v-model="ppdbSchedule.registration_start" type="datetime-local" required />
+            <input v-model="ppdbSchedule.registration_start" type="datetime-local" step="1" required />
           </label>
           <label class="form-group">
             <span>Selesai pendaftaran</span>
-            <input v-model="ppdbSchedule.registration_end" type="datetime-local" required />
+            <input v-model="ppdbSchedule.registration_end" type="datetime-local" step="1" required />
           </label>
           <button class="button primary" type="submit"><Save :size="15" /> Simpan Jadwal</button>
         </div>
@@ -1038,7 +1038,8 @@ import {
   FileText,
   CheckCircle2,
   XCircle,
-  Clock
+  Clock,
+  List
 } from 'lucide-vue-next';
 import {
   createNews,
@@ -1060,6 +1061,7 @@ import {
   getRegistrations,
   getSiteImages,
   getSchoolProfile,
+  getProfileMenuItems,
   getStudents,
   getCategories,
   getUsers,
@@ -1069,6 +1071,9 @@ import {
   uploadMajorImage,
   updateRegistrationStatus,
   updateSchoolProfile,
+  createProfileMenuItem,
+  updateProfileMenuItem,
+  deleteProfileMenuItem,
   updateStudent,
   updateSiteImage,
   uploadSiteImage,
@@ -1098,6 +1103,7 @@ const majors = ref([]);
 const images = ref([]);
 const categories = ref([]);
 const usersList = ref([]);
+const profileMenuItems = ref([]);
 
 // Modals
 const selectedApp = ref(null);
@@ -1160,6 +1166,7 @@ const visionMissionImages = reactive({ vision: { file: null }, mission: { file: 
 const categoryForm = reactive({ id: null, name: '', type: 'news' });
 const userForm = reactive({ id: null, name: '', email: '', password: '', phone: '', role: 'admin_sekolah', is_active: true });
 const ppdbSchedule = reactive({ registration_start: '', registration_end: '' });
+const profileMenuForm = reactive({ id: null, label: '', description: '', path: '/profil', hash: '', icon: 'S', position: 1, is_active: true });
 
 // Tabs config
 const tabs = computed(() => [
@@ -1171,6 +1178,7 @@ const tabs = computed(() => [
   { id: 'categories', label: 'Kategori', icon: Tag, count: categories.value.length },
   { id: 'users', label: 'Pengguna & Admin', icon: Users, count: usersList.value.length },
   { id: 'profile', label: 'Profil Sekolah', icon: Settings, count: '' },
+  { id: 'profile-menu', label: 'Dropdown Profil', icon: List, count: profileMenuItems.value.length },
   { id: 'profile-page', label: 'Detail Profil', icon: FileText, count: '' },
   { id: 'vision-mission-page', label: 'Detail Visi & Misi', icon: Building2, count: '' },
 ]);
@@ -1237,7 +1245,7 @@ function toDateTimeLocal(value) {
   if (!value) return '';
   const date = new Date(value);
   const pad = (number) => String(number).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
 function toIsoString(value) {
@@ -1324,6 +1332,13 @@ async function loadUsers() {
   try {
     const response = await getUsers();
     usersList.value = response.data?.data || [];
+  } catch (error) { errorMessage(error); }
+}
+
+async function loadProfileMenuItems() {
+  try {
+    const response = await getProfileMenuItems(true);
+    profileMenuItems.value = response.data?.data || [];
   } catch (error) { errorMessage(error); }
 }
 
@@ -1855,6 +1870,40 @@ async function saveProfile() {
   } catch (error) { errorMessage(error); }
 }
 
+function resetProfileMenu() {
+  Object.assign(profileMenuForm, { id: null, label: '', description: '', path: '/profil', hash: '', icon: 'S', position: profileMenuItems.value.length + 1, is_active: true });
+}
+
+function editProfileMenu(item) {
+  Object.assign(profileMenuForm, { ...item, hash: item.hash || '', icon: item.icon || 'S' });
+  window.scrollTo({ top: 150, behavior: 'smooth' });
+}
+
+async function saveProfileMenu() {
+  try {
+    const payload = { ...profileMenuForm };
+    delete payload.id;
+    if (profileMenuForm.id) {
+      await updateProfileMenuItem(profileMenuForm.id, payload);
+      notify('Menu dropdown profil berhasil diperbarui.');
+    } else {
+      await createProfileMenuItem(payload);
+      notify('Menu dropdown profil berhasil ditambahkan.');
+    }
+    resetProfileMenu();
+    await loadProfileMenuItems();
+  } catch (error) { errorMessage(error); }
+}
+
+async function removeProfileMenu(id) {
+  if (!window.confirm('Hapus item dropdown profil ini?')) return;
+  try {
+    await deleteProfileMenuItem(id);
+    notify('Item dropdown profil berhasil dihapus.');
+    await loadProfileMenuItems();
+  } catch (error) { errorMessage(error); }
+}
+
 async function saveProfilePage() {
   try {
     await updateSchoolProfile({ ...profilePageForm });
@@ -1950,6 +1999,7 @@ onMounted(() => {
     loadImages(),
     loadCategories(),
     loadUsers(),
+    loadProfileMenuItems(),
     loadProfile(),
   ]);
 });

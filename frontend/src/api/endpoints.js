@@ -39,6 +39,12 @@ export const getUserProfile = () => client.get('/auth/profile');
 
 // School endpoints
 export const getSchoolProfile = () => client.get('/school/profile');
+export const getProfileMenuItems = (includeInactive = false) => client.get(includeInactive ? '/admin/profile-menu-items' : '/profile-menu-items', {
+  params: includeInactive ? { include_inactive: true } : {},
+});
+export const createProfileMenuItem = (data) => client.post('/admin/profile-menu-items', data);
+export const updateProfileMenuItem = (id, data) => client.put(`/admin/profile-menu-items/${id}`, data);
+export const deleteProfileMenuItem = (id) => client.delete(`/admin/profile-menu-items/${id}`);
 
 // Dashboard endpoints
 export const getDashboardStats = () => client.get('/dashboard/stats');
