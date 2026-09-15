@@ -192,9 +192,11 @@ watch(() => isOpen.value, (newVal) => {
   box-shadow: 0 12px 28px rgba(4, 45, 134, 0.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
+  animation: chatbot-float 3.2s ease-in-out infinite;
 }
 
 .chat-fab:hover {
+  animation-play-state: paused;
   transform: translateY(-2px);
   box-shadow: 0 16px 34px rgba(4, 45, 134, 0.45);
 }
@@ -203,6 +205,18 @@ watch(() => isOpen.value, (newVal) => {
   background: #ffffff;
   color: $brand;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  animation: none;
+}
+
+@keyframes chatbot-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
 }
 
 .chat-fab-icon {

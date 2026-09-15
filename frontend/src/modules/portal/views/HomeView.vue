@@ -33,7 +33,6 @@
     <AnimateOnScroll animation="fadeInUp" :delay="550">
       <FooterSection />
     </AnimateOnScroll>
-    <button class="chat-bot" aria-label="Buka asisten karier">?</button>
   </div>
 </template>
 
