@@ -272,7 +272,9 @@ function applyTheme(preferredTheme) {
   const savedTheme = preferredTheme || localStorage.getItem('admin_theme');
   const theme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   currentTheme.value = theme === 'dark' ? 'dark' : 'light';
-  document.querySelector('.app-shell')?.setAttribute('data-theme', currentTheme.value);
+  document.querySelectorAll('.app-shell').forEach((shell) => {
+    shell.setAttribute('data-theme', currentTheme.value);
+  });
 }
 
 function toggleTheme() {
