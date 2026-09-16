@@ -51,8 +51,7 @@
             <Sun v-if="currentTheme === 'dark'" :size="16" />
             <Moon v-else :size="16" />
           </button>
-          <router-link to="/admin/content" class="btn btn-outline btn-sm"><Palette :size="15" /> Content Studio</router-link>
-          <button class="btn btn-danger-soft btn-sm" @click="logout"><LogOut :size="15" /> Keluar</button>
+          <button class="btn btn-danger-soft btn-sm" @click="logout"><LogOut :size="15" /> <span>Keluar</span></button>
         </div>
       </header>
 
@@ -957,6 +956,13 @@
           </form>
         </section>
 
+        <!-- ============================================= -->
+        <!-- KONTEN WEBSITE TAMBAHAN -->
+        <!-- ============================================= -->
+        <section v-else-if="isContentTab" class="content-studio-panel">
+          <AdminContent :initial-type="contentType" embedded />
+        </section>
+
       </main>
     </div>
 
@@ -1093,11 +1099,13 @@
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import {
-  LayoutDashboard, Palette, Globe, LogOut, Menu, X, Search, Inbox,
+  LayoutDashboard, Globe, LogOut, Menu, X, Search, Inbox,
   ClipboardList, GraduationCap, Newspaper, School, Image as ImageIcon,
+  Trophy, Camera, Briefcase, ShoppingBag,
   Tag, Users, Settings, RotateCw, Plus, Save, Send, Upload, Edit2,
   Trash2, Building2, FileText, CheckCircle2, XCircle, Clock, List, Sun, Moon
 } from 'lucide-vue-next';
+import AdminContent from './AdminContent.vue';
 import {
   createNews, createMajor, createSiteImage, createStudent, createCategory, createUser,
   deleteNews, deleteMajor, deleteSiteImage, deleteStudent, deleteRegistration, deleteCategory, deleteUser,
@@ -1110,6 +1118,7 @@ import {
   addMajorFacility, deleteMajorFacility,
   addMajorCurriculum, updateMajorCurriculum, deleteMajorCurriculum,
   getRegistrationDetail,
+  getAdminContent,
 } from '../../../api/endpoints';
 
 const router = useRouter();
@@ -1145,6 +1154,13 @@ const images = ref([]);
 const categories = ref([]);
 const usersList = ref([]);
 const profileMenuItems = ref([]);
+const contentCounts = reactive({
+  achievements: 0,
+  galleries: 0,
+  industry_partners: 0,
+  job_vacancies: 0,
+  products: 0,
+});
 
 // Modals
 const selectedApp = ref(null);
@@ -1208,6 +1224,11 @@ const navGroups = computed(() => [
       { id: 'majors', label: 'Jurusan', icon: School, count: majors.value.length },
       { id: 'images', label: 'Gambar Website', icon: ImageIcon, count: images.value.length },
       { id: 'categories', label: 'Kategori', icon: Tag, count: categories.value.length },
+            { id: 'content-achievements', label: 'Prestasi Siswa', icon: Trophy, count: contentCounts.achievements },
+            { id: 'content-galleries', label: 'Galeri Foto', icon: Camera, count: contentCounts.galleries },
+            { id: 'content-industry_partners', label: 'Mitra Industri', icon: Building2, count: contentCounts.industry_partners },
+            { id: 'content-job_vacancies', label: 'Lowongan Kerja', icon: Briefcase, count: contentCounts.job_vacancies },
+            { id: 'content-products', label: 'Produk TEFA', icon: ShoppingBag, count: contentCounts.products },
     ],
   },
   {
@@ -1229,6 +1250,11 @@ const pageTitles = {
   majors: 'Jurusan & Fasilitas',
   images: 'Gambar Website',
   categories: 'Kategori Konten',
+  'content-achievements': 'Prestasi Siswa',
+  'content-galleries': 'Galeri Foto',
+  'content-industry_partners': 'Mitra Industri',
+  'content-job_vacancies': 'Lowongan Kerja',
+  'content-products': 'Produk TEFA',
   users: 'Pengguna & Admin',
   profile: 'Profil Sekolah',
   'profile-menu': 'Dropdown Profil',
@@ -1237,6 +1263,8 @@ const pageTitles = {
 };
 
 const pageTitle = computed(() => pageTitles[activeTab.value] || 'Dashboard');
+const isContentTab = computed(() => activeTab.value.startsWith('content-'));
+const contentType = computed(() => activeTab.value.replace(/^content-/, ''));
 
 function goTo(id) {
   activeTab.value = id;
@@ -1392,6 +1420,18 @@ async function loadCategories() {
     const response = await getCategories();
     categories.value = response.data || [];
   } catch (error) { errorMessage(error); }
+}
+
+async function loadContentCounts() {
+  await Promise.all(Object.keys(contentCounts).map(async (type) => {
+    try {
+      const response = await getAdminContent(type);
+      const data = response.data?.data || response.data || [];
+      contentCounts[type] = Array.isArray(data) ? data.length : (data.data?.length || 0);
+    } catch (error) {
+      contentCounts[type] = 0;
+    }
+  }));
 }
 
 async function loadUsers() {
@@ -2044,6 +2084,7 @@ onMounted(() => {
     loadMajors(),
     loadImages(),
     loadCategories(),
+    loadContentCounts(),
     loadUsers(),
     loadProfileMenuItems(),
     loadProfile(),
@@ -2296,7 +2337,8 @@ option {
   border-bottom: 1px solid var(--border);
 }
 
-.topbar-left { display: flex; align-items: center; gap: 14px; }
+.topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.topbar-left > div { min-width: 0; }
 
 .hamburger {
   display: none;
@@ -2314,11 +2356,14 @@ option {
   font-weight: 700;
   letter-spacing: -0.015em;
   color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .topbar-date { margin: 0; color: var(--text-3); font-size: 12px; }
 
-.topbar-actions { display: flex; align-items: center; gap: 8px; }
+.topbar-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
 .theme-toggle {
   display: inline-grid;
@@ -3036,6 +3081,8 @@ td code {
 
 @media (max-width: 768px) {
   .topbar { padding: 12px 16px; }
+  .topbar-actions .btn-danger-soft span { display: none; }
+  .topbar-actions .btn-danger-soft { padding: 8px; }
   .content { padding: 18px 16px 56px; }
   .form-grid { grid-template-columns: 1fr; }
   .row-2 { grid-template-columns: 1fr; }
