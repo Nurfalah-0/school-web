@@ -110,13 +110,15 @@ const activePartners = computed(() => {
 }
 
 .mitra-card {
-  background: #ffffff;
+  background: transparent;
   border-radius: 1rem;
-  padding: 1rem;
-  height: 6rem;
+  padding: 0;
+  width: 100%;
+  height: 6.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   transition: all 0.25s ease;
 
@@ -127,9 +129,12 @@ const activePartners = computed(() => {
 }
 
 .mitra-logo {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: transparent;
+  border-radius: inherit;
   filter: grayscale(100%) opacity(0.7);
   transition: filter 0.2s;
 }

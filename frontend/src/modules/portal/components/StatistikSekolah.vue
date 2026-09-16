@@ -9,7 +9,7 @@
           :data-label="item.label"
         >
           <div class="statistik-number">
-            {{ animatedValues[item.label] || 0 }}
+            {{ formatStatValue(item) }}
           </div>
           <div class="statistik-label">{{ item.label }}</div>
         </div>
@@ -25,15 +25,21 @@ const props = defineProps({
   stats: {
     type: Array,
     default: () => [
-      { angka: 1200, label: "SISWA AKTIF" },
-      { angka: 85, label: "GURU & STAFF" },
-      { angka: 4500, label: "ALUMNI SUKSES" },
-      { angka: 50, label: "PARTNER INDUSTRI" },
+      { angka: 1200, label: "Siswa Aktif", suffix: "+" },
+      { angka: 85, label: "Guru & Staff" },
+      { angka: 4500, label: "Alumni Sukses" },
+      { angka: 50, label: "Partner Industri" },
     ],
   },
 });
 
 const animatedValues = reactive({});
+
+const formatStatValue = (stat) => {
+  const value = animatedValues[stat.label];
+  return `${value ?? 0}${stat.suffix ?? ""}`;
+};
+
 let observer = null;
 let animationFrameId = null;
 

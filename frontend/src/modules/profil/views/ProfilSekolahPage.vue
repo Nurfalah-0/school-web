@@ -520,4 +520,24 @@ h3 {
   color: #64748b;
   font-weight: 700;
 }
+
+@media (max-width: 820px) {
+  .principal-card {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding: 1rem;
+  }
+
+  .principal-photo-wrap {
+    min-height: auto;
+  }
+
+  .principal-photo {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+}
 </style>

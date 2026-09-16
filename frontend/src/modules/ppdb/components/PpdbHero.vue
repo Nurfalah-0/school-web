@@ -200,7 +200,7 @@ onUnmounted(() => {
       transparent 28%
     ),
     linear-gradient(135deg, #ffffff 0%, #eef4ff 45%, #dfeafc 100%);
-  padding: 5rem 0;
+  padding: calc(5rem + var(--nav-height, 64px)) 0 5rem;
   position: relative;
   overflow: hidden;
 }
@@ -586,7 +586,7 @@ onUnmounted(() => {
 
 @media (max-width: 767px) {
   .ppdb-hero {
-    padding-top: 3rem;
+    padding-top: calc(3rem + var(--nav-height, 64px));
     padding-bottom: 3rem;
   }
 

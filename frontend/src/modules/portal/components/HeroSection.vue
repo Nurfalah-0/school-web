@@ -79,9 +79,10 @@ const heroImg = computed(() => {
 
 .hero-section {
   position: relative;
-  padding: 80px 0;
+  padding: calc(4rem + var(--nav-height, 64px)) 0 5rem;
   min-height: min(760px, 90vh);
   background: linear-gradient(90deg, #ffffff 0%, #bfdbfe 45%, #1e3a8a 100%);
+  scroll-margin-top: calc(var(--nav-height, 64px) + 1rem);
 }
 
 .hero-inner {
@@ -213,6 +214,15 @@ const heroImg = computed(() => {
   background: #ffffff;
 }
 
+@keyframes floatCard {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
 .hero-stat-card {
   position: absolute;
   z-index: 20;
@@ -223,6 +233,15 @@ const heroImg = computed(() => {
   border-radius: 24px;
   background: #ffffff;
   box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+  animation: floatCard 4s ease-in-out infinite;
+}
+
+.hero-stat-top {
+  animation-delay: 0s;
+}
+
+.hero-stat-bottom {
+  animation-delay: 0.8s;
 }
 
 .hero-stat-top {
@@ -276,7 +295,8 @@ const heroImg = computed(() => {
 @media (max-width: 1100px) {
   .hero-section {
     background: linear-gradient(180deg, #ffffff 0%, #bfdbfe 50%, #1e3a8a 100%);
-    padding: 60px 0;
+    padding-top: calc(3.25rem + var(--nav-height, 64px));
+    padding-bottom: 4rem;
     min-height: unset;
   }
 
@@ -331,7 +351,8 @@ const heroImg = computed(() => {
 
 @media (max-width: 760px) {
   .hero-section {
-    padding: 3rem 0;
+    padding-top: calc(2.75rem + var(--nav-height, 56px));
+    padding-bottom: 3rem;
   }
 
   .hero-inner {

@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar">
+  <nav ref="navbarElement" class="navbar">
     <div class="container nav-inner">
       <router-link to="/" class="brand" @click="closeMenu">
         <img :src="logoSrc" alt="Logo SMK" class="brand-logo" />
@@ -29,7 +29,9 @@
             <button
               class="nav-link nav-trigger"
               type="button"
-              @click="toggleDropdown(item.label)"
+              @pointerdown.prevent.stop="toggleDropdown(item.label, $event)"
+              @keydown.enter.prevent.stop="toggleDropdown(item.label, $event)"
+              @keydown.space.prevent.stop="toggleDropdown(item.label, $event)"
               @mouseenter="handleTriggerMouseEnter(item)"
               @mouseleave="handleTriggerMouseLeave(item)"
             >
@@ -80,7 +82,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import defaultLogo from '../../assets/logo.webp';
 
@@ -115,6 +117,7 @@ const props = defineProps({
 });
 
 const route = useRoute();
+const navbarElement = ref(null);
 const isMenuOpen = ref(false);
 const openDropdown = ref(null);
 const dropdownCloseTimers = ref({});
@@ -123,6 +126,13 @@ const dropdownHoverState = ref({});
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
+};
+
+const handleOutsidePointerDown = (event) => {
+  if (!isMenuOpen.value || window.innerWidth > 900) return;
+  if (!navbarElement.value?.contains(event.target)) {
+    closeMenu();
+  }
 };
 
 const closeMenu = () => {
@@ -173,7 +183,12 @@ const handleTriggerMouseLeave = (item) => {
   scheduleDropdownClose(item.label);
 };
 
-const toggleDropdown = (label) => {
+const toggleDropdown = (label, event) => {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
   openDropdown.value = openDropdown.value === label ? null : label;
 };
 
@@ -207,6 +222,14 @@ const isActive = (item) => {
   }
   return route.path === target.path;
 };
+
+onMounted(() => {
+  document.addEventListener('pointerdown', handleOutsidePointerDown);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', handleOutsidePointerDown);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -300,6 +323,7 @@ const isActive = (item) => {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  touch-action: manipulation;
 }
 
 .nav-link:hover,
@@ -466,17 +490,17 @@ const isActive = (item) => {
   .navbar-menu.open {
     display: flex;
     position: absolute;
-    top: 100%;
+    top: calc(100% + 0.5rem);
     left: 0;
     right: 0;
     transform: none;
     flex-direction: column;
     align-items: stretch;
-    gap: 1rem;
-    margin: 0.75rem auto;
-    padding: 1rem;
-    background: #ffffff;
-    border: 1px solid rgba(148, 163, 184, 0.16);
+    gap: 0.7rem;
+    margin: 0 auto;
+    padding: 0.75rem;
+    background: #edf2f7;
+    border: 1px solid rgba(148, 163, 184, 0.18);
     border-radius: 1rem;
     box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
     z-index: 49;
@@ -488,29 +512,44 @@ const isActive = (item) => {
 
   .nav-link,
   .nav-trigger {
+    display: flex;
+    align-items: center;
     width: 100%;
-    padding: 0.8rem 1rem;
+    padding: 0.85rem 1rem;
     border-radius: 0.85rem;
-    background: #f8fafc;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(148, 163, 184, 0.14);
     justify-content: space-between;
   }
 
   .dropdown-menu {
     position: static;
-    margin-top: 0.5rem;
+    margin-top: 0.45rem;
     min-width: 0;
     width: 100%;
-    background: #f8fafc;
+    background: rgba(255, 255, 255, 0.9);
     box-shadow: none;
     border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 0.8rem;
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
     transform: none;
+    padding: 0.5rem;
   }
 
   .dropdown-menu:not(.open) {
     display: none;
+  }
+
+  .dropdown-menu,
+  .dropdown-menu.open {
+    transition: none;
+  }
+
+  .dropdown-link {
+    padding: 0.7rem 0.8rem;
+    border-radius: 0.7rem;
   }
 
   .nav-cta-mobile {
