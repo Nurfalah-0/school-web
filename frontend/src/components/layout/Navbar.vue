@@ -23,7 +23,7 @@
           v-for="item in menuItems"
           :key="item.label"
           class="nav-item"
-          :class="{ 'has-dropdown': !!item.children, 'active-group': isGroupActive(item) }"
+          :class="{ 'has-dropdown': !!item.children, 'active-group': isGroupActive(item), 'dropdown-open': openDropdown === item.label }"
         >
           <template v-if="item.children">
             <button
@@ -72,7 +72,7 @@
 
       <router-link
         class="nav-contact button-secondary"
-        :to="{ path: '/', hash: '#kontak' }"
+        to="/contact"
         @click="closeMenu"
       >
         Contact
@@ -341,6 +341,7 @@ onBeforeUnmount(() => {
 
 .nav-link.active::after,
 .active-group > .nav-trigger::after,
+.dropdown-open > .nav-trigger::after,
 .dropdown-link.active::after {
   content: '';
   position: absolute;
@@ -520,6 +521,11 @@ onBeforeUnmount(() => {
     background: rgba(255, 255, 255, 0.88);
     border: 1px solid rgba(148, 163, 184, 0.14);
     justify-content: space-between;
+  }
+
+  .nav-trigger {
+    transition: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .dropdown-menu {
