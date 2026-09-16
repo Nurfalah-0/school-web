@@ -123,6 +123,9 @@ const openDropdown = ref(null);
 const dropdownCloseTimers = ref({});
 const triggerHoverState = ref({});
 const dropdownHoverState = ref({});
+const lastTouchInteractionAt = ref(0);
+
+const supportsHover = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -160,18 +163,23 @@ const scheduleDropdownClose = (label) => {
 };
 
 const handleDropdownMouseEnter = (item) => {
+  if (!supportsHover()) return;
+  if (Date.now() - lastTouchInteractionAt.value < 700) return;
   dropdownHoverState.value[item.label] = true;
   clearDropdownTimer(item.label);
   openDropdown.value = item.label;
 };
 
 const handleDropdownMouseLeave = (item) => {
+  if (!supportsHover()) return;
   dropdownHoverState.value[item.label] = false;
   scheduleDropdownClose(item.label);
 };
 
 const handleTriggerMouseEnter = (item) => {
   if (!item.children) return;
+  if (!supportsHover()) return;
+  if (Date.now() - lastTouchInteractionAt.value < 700) return;
   triggerHoverState.value[item.label] = true;
   clearDropdownTimer(item.label);
   openDropdown.value = item.label;
@@ -179,11 +187,16 @@ const handleTriggerMouseEnter = (item) => {
 
 const handleTriggerMouseLeave = (item) => {
   if (!item.children) return;
+  if (!supportsHover()) return;
   triggerHoverState.value[item.label] = false;
   scheduleDropdownClose(item.label);
 };
 
 const toggleDropdown = (label, event) => {
+  if (event?.pointerType === 'touch') {
+    lastTouchInteractionAt.value = Date.now();
+  }
+
   if (event) {
     event.preventDefault();
     event.stopPropagation();
