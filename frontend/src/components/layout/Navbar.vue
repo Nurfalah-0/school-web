@@ -42,23 +42,15 @@
               @mouseenter="handleDropdownMouseEnter(item)"
               @mouseleave="handleDropdownMouseLeave(item)"
             >
-              <div class="dropdown-heading">
-                <span class="dropdown-kicker">Jelajahi</span>
-                <strong>{{ item.label }}</strong>
-              </div>
               <router-link
                 v-for="child in item.children"
-                :key="child.id || child.label"
+                :key="child.label"
                 :to="child.to"
                 class="dropdown-link"
                 :class="{ active: isActive(child) }"
                 @click="closeMenu"
               >
-                <span class="dropdown-icon">{{ child.icon || '•' }}</span>
-                <span class="dropdown-copy">
-                  <strong>{{ child.label }}</strong>
-                  <small v-if="child.description">{{ child.description }}</small>
-                </span>
+                {{ child.label }}
               </router-link>
             </div>
           </template>
@@ -78,7 +70,7 @@
 
       <router-link
         class="nav-contact button-secondary"
-        to="/contact"
+        :to="{ path: '/', hash: '#kontak' }"
         @click="closeMenu"
       >
         Contact
@@ -88,10 +80,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import defaultLogo from '../../assets/logo.webp';
-import { getProfileMenuItems } from '../../api/endpoints';
 
 const props = defineProps({
   logoSrc: {
@@ -129,33 +120,6 @@ const openDropdown = ref(null);
 const dropdownCloseTimers = ref({});
 const triggerHoverState = ref({});
 const dropdownHoverState = ref({});
-const profileMenuItems = ref(null);
-
-const fallbackProfileItems = [
-  { label: 'SMK Nurul Jadid', description: 'Identitas dan perjalanan sekolah', to: { path: '/profil', hash: '#profil-sekolah' }, icon: 'S' },
-  { label: 'Visi & Misi Sekolah', description: 'Arah dan nilai pendidikan', to: { path: '/profil', hash: '#visi-misi' }, icon: 'V' },
-  { label: 'Kepala Sekolah', description: 'Sambutan dan kepemimpinan', to: { path: '/profil', hash: '#kepala-sekolah' }, icon: 'K' },
-];
-
-const menuItems = computed(() => props.menuItems.map((item) => {
-  if (item.label !== 'Profil') return item;
-  return { ...item, children: profileMenuItems.value || fallbackProfileItems };
-}));
-
-onMounted(async () => {
-  try {
-    const response = await getProfileMenuItems();
-    const items = response.data?.data || [];
-    if (items.length) {
-      profileMenuItems.value = items.map((item) => ({
-        ...item,
-        to: { path: item.path, ...(item.hash ? { hash: item.hash.startsWith('#') ? item.hash : `#${item.hash}` } : {}) },
-      }));
-    }
-  } catch {
-    // The built-in menu remains available when the API is unavailable.
-  }
-});
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -397,65 +361,13 @@ const isActive = (item) => {
   transform: translateY(0);
 }
 
-.dropdown-heading {
-  display: grid;
-  gap: 0.15rem;
-  padding: 0.45rem 0.8rem 0.7rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-}
-
-.dropdown-kicker {
-  color: #0f766e;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.dropdown-heading strong {
-  color: #0f172a;
-  font-size: 0.95rem;
-}
-
 .dropdown-link {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.7rem;
   position: relative;
   color: #334155;
   text-decoration: none;
   padding: 0.7rem 0.8rem;
   border-radius: 0.75rem;
   font-weight: 800;
-}
-
-.dropdown-icon {
-  display: grid;
-  flex: 0 0 1.7rem;
-  place-items: center;
-  width: 1.7rem;
-  height: 1.7rem;
-  color: #ffffff;
-  background: #0f766e;
-  border-radius: 0.55rem;
-  font-size: 0.72rem;
-  font-weight: 900;
-}
-
-.dropdown-copy {
-  display: grid;
-  gap: 0.18rem;
-}
-
-.dropdown-copy strong {
-  font-size: 0.85rem;
-}
-
-.dropdown-copy small {
-  color: #64748b;
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1.35;
 }
 
 .dropdown-link:hover,
