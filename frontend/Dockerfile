@@ -1,6 +1,8 @@
 # Stage 1: Build Vue application
 FROM node:18-alpine as build-stage
 WORKDIR /app
+ARG VITE_API_URL=http://api.lomba.test/api
+ENV VITE_API_URL=$VITE_API_URL
 COPY package*.json ./
 RUN npm install
 COPY . .

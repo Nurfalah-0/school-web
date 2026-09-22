@@ -25,8 +25,7 @@ export default [
   },
   {
     path: '/admin/content',
-    name: 'AdminContent',
-    component: () => import('./views/AdminContent.vue'),
+    redirect: { path: '/admin/manage', query: { tab: 'content-achievements' } },
     meta: { hideNavbar: true },
   },
 ];

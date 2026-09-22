@@ -1,7 +1,7 @@
 <template>
-  <div class="app-shell">
+  <div :class="['app-shell', { embedded }]">
     <!-- ===== SIDEBAR ===== -->
-    <aside :class="['sidebar', { open: sidebarOpen }]">
+    <aside v-if="!embedded" :class="['sidebar', { open: sidebarOpen }]">
       <div class="sidebar-brand">
         <div class="brand-mark"><Palette :size="19" /></div>
         <div class="brand-text">
@@ -31,11 +31,11 @@
       </div>
     </aside>
 
-    <div v-if="sidebarOpen" class="sidebar-overlay" @click="sidebarOpen = false"></div>
+    <div v-if="!embedded && sidebarOpen" class="sidebar-overlay" @click="sidebarOpen = false"></div>
 
     <!-- ===== MAIN AREA ===== -->
     <div class="main-area">
-      <header class="topbar">
+      <header v-if="!embedded" class="topbar">
         <div class="topbar-left">
           <button class="hamburger" @click="sidebarOpen = true"><Menu :size="20" /></button>
           <div>
@@ -244,7 +244,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   ArrowLeft, Menu, X, LogOut, Search, Inbox, Calendar,
@@ -254,9 +254,14 @@ import {
 } from 'lucide-vue-next';
 import { createAdminContent, deleteAdminContent, getAdminContent, updateAdminContent } from '../../../api/endpoints';
 
+const props = defineProps({
+  initialType: { type: String, default: 'achievements' },
+  embedded: { type: Boolean, default: false },
+});
+
 const router = useRouter();
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/api\/?$/, '');
-const type = ref('achievements');
+const type = ref(props.initialType);
 const records = ref([]);
 const notice = ref('');
 const noticeType = ref('success');
@@ -267,7 +272,9 @@ function applyTheme(preferredTheme) {
   const savedTheme = preferredTheme || localStorage.getItem('admin_theme');
   const theme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   currentTheme.value = theme === 'dark' ? 'dark' : 'light';
-  document.querySelector('.app-shell')?.setAttribute('data-theme', currentTheme.value);
+  document.querySelectorAll('.app-shell').forEach((shell) => {
+    shell.setAttribute('data-theme', currentTheme.value);
+  });
 }
 
 function toggleTheme() {
@@ -485,6 +492,13 @@ onMounted(() => {
   applyTheme();
   load();
 });
+
+watch(() => props.initialType, async (value) => {
+  if (value === type.value) return;
+  type.value = value;
+  reset();
+  await load();
+});
 </script>
 
 <style scoped>
@@ -536,6 +550,20 @@ onMounted(() => {
   line-height: 1.5;
   color-scheme: light;
   -webkit-font-smoothing: antialiased;
+}
+
+.app-shell.embedded {
+  min-height: auto;
+  background: transparent;
+}
+
+.embedded .main-area {
+  margin-left: 0;
+  min-height: auto;
+}
+
+.embedded .content {
+  padding: 0;
 }
 
 .app-shell[data-theme="dark"] {
