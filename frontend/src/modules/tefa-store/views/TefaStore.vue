@@ -65,7 +65,13 @@
     </AnimateOnScroll>
 
     <!-- Floating Cart Button -->
-    <button v-if="cart.length > 0" class="cart-fab" @click="cartOpen = true" aria-label="Buka keranjang">
+    <button
+      v-if="cart.length > 0"
+      class="cart-fab"
+      :class="{ 'cart-fab--hidden': cartOpen }"
+      @click="cartOpen = true"
+      aria-label="Buka keranjang"
+    >
       <ShoppingCart :size="23" color="#ffffff" />
       <span class="cart-fab-badge">{{ cartTotalQty }}</span>
     </button>
@@ -615,7 +621,7 @@ function checkoutWhatsApp() {
     display: inline-flex;
   }
 
-  .cart-sidebar--open ~ .cart-fab {
+  .cart-fab--hidden {
     display: none;
   }
 
@@ -662,7 +668,7 @@ function checkoutWhatsApp() {
   cursor: pointer;
   display: grid;
   place-items: center;
-  z-index: 30;
+  z-index: 45;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
