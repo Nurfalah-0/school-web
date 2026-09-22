@@ -23,7 +23,7 @@
           v-for="item in menuItems"
           :key="item.label"
           class="nav-item"
-          :class="{ 'has-dropdown': !!item.children, 'active-group': isGroupActive(item) }"
+          :class="{ 'has-dropdown': !!item.children, 'active-group': isGroupActive(item), 'dropdown-open': openDropdown === item.label }"
         >
           <template v-if="item.children">
             <button
@@ -72,7 +72,7 @@
 
       <router-link
         class="nav-contact button-secondary"
-        :to="{ path: '/', hash: '#kontak' }"
+        to="/contact"
         @click="closeMenu"
       >
         Contact
@@ -123,13 +123,16 @@ const openDropdown = ref(null);
 const dropdownCloseTimers = ref({});
 const triggerHoverState = ref({});
 const dropdownHoverState = ref({});
+const lastTouchInteractionAt = ref(0);
+
+const supportsHover = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
 };
 
 const handleOutsidePointerDown = (event) => {
-  if (!isMenuOpen.value || window.innerWidth > 900) return;
+  if (!isMenuOpen.value || window.innerWidth > 768) return;
   if (!navbarElement.value?.contains(event.target)) {
     closeMenu();
   }
@@ -160,18 +163,23 @@ const scheduleDropdownClose = (label) => {
 };
 
 const handleDropdownMouseEnter = (item) => {
+  if (!supportsHover()) return;
+  if (Date.now() - lastTouchInteractionAt.value < 700) return;
   dropdownHoverState.value[item.label] = true;
   clearDropdownTimer(item.label);
   openDropdown.value = item.label;
 };
 
 const handleDropdownMouseLeave = (item) => {
+  if (!supportsHover()) return;
   dropdownHoverState.value[item.label] = false;
   scheduleDropdownClose(item.label);
 };
 
 const handleTriggerMouseEnter = (item) => {
   if (!item.children) return;
+  if (!supportsHover()) return;
+  if (Date.now() - lastTouchInteractionAt.value < 700) return;
   triggerHoverState.value[item.label] = true;
   clearDropdownTimer(item.label);
   openDropdown.value = item.label;
@@ -179,11 +187,16 @@ const handleTriggerMouseEnter = (item) => {
 
 const handleTriggerMouseLeave = (item) => {
   if (!item.children) return;
+  if (!supportsHover()) return;
   triggerHoverState.value[item.label] = false;
   scheduleDropdownClose(item.label);
 };
 
 const toggleDropdown = (label, event) => {
+  if (event?.pointerType === 'touch') {
+    lastTouchInteractionAt.value = Date.now();
+  }
+
   if (event) {
     event.preventDefault();
     event.stopPropagation();
@@ -317,6 +330,7 @@ onBeforeUnmount(() => {
   font-weight: 800;
   cursor: pointer;
   padding: 0;
+  white-space: nowrap;
 }
 
 .nav-trigger {
@@ -341,6 +355,7 @@ onBeforeUnmount(() => {
 
 .nav-link.active::after,
 .active-group > .nav-trigger::after,
+.dropdown-open > .nav-trigger::after,
 .dropdown-link.active::after {
   content: '';
   position: absolute;
@@ -392,6 +407,7 @@ onBeforeUnmount(() => {
   padding: 0.7rem 0.8rem;
   border-radius: 0.75rem;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .dropdown-link:hover,
@@ -452,12 +468,21 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 1024px) {
+  .navbar-menu {
+    position: static;
+    transform: none;
+    left: auto;
+    margin: 0 auto;
+    width: fit-content;
+    gap: 1rem;
+  }
+
   .nav-link {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .navbar-menu,
   .nav-cta-desktop {
     display: none;
@@ -465,6 +490,59 @@ onBeforeUnmount(() => {
 
   .nav-toggle {
     display: inline-flex;
+  }
+
+  .navbar-menu.open {
+    display: flex;
+    position: fixed;
+    top: var(--nav-height, 64px);
+    left: 0;
+    right: 0;
+    width: 100%;
+    transform: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7rem;
+    margin: 0;
+    padding: 1rem 0.75rem 4rem;
+    background: #edf2f7;
+    border: none;
+    border-radius: 0;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    z-index: 60;
+  }
+
+  .navbar-menu.open .nav-item {
+    width: 100%;
+  }
+
+  .navbar-menu.open .nav-link,
+  .navbar-menu.open .nav-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border-radius: 0.85rem;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+  }
+
+  .navbar-menu.open .dropdown-menu {
+    position: static;
+    width: 100%;
+    min-width: 0;
+    margin-top: 0.45rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: none;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 0.8rem;
+    transform: none;
+  }
+
+  .navbar-menu.open .dropdown-menu:not(.open) {
+    display: none;
   }
 }
 
@@ -479,8 +557,8 @@ onBeforeUnmount(() => {
 
 @media (max-width: 760px) {
   .nav-inner {
-    width: min(100%, calc(100% - 1.5rem));
-    padding: 0.75rem 0;
+    width: 100%;
+    padding: 0.75rem 0.5rem;
   }
 
   .brand-text {
@@ -489,21 +567,22 @@ onBeforeUnmount(() => {
 
   .navbar-menu.open {
     display: flex;
-    position: absolute;
-    top: calc(100% + 0.5rem);
+    position: fixed;
+    top: var(--nav-height, 64px);
     left: 0;
     right: 0;
+    width: 100%;
     transform: none;
     flex-direction: column;
     align-items: stretch;
     gap: 0.7rem;
-    margin: 0 auto;
-    padding: 0.75rem;
+    margin: 0;
+    padding: 1rem 0.75rem 4rem;
     background: #edf2f7;
-    border: 1px solid rgba(148, 163, 184, 0.18);
-    border-radius: 1rem;
+    border: none;
+    border-radius: 0;
     box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
-    z-index: 49;
+    z-index: 60;
   }
 
   .nav-item {
@@ -520,6 +599,11 @@ onBeforeUnmount(() => {
     background: rgba(255, 255, 255, 0.88);
     border: 1px solid rgba(148, 163, 184, 0.14);
     justify-content: space-between;
+  }
+
+  .nav-trigger {
+    transition: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .dropdown-menu {

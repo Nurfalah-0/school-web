@@ -334,7 +334,15 @@ const heroImg = computed(() => {
     margin: 0 auto;
   }
 
+  .hero-card {
+    min-height: 380px;
+  }
+
   .hero-card img {
+    height: 380px;
+  }
+
+  .hero-image-placeholder {
     height: 380px;
   }
 

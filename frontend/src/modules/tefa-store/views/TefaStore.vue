@@ -122,6 +122,11 @@
           Pesan via WhatsApp
         </button>
       </div>
+
+      <button class="cart-exit-btn" @click="cartOpen = false" aria-label="Keluar dari keranjang">
+        <X :size="18" color="#1e3a8a" />
+        Keluar
+      </button>
     </div>
 
     <AnimateOnScroll animation="fadeInUp" :delay="300">
@@ -575,11 +580,51 @@ function checkoutWhatsApp() {
   background: #128c7e;
 }
 
+.cart-exit-btn {
+  display: none;
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: #1e3a8a;
+  color: #ffffff;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  z-index: 70;
+  transition: background 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 8px 24px rgba(30, 58, 138, 0.3);
+}
+
+.cart-exit-btn:hover {
+  background: #1e40af;
+  transform: scale(1.05);
+}
+
 /* Responsive */
 @media (max-width: 767px) {
   .cart-sidebar {
     width: 100%;
     max-width: 100%;
+  }
+
+  .cart-exit-btn {
+    display: inline-flex;
+  }
+
+  .cart-sidebar--open ~ .cart-fab {
+    display: none;
+  }
+
+  .cart-items {
+    padding-bottom: 70px;
+  }
+
+  .cart-close {
+    padding: 10px;
   }
 
   .cart-bar-inner {
