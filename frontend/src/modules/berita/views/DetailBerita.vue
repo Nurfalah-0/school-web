@@ -140,24 +140,17 @@ watchEffect(() => {
 .detail-berita-layout {
   max-width: 84rem;
   margin: 0 auto;
-  padding: 2rem 1.25rem;
+  padding: calc(var(--nav-height, 64px) + 2rem) 1.25rem 3rem;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
-}
-
-@media (min-width: 768px) {
-  .detail-berita-layout {
-    grid-template-columns: 1fr 280px;
-    gap: 3rem;
-    padding: 3rem 1.5rem;
-  }
+  gap: 2.5rem;
 }
 
 @media (min-width: 1024px) {
   .detail-berita-layout {
-    grid-template-columns: 1fr 300px;
+    grid-template-columns: 1fr 320px;
     gap: 4rem;
+    padding: calc(var(--nav-height, 64px) + 2.5rem) 1.5rem 4rem;
   }
 }
 

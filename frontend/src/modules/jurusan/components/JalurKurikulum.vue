@@ -49,7 +49,7 @@ function dotColor(warna) {
 
 @media (min-width: 768px) {
   .kurikulum-inner {
-    padding: 0 0 3rem;
+    padding: 0 1.5rem 3rem;
   }
 }
 

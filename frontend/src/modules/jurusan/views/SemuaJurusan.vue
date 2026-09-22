@@ -52,11 +52,13 @@
         </AnimateOnScroll>
       </div>
     </AnimateOnScroll>
+    <FooterSection />
   </section>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from "vue";
+import FooterSection from "@/modules/portal/components/FooterSection.vue";
 import {
   CodeXml,
   Briefcase,
@@ -121,12 +123,13 @@ onMounted(async () => {
 .semua-jurusan-page {
   min-height: 100vh;
   background: #ffffff;
-  padding: 4rem 0;
+  padding: calc(var(--nav-height, 64px) + 2.5rem) 0 0;
 }
 
 .semua-jurusan-inner {
   width: min(1200px, calc(100% - 48px));
   margin: 0 auto;
+  padding-bottom: 4rem;
 }
 
 .semua-jurusan-header {

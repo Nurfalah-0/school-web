@@ -72,6 +72,7 @@
         </AnimateOnScroll>
       </div>
     </AnimateOnScroll>
+    <FooterSection />
   </section>
 </template>
 
@@ -81,6 +82,7 @@ import { useRoute } from "vue-router";
 import { getNews } from "@/api/endpoints";
 import { mapNews } from "../services/newsMapper";
 import AnimateOnScroll from "@/shared/components/AnimateOnScroll.vue";
+import FooterSection from "@/modules/portal/components/FooterSection.vue";
 
 const route = useRoute();
 const kategoriAktif = ref("Semua");
@@ -152,13 +154,13 @@ watch(
 .semua-berita-page {
   min-height: 100vh;
   background: #f8f7fb;
-  padding: 2rem 0 4rem;
+  padding: calc(var(--nav-height, 64px) + 2.5rem) 0 0;
 }
 
 .semua-berita-inner {
   max-width: 80rem;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 1.5rem 4rem;
 }
 
 .semua-berita-header {

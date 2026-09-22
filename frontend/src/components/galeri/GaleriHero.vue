@@ -63,7 +63,7 @@
 .galeri-hero {
   position: relative;
   background: linear-gradient(135deg, #0f0c29 0%, #1a1a6e 40%, #24243e 100%);
-  padding: 6rem 1.5rem 5rem;
+  padding: calc(var(--nav-height, 64px) + 3rem) 1.5rem 5rem;
   text-align: center;
   overflow: hidden;
 }
@@ -278,7 +278,7 @@
 
 @media (max-width: 639px) {
   .galeri-hero {
-    padding: 4.5rem 1rem 3.5rem;
+    padding: calc(var(--nav-height, 64px) + 2rem) 1rem 3.5rem;
   }
 
   .hero-stats {

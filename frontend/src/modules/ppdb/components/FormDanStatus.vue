@@ -689,6 +689,9 @@ onMounted(async () => {
   color: #334155;
   display: flex;
   justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  word-break: break-word;
 }
 
 .result-details p span {

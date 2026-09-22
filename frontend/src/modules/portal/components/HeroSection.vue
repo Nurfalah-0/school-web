@@ -442,13 +442,13 @@ const heroImg = computed(() => {
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 480px) {
   .hero-title {
     font-size: clamp(2rem, 10.5vw, 2.75rem);
   }
 
-  .hero-stat-card {
-    max-width: calc(100% - 0.5rem);
+  .hero-card-wrap {
+    padding: 0.5rem 0 1rem;
   }
 }
 </style>
