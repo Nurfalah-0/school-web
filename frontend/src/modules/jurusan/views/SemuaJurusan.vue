@@ -88,10 +88,13 @@ const normalizeImageUrl = (value) => {
 
 const jurusanList = ref([]);
 onMounted(async () => {
-  try {
-    const response = await getMajors({ summary: 1 });
-    const items = response.data?.data || [];
+  // Load fallback data immediately to avoid server error toast
+  jurusanList.value = fallbackJurusanList
 
+  // Optionally enhance with API data (silent fail)
+  try {
+    const response = await getMajors({ summary: 1, skipErrorToast: true });
+    const items = response.data?.data || [];
     if (items.length > 0) {
       jurusanList.value = items.map((item) => {
         const fallback = fallbackJurusanList.find((entry) => entry.slug === item.slug) || {};
@@ -107,13 +110,10 @@ onMounted(async () => {
           icon: fallback.icon || "CodeXml",
         };
       });
-      return;
     }
-  } catch (err) {
-    console.warn("Gagal memuat jurusan dari API, mencoba data dummy:", err);
+  } catch {
+    // Silently ignore - fallback already loaded
   }
-
-  jurusanList.value = [];
 });
 </script>
 

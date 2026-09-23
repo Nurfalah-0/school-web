@@ -114,25 +114,28 @@ function mapMajor(item) {
 }
 
 onMounted(async () => {
-  try {
-    const response = await getMajors()
-    const items = response.data?.data || []
+  // Load fallback data immediately to avoid server error toast
+  apiMajors.value = fallbackJurusanList.map(item => ({ ...item, fromApi: false }))
+  isLoading.value = false
 
+  // Optionally enhance with API data (silent fail)
+  try {
+    const response = await getMajors({ skipErrorToast: true })
+    const items = response.data?.data || []
     if (items.length > 0) {
       apiMajors.value = items.map(mapMajor)
-    } else {
-      apiMajors.value = []
     }
-  } catch (error) {
-    console.warn('Gagal memuat jurusan dari API, mencoba data dummy:', error)
-    apiMajors.value = fallbackJurusanList
+  } catch {
+    // Silently ignore - fallback already loaded
   }
-
-  isLoading.value = false
 })
 
 const jurusanAktif = computed(() => apiMajors.value.find((item) => item.slug === route.params.slug))
-const jurusanLainnya = computed(() => apiMajors.value.filter((item) => item.slug !== route.params.slug))
+const jurusanLainnya = computed(() => {
+  const apiOthers = apiMajors.value.filter((item) => item.slug !== route.params.slug && item.fromApi)
+  if (apiOthers.length > 0) return apiOthers
+  return apiMajors.value.filter((item) => item.slug !== route.params.slug && !item.fromApi)
+})
 
 watch(
   [() => route.params.slug, apiMajors],
