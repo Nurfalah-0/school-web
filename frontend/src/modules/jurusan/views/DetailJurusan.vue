@@ -94,6 +94,10 @@ function mapMajor(item) {
     }))
     : []
 
+  // ONLY use database image, no fallback to dummy data
+  const dbImage = item.image || ''
+  const gambarHero = normalizeImageUrl(dbImage)
+
   return {
     ...fallback,
     ...item,
@@ -101,7 +105,7 @@ function mapMajor(item) {
     kategori: item.code || 'Program Keahlian',
     nama: name,
     deskripsi: description,
-    gambarHero: normalizeImageUrl(item.image),
+    gambarHero: gambarHero,
     icon: iconByCode[item.code] || fallback.icon || 'Briefcase',
     iconBg: fallback.iconBg || '#1e3a5f',
     keunggulan: [
@@ -109,30 +113,35 @@ function mapMajor(item) {
       { icon: 'Handshake', judul: 'Visi Program', deskripsi: vision },
       { icon: 'Award', judul: 'Fasilitas Program', deskripsi: facilities }
     ],
-    kurikulum: curriculum
+    kurikulum: curriculum,
+    fromApi: true
   }
 }
 
 onMounted(async () => {
+  // Keep loading true, wait for API first to avoid dummy data flash
   try {
-    const response = await getMajors()
+    const response = await getMajors({ skipErrorToast: true })
     const items = response.data?.data || []
-
     if (items.length > 0) {
       apiMajors.value = items.map(mapMajor)
     } else {
-      apiMajors.value = []
+      // API works but empty - use fallback without images
+      apiMajors.value = fallbackJurusanList.map(item => ({ ...item, gambarHero: '', fromApi: false }))
     }
-  } catch (error) {
-    console.warn('Gagal memuat jurusan dari API, mencoba data dummy:', error)
-    apiMajors.value = fallbackJurusanList
+  } catch {
+    // API failed silently - use fallback without images
+    apiMajors.value = fallbackJurusanList.map(item => ({ ...item, gambarHero: '', fromApi: false }))
+  } finally {
+    isLoading.value = false
   }
-
-  isLoading.value = false
 })
 
 const jurusanAktif = computed(() => apiMajors.value.find((item) => item.slug === route.params.slug))
-const jurusanLainnya = computed(() => apiMajors.value.filter((item) => item.slug !== route.params.slug))
+const jurusanLainnya = computed(() => {
+  // Only show other majors from database (fromApi: true)
+  return apiMajors.value.filter((item) => item.slug !== route.params.slug && item.fromApi)
+})
 
 watch(
   [() => route.params.slug, apiMajors],
