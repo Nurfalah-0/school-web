@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\StudentController;
@@ -19,6 +20,19 @@ use App\Http\Controllers\Api\ContactController;
 // =============================================
 //  CSRF TOKEN — untuk SPA
 // =============================================
+Route::get('/health', function () {
+    try {
+        DB::connection()->getPdo();
+
+        return response()->json(['status' => 'ok']);
+    } catch (\Throwable $exception) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Database tidak tersedia.',
+        ], 503);
+    }
+});
+
 Route::get('/sanctum/csrf-cookie', function () {
     return response()->json(['success' => true]);
 })->middleware('web');
