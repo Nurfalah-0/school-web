@@ -98,20 +98,26 @@ const props = defineProps({
   menuItems: {
     type: Array,
     default: () => [
+      { label: 'Home', to: '/' },
       {
         label: 'Profil',
         children: [
           { label: 'SMK Nurul Jadid', to: { path: '/profil', hash: '#profil-sekolah' } },
           { label: 'Visi & Misi Sekolah', to: { path: '/profil', hash: '#visi-misi' } },
-          { label: 'Kepala Sekolah', to: { path: '/profil', hash: '#kepala-sekolah' } },
         ],
       },
       { label: 'Jurusan', to: '/jurusan' },
-      { label: 'Prestasi', to: '/prestasi' },
+      {
+        label: 'News',
+        children: [
+          { label: 'Berita', to: '/berita' },
+          { label: 'Prestasi', to: '/prestasi' },
+          { label: 'Galeri', to: '/galeri' },
+        ],
+      },
       { label: 'TEFA', to: '/tefa-store' },
       { label: 'PPDB', to: '/ppdb' },
       { label: 'PKL & BKK', to: '/pkl-bkk' },
-      { label: 'News', to: '/berita' },
     ],
   },
 });
