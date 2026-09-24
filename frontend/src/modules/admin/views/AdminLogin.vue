@@ -256,6 +256,8 @@ async function handleLogin() {
       isRateLimited.value = true
       sessionStorage.setItem('admin_login_limited_until', String(until))
       globalError.value = 'Terlalu banyak percobaan. Coba lagi dalam 1 menit.'
+    } else if (err.isHandled) {
+      globalError.value = 'Server atau database tidak dapat dihubungi. Coba lagi beberapa saat lagi.'
     } else {
       globalError.value = err.response?.data?.message || 'Email atau password salah.'
     }

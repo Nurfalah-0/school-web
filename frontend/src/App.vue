@@ -22,10 +22,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import MainLayout from './shared/layouts/MainLayout.vue';
 import ChatbotWidget from './modules/chatbot/components/ChatbotWidget.vue';
+import client from './api/client';
 
 const route = useRoute();
 const isLoading = ref(false);
@@ -33,6 +34,15 @@ let loadingTimer = null;
 const router = useRouter();
 
 const isBlankLayout = computed(() => route.meta.blankLayout === true);
+
+onMounted(async () => {
+  try {
+    await client.get('/health', { timeout: 5000 });
+  } catch (error) {
+    // The Axios interceptor displays the connection notification once.
+    console.warn('Backend health check gagal:', error.message);
+  }
+});
 
 const showLoading = () => {
   clearTimeout(loadingTimer);

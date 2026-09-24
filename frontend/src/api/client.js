@@ -104,7 +104,7 @@ client.interceptors.response.use(
       showNotification('Terjadi masalah pada server. Sedang dalam perbaikan.');
       console.warn('API Server Error (500+). Cek backend database atau service.');
       error.isHandled = true; // flag to components
-    } else if ((error.code === 'ERR_NETWORK' || error.message === 'Network Error') && !skipToast) {
+    } else if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
       showNotification('Tidak dapat terhubung ke server. Pastikan server aktif.');
       console.warn('Network Error. Cek apakah backend berjalan.');
       error.isHandled = true; // flag to components
