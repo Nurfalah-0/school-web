@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\File;
 
 class PpdbController extends Controller
 {
@@ -81,13 +82,13 @@ class PpdbController extends Controller
                 'tempat_lahir'      => 'nullable|string|max:100',
                 'asal_sekolah'      => 'nullable|string|max:200',
                 'jalur_pendaftaran' => 'nullable|in:reguler,prestasi,bidikmisi',
-                'berkas'            => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'kk'                => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'ktp_ayah'          => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'ktp_ibu'           => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'akta_kelahiran'    => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'ijazah_menengah'   => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'dokumen_lain'      => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+                'berkas'            => ['nullable', File::image()->types(['jpg', 'jpeg', 'png', 'gif', 'webp'])->max(2048)],
+                'kk'                => ['required', File::image()->types(['jpg', 'jpeg', 'png', 'gif', 'webp'])->max(2048)],
+                'ktp_ayah'          => ['required', File::image()->types(['jpg', 'jpeg', 'png', 'gif', 'webp'])->max(2048)],
+                'ktp_ibu'           => ['required', File::image()->types(['jpg', 'jpeg', 'png', 'gif', 'webp'])->max(2048)],
+                'akta_kelahiran'    => ['required', File::image()->types(['jpg', 'jpeg', 'png', 'gif', 'webp'])->max(2048)],
+                'ijazah_menengah'   => ['required', File::image()->types(['jpg', 'jpeg', 'png', 'gif', 'webp'])->max(2048)],
+                'dokumen_lain'      => ['nullable', File::image()->types(['jpg', 'jpeg', 'png', 'gif', 'webp'])->max(2048)],
             ]);
 
             if ($validator->fails()) {
