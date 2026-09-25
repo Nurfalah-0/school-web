@@ -82,6 +82,9 @@
     <!-- Cart Sidebar -->
     <div class="cart-sidebar" :class="{ 'cart-sidebar--open': cartOpen }">
       <div class="cart-header">
+        <button class="cart-exit-btn" @click="cartOpen = false" aria-label="Keluar">
+          <ArrowLeft :size="20" color="#1e3a8a" />
+        </button>
         <h3 class="cart-title">Keranjang ({{ cart.length }})</h3>
         <button class="cart-close" @click="cartOpen = false" aria-label="Tutup keranjang">
           <X :size="20" color="#1e293b" />
@@ -128,11 +131,6 @@
           Pesan via WhatsApp
         </button>
       </div>
-
-      <button class="cart-exit-btn" @click="cartOpen = false" aria-label="Keluar dari keranjang">
-        <X :size="18" color="#1e3a8a" />
-        Keluar
-      </button>
     </div>
 
     <AnimateOnScroll animation="fadeInUp" :delay="300">
@@ -151,7 +149,7 @@ import FilterKategori from '../components/FilterKategori.vue'
 import GridProduk from '../components/GridProduk.vue'
 import DetailProduk from '../components/DetailProduk.vue'
 import FooterSection from '../../portal/components/FooterSection.vue'
-import { X, Trash2, ShoppingCart, MessageCircle, ChevronRight, CodeXml, Palette, Megaphone, Wrench, ArrowRight } from 'lucide-vue-next'
+import { X, Trash2, ShoppingCart, MessageCircle, ChevronRight, CodeXml, Palette, Megaphone, Wrench, ArrowRight, ArrowLeft } from 'lucide-vue-next'
 import { formatRupiah } from '../../../shared/utils/formatRupiah'
 import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue'
 
@@ -305,7 +303,7 @@ function checkoutWhatsApp() {
   border-bottom: 1px solid #e5e7eb;
   padding: 12px 0;
   position: sticky;
-  top: 0;
+  top: var(--nav-height, 60px);
   z-index: 35;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
@@ -588,29 +586,33 @@ function checkoutWhatsApp() {
 
 .cart-exit-btn {
   display: none;
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: none;
-  background: #1e3a8a;
-  color: #ffffff;
+  border: 2px solid rgba(30, 58, 138, 0.1);
+  background: #ffffff;
+  color: #1e3a8a;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  z-index: 70;
-  transition: background 0.2s ease, transform 0.1s ease;
-  box-shadow: 0 8px 24px rgba(30, 58, 138, 0.3);
+  z-index: 5;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: background 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
 }
 
 .cart-exit-btn:hover {
-  background: #1e40af;
-  transform: scale(1.05);
+  background: #f0f4ff;
+  border-color: #1e3a8a;
+  transform: scale(1.1);
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .cart-exit-btn {
+    display: inline-flex;
+  }
+}
+
 @media (max-width: 767px) {
   .cart-sidebar {
     width: 100%;
@@ -621,12 +623,13 @@ function checkoutWhatsApp() {
     display: inline-flex;
   }
 
-  .cart-fab--hidden {
+  .cart-fab--hidden,
+  .cart-sidebar--open ~ .cart-fab {
     display: none;
   }
 
-  .cart-items {
-    padding-bottom: 70px;
+  .cart-header {
+    padding: 16px 20px;
   }
 
   .cart-close {

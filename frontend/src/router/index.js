@@ -33,6 +33,10 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
+    if (to.name === 'Home' && !from.name) {
+      return { top: 0, behavior: 'auto' }
+    }
+
     if (savedPosition) {
       return savedPosition
     }

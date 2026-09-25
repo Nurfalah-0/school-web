@@ -599,6 +599,17 @@ onUnmounted(() => {
     align-items: center;
   }
 
+  .ppdb-hero-title {
+    font-size: clamp(1.85rem, 7.5vw, 2.6rem);
+    letter-spacing: -0.04em;
+  }
+
+  .ppdb-hero-main-line {
+    flex-wrap: wrap;
+    justify-content: center;
+    white-space: normal;
+  }
+
   .ppdb-hero-badge {
     margin: 0 auto;
     font-size: 0.75rem;
@@ -619,12 +630,12 @@ onUnmounted(() => {
   }
 
   .ppdb-hero-count-box {
-    min-width: 4.5rem;
-    padding: 0.75rem 0.85rem;
+    min-width: 4.2rem;
+    padding: 0.65rem 0.75rem;
   }
 
   .ppdb-hero-count-box strong {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
 
   .ppdb-hero-actions {
@@ -652,6 +663,19 @@ onUnmounted(() => {
 
   .ppdb-hero-img {
     height: 260px;
+  }
+}
+
+@media (max-width: 420px) {
+  .ppdb-hero-count-box {
+    min-width: 3.6rem;
+    padding: 0.5rem 0.5rem;
+  }
+  .ppdb-hero-count-box strong {
+    font-size: 1.15rem;
+  }
+  .ppdb-hero-count-box span {
+    font-size: 0.65rem;
   }
 }
 </style>

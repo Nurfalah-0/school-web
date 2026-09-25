@@ -9,26 +9,16 @@
           Bergabunglah dengan program Kerjasama Industri kami. Pasang lowongan kerja Anda dan temukan lulusan siap kerja dari SMK Nurul Jadid.
         </p>
       </div>
-      <button type="button" class="cta-rekrutmen-btn" @click="openModal">
+      <router-link to="/contact" class="cta-rekrutmen-btn">
         <Tag :size="18" color="#ffffff" />
         Hubungi Kami
-      </button>
+      </router-link>
     </div>
-
-    <ModalPasangLowongan v-model:open="isOpen" @submit="isOpen = false" />
   </section>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { Tag } from 'lucide-vue-next'
-import ModalPasangLowongan from './ModalPasangLowongan.vue'
-
-const isOpen = ref(false)
-
-function openModal() {
-  isOpen.value = true
-}
 </script>
 
 <style lang="scss" scoped>

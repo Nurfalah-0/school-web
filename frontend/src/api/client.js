@@ -85,6 +85,9 @@ client.interceptors.request.use(config => {
 client.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Check if this request should skip the error toast
+    const skipToast = error.config?.skipErrorToast === true
+    
     if (error.response?.status === 401) {
       // Prevent infinite redirect loop
       if (window.location.pathname !== '/login') {
@@ -97,7 +100,7 @@ client.interceptors.response.use(
           window.location.href = '/login';
         }
       }
-    } else if (error.response?.status >= 500) {
+    } else if (error.response?.status >= 500 && !skipToast) {
       showNotification('Terjadi masalah pada server. Sedang dalam perbaikan.');
       console.warn('API Server Error (500+). Cek backend database atau service.');
       error.isHandled = true; // flag to components

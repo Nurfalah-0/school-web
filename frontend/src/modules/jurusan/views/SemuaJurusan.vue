@@ -11,7 +11,11 @@
           </p>
         </div>
         <AnimateOnScroll animation="fadeInUp" :delay="100">
-          <div class="semua-jurusan-grid">
+          <div v-if="isLoading" class="semua-jurusan-loading">
+            <div class="loading-spinner"></div>
+            <p>Memuat data jurusan...</p>
+          </div>
+          <div v-else class="semua-jurusan-grid">
             <div
               v-for="item in jurusanList"
               :key="item.slug"
@@ -52,11 +56,13 @@
         </AnimateOnScroll>
       </div>
     </AnimateOnScroll>
+    <FooterSection />
   </section>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from "vue";
+import FooterSection from "@/modules/portal/components/FooterSection.vue";
 import {
   CodeXml,
   Briefcase,
@@ -85,14 +91,19 @@ const normalizeImageUrl = (value) => {
 };
 
 const jurusanList = ref([]);
+const isLoading = ref(true)
 onMounted(async () => {
+  // Wait for API first to avoid dummy data flash
   try {
-    const response = await getMajors({ summary: 1 });
+    const response = await getMajors({ summary: 1, skipErrorToast: true });
     const items = response.data?.data || [];
-
     if (items.length > 0) {
       jurusanList.value = items.map((item) => {
         const fallback = fallbackJurusanList.find((entry) => entry.slug === item.slug) || {};
+
+        // ONLY use database image, no fallback to dummy data
+        const dbImage = item.image || ''
+        const gambarHero = normalizeImageUrl(dbImage)
 
         return {
           ...fallback,
@@ -101,17 +112,20 @@ onMounted(async () => {
           nama: item.name || fallback.nama,
           kategori: item.code || fallback.kategori,
           deskripsi: item.description || fallback.deskripsi || "Program keahlian SMK Nurul Jadid.",
-          gambarHero: normalizeImageUrl(item.image),
+          gambarHero: gambarHero,
           icon: fallback.icon || "CodeXml",
         };
       });
-      return;
+    } else {
+      // API works but empty - use fallback without images
+      jurusanList.value = fallbackJurusanList.map(item => ({ ...item, gambarHero: '' }))
     }
-  } catch (err) {
-    console.warn("Gagal memuat jurusan dari API, mencoba data dummy:", err);
+  } catch {
+    // API failed silently - use fallback without images
+    jurusanList.value = fallbackJurusanList.map(item => ({ ...item, gambarHero: '' }))
+  } finally {
+    isLoading.value = false
   }
-
-  jurusanList.value = [];
 });
 </script>
 
@@ -121,12 +135,13 @@ onMounted(async () => {
 .semua-jurusan-page {
   min-height: 100vh;
   background: #ffffff;
-  padding: 4rem 0;
+  padding: calc(var(--nav-height, 64px) + 2.5rem) 0 0;
 }
 
 .semua-jurusan-inner {
   width: min(1200px, calc(100% - 48px));
   margin: 0 auto;
+  padding-bottom: 4rem;
 }
 
 .semua-jurusan-header {
@@ -284,5 +299,29 @@ onMounted(async () => {
 .semua-jurusan-detail:hover {
   background: #042d86;
   color: #ffffff;
+}
+
+.semua-jurusan-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid #e2e8f0;
+  border-top-color: #042d86;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>

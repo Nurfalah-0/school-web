@@ -28,7 +28,10 @@
         <div class="footer-col">
           <h4 class="footer-heading">Quick Links</h4>
           <nav class="footer-links">
-            <a v-for="link in quickLinks" :key="link" :href="link.href">{{ link.label }}</a>
+            <template v-for="link in quickLinks" :key="link.label || link">
+              <router-link v-if="link.href && link.href.startsWith('/')" :to="link.href">{{ link.label }}</router-link>
+              <a v-else :href="link.href || '#'">{{ link.label || link }}</a>
+            </template>
           </nav>
         </div>
 
@@ -69,7 +72,10 @@
       <div class="footer-bottom">
         <p class="footer-copyright">{{ copyright }}</p>
         <div class="footer-bottom-links">
-          <a v-for="link in bottomLinks" :key="link.label" :href="link.href">{{ link.label }}</a>
+          <template v-for="link in bottomLinks" :key="link.label">
+            <router-link v-if="link.href && link.href.startsWith('/')" :to="link.href">{{ link.label }}</router-link>
+            <a v-else :href="link.href">{{ link.label }}</a>
+          </template>
         </div>
       </div>
     </div>
@@ -97,10 +103,10 @@ const props = defineProps({
   quickLinks: {
     type: Array,
     default: () => [
-      { label: 'Tentang Kami', href: '#profil' },
-      { label: 'Program Keahlian', href: '#lowongan' },
+      { label: 'Tentang Kami', href: '/profil#profil-sekolah' },
+      { label: 'Program Keahlian', href: '/jurusan' },
       { label: 'Pendaftaran (PPDB)', href: '/ppdb' },
-      { label: 'Fasilitas Sekolah', href: '#profil' }
+      { label: 'Pusat Karir & BKK', href: '/pkl-bkk' }
     ]
   },
   contactInfo: {
@@ -159,8 +165,8 @@ const props = defineProps({
   bottomLinks: {
     type: Array,
     default: () => [
-      { label: 'Privacy Policy', href: '#privacy' },
-      { label: 'Terms of Service', href: '#terms' }
+      { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Terms of Service', href: '/terms' }
     ]
   }
 });

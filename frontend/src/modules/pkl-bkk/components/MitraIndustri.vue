@@ -1,20 +1,23 @@
 <template>
-  <section class="mitra-section">
-    <div class="mitra-inner">
-      <div class="mitra-header">
-        <h2 class="mitra-title">{{ title }}</h2>
-        <p class="mitra-subtitle">{{ subtitle }}</p>
-      </div>
-      <div class="mitra-grid">
-        <div v-for="(partner, idx) in activePartners" :key="partner.name || idx" class="mitra-card">
-          <img
-            v-if="partner.logoSrc"
-            :src="partner.logoSrc"
-            :alt="partner.name"
-            class="mitra-logo"
-            loading="lazy"
-          />
-          <div v-else class="mitra-logo image-placeholder" aria-hidden="true"></div>
+  <section class="mitra-section" aria-label="Mitra sekolah">
+    <div class="mitra-marquee">
+      <div class="mitra-track">
+        <div v-for="groupIndex in marqueeGroups" :key="groupIndex" class="mitra-group">
+          <div
+            v-for="(partner, partnerIndex) in activePartners"
+            :key="`${groupIndex}-${partnerIndex}`"
+            class="mitra-card"
+            :aria-hidden="groupIndex > 1 ? 'true' : undefined"
+          >
+            <img
+              v-if="partner.logoSrc"
+              :src="partner.logoSrc"
+              :alt="partner.name"
+              class="mitra-logo"
+              loading="lazy"
+            />
+            <div v-else class="mitra-logo image-placeholder" aria-hidden="true"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -26,18 +29,8 @@ import { ref, computed, onMounted } from 'vue';
 import { getPublicContent } from '@/api/endpoints';
 import { publicImage } from '@/modules/contentMapper';
 
-defineProps({
-  title: {
-    type: String,
-    default: 'Mitra Industri Terpercaya'
-  },
-  subtitle: {
-    type: String,
-    default: 'Bekerjasama dengan lebih dari 100+ perusahaan berskala nasional dan multinasional.'
-  }
-});
-
 const apiPartners = ref([]);
+const marqueeGroups = 3;
 
 onMounted(async () => {
   try {
@@ -62,65 +55,46 @@ const activePartners = computed(() => {
 <style lang="scss" scoped>
 .mitra-section {
   background: #eff6ff;
-  padding: 5rem 0;
+  padding: 6rem 0;
+  overflow: hidden;
 }
 
-.mitra-inner {
-  width: min(1200px, calc(100% - 48px));
-  margin: 0 auto;
+.mitra-marquee {
+  overflow: hidden;
 }
 
-.mitra-header {
-  text-align: center;
-  margin-bottom: 3rem;
+.mitra-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: mitra-slide 8s linear infinite;
 }
 
-.mitra-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-weight: 800;
-  font-size: clamp(1.8rem, 3vw, 2.5rem);
-  color: #0f172a;
-  margin: 0 0 0.75rem;
+.mitra-group {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding-right: 1.5rem;
 }
 
-.mitra-subtitle {
-  color: #475569;
-  font-size: 1rem;
-  margin: 0;
-}
-
-.mitra-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-@media (min-width: 640px) {
-  .mitra-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.25rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .mitra-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 1.5rem;
+@keyframes mitra-slide {
+  to {
+    transform: translateX(-33.333333%);
   }
 }
 
 .mitra-card {
-  background: transparent;
-  border-radius: 1rem;
-  padding: 0;
-  width: 100%;
-  height: 6.5rem;
+  flex: 0 0 15rem;
+  width: 15rem;
+  height: 8.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  background: #ffffff;
+  border-radius: 1rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: all 0.25s ease;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
 
   &:hover {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
@@ -130,16 +104,26 @@ const activePartners = computed(() => {
 
 .mitra-logo {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 70%;
+  max-height: 70%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   background: transparent;
-  border-radius: inherit;
-  filter: grayscale(100%) opacity(0.7);
-  transition: filter 0.2s;
 }
 
-.mitra-card:hover .mitra-logo {
-  filter: grayscale(0%) opacity(1);
+.image-placeholder {
+  width: 70%;
+  height: 70%;
+  background: #e2e8f0;
+  border-radius: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .mitra-card {
+    flex-basis: 9rem;
+    width: 9rem;
+    height: 5.5rem;
+  }
 }
 </style>

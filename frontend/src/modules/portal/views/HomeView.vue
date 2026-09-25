@@ -7,16 +7,16 @@
       <ProfilSekolah />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="150">
-      <MengapaKami />
+      <SambutanKepalaSekolah />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="200">
-      <PilihJalurKarir />
+      <MengapaKami />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="250">
-      <PrestasiMembanggakan />
+      <MitraIndustri />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="300">
-      <TeachingFactory />
+      <PilihJalurKarir />
     </AnimateOnScroll>
     <AnimateOnScroll animation="scaleIn" :delay="350">
       <StatistikSekolah />
@@ -41,8 +41,8 @@ import HeroSection from '../components/HeroSection.vue';
 import ProfilSekolah from '../components/ProfilSekolah.vue';
 import MengapaKami from '../components/MengapaKami.vue';
 import PilihJalurKarir from '../components/PilihJalurKarir.vue';
-import PrestasiMembanggakan from '../components/PrestasiMembanggakan.vue';
-import TeachingFactory from '../components/TeachingFactory.vue';
+import MitraIndustri from '../../pkl-bkk/components/MitraIndustri.vue';
+import SambutanKepalaSekolah from '../components/SambutanKepalaSekolah.vue';
 import StatistikSekolah from '../components/StatistikSekolah.vue';
 import TestimoniAlumni from '../components/TestimoniAlumni.vue';
 import BeritaKegiatan from '../components/BeritaKegiatan.vue';

@@ -547,6 +547,15 @@ const props = defineProps({
   font-weight: 700;
 }
 
+@media (max-width: 1024px) {
+  .tracer-card {
+    transform: none;
+  }
+  .side-panel {
+    display: none;
+  }
+}
+
 @media (max-width: 767px) {
   .tracer-section {
     padding: 4rem 0;

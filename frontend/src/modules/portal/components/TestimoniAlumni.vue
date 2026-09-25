@@ -5,12 +5,14 @@
       <div class="testimoni-grid">
         <div v-for="item in testimoni" :key="item.nama" class="testimoni-card">
           <div class="testimoni-header">
-            <div class="testimoni-avatar-wrap">
-              <img :src="item.foto" :alt="`Foto ${item.nama}, alumni`" class="testimoni-avatar" />
-            </div>
-            <div class="testimoni-meta">
-              <div class="testimoni-name">{{ item.nama }}</div>
-              <div class="testimoni-role">{{ item.jabatan }}</div>
+            <div class="testimoni-profile">
+              <div class="testimoni-avatar-wrap">
+                <img :src="item.foto" :alt="`Foto ${item.nama}, alumni`" class="testimoni-avatar" />
+              </div>
+              <div class="testimoni-meta">
+                <div class="testimoni-name">{{ item.nama }}</div>
+                <div class="testimoni-role">{{ item.jabatan }}</div>
+              </div>
             </div>
             <div class="testimoni-quote-mark">&ldquo;</div>
           </div>
@@ -99,8 +101,15 @@ defineProps({
 .testimoni-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 1rem;
+}
+
+.testimoni-profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
 }
 
 .testimoni-avatar-wrap {
@@ -119,6 +128,7 @@ defineProps({
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
+  min-width: 0;
 }
 
 .testimoni-name {

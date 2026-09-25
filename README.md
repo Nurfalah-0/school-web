@@ -10,7 +10,7 @@ Website sekolah menggunakan Vue.js untuk frontend dan Laravel untuk backend.
 5. Jalankan `npm install`
 6. Jalankan `npm run dev` untuk menjalankan frontend dan backend.
 
-Frontend akan tersedia di `http://localhost:5173` dan backend Laravel di `http://localhost:8000`.
+Frontend akan tersedia di `http://localhost:3000` dan backend Laravel di `http://localhost:8000`.
 
 ## Jalankan dengan Docker
 

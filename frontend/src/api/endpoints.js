@@ -58,7 +58,10 @@ export const updateStudent = (id, data) => client.put(`/admin/students/${id}`, d
 export const deleteStudent = (id) => client.delete(`/admin/students/${id}`);
 
 // Major endpoints
-export const getMajors = (options = {}) => client.get('/majors', { params: options });
+export const getMajors = (options = {}) => {
+  const { skipErrorToast, ...params } = options
+  return client.get('/majors', { params, skipErrorToast })
+}
 export const getMajorDetail = (id) => client.get(`/majors/${id}`);
 
 // PPDB endpoints

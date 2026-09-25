@@ -95,6 +95,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import logo from "../../../assets/logo.webp";
 import { loginUser } from "../../../api/endpoints";
+import client from "../../../api/client";
 import { AlertTriangle, Eye, EyeOff } from "lucide-vue-next";
 
 const router = useRouter();
@@ -122,9 +123,7 @@ const handleLogin = async () => {
 
   try {
     // Step 1: Get CSRF cookie from backend
-    await fetch("http://localhost:8000/api/sanctum/csrf-cookie", {
-      credentials: "include",
-    });
+    await client.get("/sanctum/csrf-cookie", { timeout: 8000 });
 
     // Step 2: Login with credentials
     const res = await loginUser({
@@ -148,10 +147,11 @@ const handleLogin = async () => {
     }
   } catch (error) {
     console.error("Login gagal:", error);
-    const errorMsg =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      "Email atau password salah. Silakan coba lagi.";
+    const errorMsg = error.isHandled
+      ? "Server atau database tidak dapat dihubungi. Coba lagi beberapa saat lagi."
+      : error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Email atau password salah. Silakan coba lagi.";
     errorMessage.value = errorMsg;
   } finally {
     isLoading.value = false;

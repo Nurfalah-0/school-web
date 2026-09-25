@@ -63,7 +63,7 @@ const pageData = computed(() => {
 .static-inner {
   max-width: 800px;
   margin: 0 auto;
-  padding: 4rem 1.5rem;
+  padding: calc(var(--nav-height, 64px) + 2.5rem) 1.5rem 4rem;
 }
 
 .static-title {

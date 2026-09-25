@@ -231,6 +231,10 @@ defineProps({
 }
 
 @media (max-width: 767px) {
+  .persiapan-title {
+    font-size: clamp(1.85rem, 7vw, 2.5rem);
+  }
+
   .persiapan-media {
     justify-content: center;
     padding-left: 0;
