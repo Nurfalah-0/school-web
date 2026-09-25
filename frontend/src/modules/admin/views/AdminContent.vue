@@ -935,7 +935,7 @@ option {
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-group.full, .form-footer.full { grid-column: 1 / -1; }
 
-.form-group label { font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+.form-group label { display: inline-flex; align-items: baseline; gap: 3px; font-size: 12.5px; font-weight: 600; color: var(--text-2); }
 .form-group label em { color: var(--red); font-style: normal; }
 
 .hint { color: var(--text-3); font-size: 12px; }

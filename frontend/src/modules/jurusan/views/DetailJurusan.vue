@@ -1,6 +1,6 @@
 <template>
   <div class="detail-jurusan-page">
-    <AnimateOnScroll animation="fadeInDown" v-if="jurusanAktif">
+    <div v-if="jurusanAktif">
       <div class="detail-jurusan-layout">
         <div class="detail-jurusan-main">
           <JurusanHero :jurusan="jurusanAktif" />
@@ -8,11 +8,9 @@
             <KeunggulanProgram :keunggulan="jurusanAktif.keunggulan" />
           </AnimateOnScroll>
         </div>
-        <AnimateOnScroll animation="fadeInRight" :delay="200">
-          <SidebarJurusan :jurusan-lainnya="jurusanLainnya" :current-slug="route.params.slug" />
-        </AnimateOnScroll>
+        <SidebarJurusan :jurusan-lainnya="jurusanLainnya" :current-slug="route.params.slug" />
       </div>
-    </AnimateOnScroll>
+    </div>
     <AnimateOnScroll animation="fadeInUp" :delay="250" v-if="jurusanAktif">
       <JalurKurikulum :kurikulum="jurusanAktif.kurikulum" />
     </AnimateOnScroll>

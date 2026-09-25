@@ -2583,6 +2583,9 @@ option {
 .form-group.grow { flex: 1; min-width: 180px; }
 
 .form-group label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
   font-size: 12.5px;
   font-weight: 600;
   color: var(--text-2);
