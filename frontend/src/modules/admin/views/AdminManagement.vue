@@ -457,7 +457,7 @@
               <p class="major-desc">{{ item.description || 'Belum ada deskripsi.' }}</p>
               <div class="major-meta"><Users :size="14" /> Kapasitas: <strong>{{ item.capacity || item.student_count || 0 }} siswa</strong></div>
               <div class="major-actions">
-                <button class="btn btn-primary btn-xs" @click="openFacilityModal(item)"><Building2 :size="13" /> Fasilitas</button>
+                <button class="btn btn-primary btn-xs" @click="openFacilityModal(item)"><Building2 :size="13" /> Fasilitas &amp; Silabus</button>
                 <button class="btn btn-outline btn-xs" @click="editMajor(item)"><Edit2 :size="13" /> Edit</button>
                 <button class="btn btn-danger-soft btn-xs" @click="removeMajor(item.id)"><Trash2 :size="13" /></button>
               </div>
@@ -802,99 +802,6 @@
         </section>
 
         <!-- ============================================= -->
-        <!-- DROPDOWN PROFIL (sebelumnya tidak ada UI-nya) -->
-        <!-- ============================================= -->
-        <section v-else-if="activeTab === 'profile-menu'">
-          <div class="card">
-            <div class="card-head">
-              <div class="card-head-icon soft-blue"><List :size="18" /></div>
-              <div>
-                <h3>{{ profileMenuForm.id ? 'Ubah Menu Dropdown' : 'Tambah Menu Dropdown' }}</h3>
-                <p>Item yang muncul di menu "Profil" pada navbar website.</p>
-              </div>
-              <button v-if="profileMenuForm.id" class="btn btn-ghost btn-sm head-action" @click="resetProfileMenu">Batal Edit</button>
-            </div>
-            <form class="form-grid" @submit.prevent="saveProfileMenu">
-              <div class="form-group">
-                <label>Label Menu <em>*</em></label>
-                <input v-model="profileMenuForm.label" required placeholder="Contoh: Sejarah Sekolah" />
-              </div>
-              <div class="form-group">
-                <label>Path URL</label>
-                <input v-model="profileMenuForm.path" placeholder="/profil" />
-              </div>
-              <div class="form-group">
-                <label>Hash / Anchor</label>
-                <input v-model="profileMenuForm.hash" placeholder="#sejarah (opsional)" />
-              </div>
-              <div class="form-group">
-                <label>Ikon (huruf)</label>
-                <input v-model="profileMenuForm.icon" maxlength="1" placeholder="S" />
-              </div>
-              <div class="form-group">
-                <label>Urutan Tampil</label>
-                <input v-model.number="profileMenuForm.position" type="number" min="1" />
-              </div>
-              <div class="form-group">
-                <label>Status</label>
-                <select v-model="profileMenuForm.is_active">
-                  <option :value="true">Aktif</option>
-                  <option :value="false">Nonaktif</option>
-                </select>
-              </div>
-              <div class="form-group full">
-                <label>Deskripsi Singkat</label>
-                <textarea v-model="profileMenuForm.description" rows="2"></textarea>
-              </div>
-              <div class="form-footer full">
-                <button class="btn btn-primary" type="submit">
-                  <Save :size="15" v-if="profileMenuForm.id" /><Plus :size="15" v-else />
-                  {{ profileMenuForm.id ? 'Simpan Perubahan' : 'Tambah Menu' }}
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <div class="card">
-            <div class="panel-header">
-              <div>
-                <h2>Daftar Menu Dropdown</h2>
-                <p class="panel-desc">{{ profileMenuItems.length }} item terdaftar</p>
-              </div>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Label</th>
-                    <th>Path</th>
-                    <th>Urutan</th>
-                    <th>Status</th>
-                    <th class="col-actions">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="item in profileMenuItems" :key="item.id">
-                    <td><strong>{{ item.label }}</strong><small>{{ item.description }}</small></td>
-                    <td><code>{{ item.path }}{{ item.hash }}</code></td>
-                    <td>{{ item.position }}</td>
-                    <td><span :class="['status-pill', item.is_active ? 'status-approved' : 'status-rejected']">{{ item.is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
-                    <td class="actions">
-                      <button class="btn btn-outline btn-xs" @click="editProfileMenu(item)"><Edit2 :size="13" /> Edit</button>
-                      <button class="btn btn-danger-soft btn-xs" @click="removeProfileMenu(item.id)"><Trash2 :size="13" /></button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div v-if="!profileMenuItems.length" class="empty-state">
-                <Inbox :size="36" />
-                <p>Belum ada item dropdown profil.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================= -->
         <!-- DETAIL HALAMAN PROFIL -->
         <!-- ============================================= -->
         <section v-else-if="activeTab === 'profile-page'">
@@ -1026,7 +933,7 @@
       <div class="modal">
         <div class="modal-head">
           <div>
-            <span class="modal-eyebrow">Fasilitas Jurusan</span>
+            <span class="modal-eyebrow">Fasilitas &amp; Silabus Jurusan</span>
             <h3>{{ selectedMajorForFacility.name }} <span class="modal-code">{{ selectedMajorForFacility.code }}</span></h3>
           </div>
           <button class="modal-close" @click="selectedMajorForFacility = null">&times;</button>
@@ -1103,16 +1010,16 @@ import {
   ClipboardList, GraduationCap, Newspaper, School, Image as ImageIcon,
   Trophy, Camera, Briefcase, ShoppingBag,
   Tag, Users, Settings, RotateCw, Plus, Save, Send, Upload, Edit2,
-  Trash2, Building2, FileText, CheckCircle2, XCircle, Clock, List, Sun, Moon
+  Trash2, Building2, FileText, CheckCircle2, XCircle, Clock, Sun, Moon
 } from 'lucide-vue-next';
 import AdminContent from './AdminContent.vue';
 import {
   createNews, createMajor, createSiteImage, createStudent, createCategory, createUser,
   deleteNews, deleteMajor, deleteSiteImage, deleteStudent, deleteRegistration, deleteCategory, deleteUser,
   getMajors, getMajorDetail, getNews, getRegistrations, getSiteImages, getSchoolProfile,
-  getProfileMenuItems, getStudents, getCategories, getUsers,
+  getStudents, getCategories, getUsers,
   updateNews, uploadNewsImage, updateMajor, uploadMajorImage, updateRegistrationStatus,
-  updateSchoolProfile, createProfileMenuItem, updateProfileMenuItem, deleteProfileMenuItem,
+  updateSchoolProfile,
   updateStudent, updateSiteImage, uploadSiteImage, updateCategory, updateUser,
   getPpdbSchedule, updatePpdbSchedule,
   addMajorFacility, deleteMajorFacility,
@@ -1123,7 +1030,7 @@ import {
 
 const router = useRouter();
 const route = useRoute();
-const activeTab = ref(route.query.tab || 'applications');
+const activeTab = ref(route.query.tab === 'profile-menu' ? 'applications' : route.query.tab || 'applications');
 const message = ref('');
 const messageType = ref('success');
 const sidebarOpen = ref(false);
@@ -1155,13 +1062,13 @@ const majors = ref([]);
 const images = ref([]);
 const categories = ref([]);
 const usersList = ref([]);
-const profileMenuItems = ref([]);
 const contentCounts = reactive({
   achievements: 0,
   galleries: 0,
   industry_partners: 0,
   job_vacancies: 0,
   products: 0,
+  staff_profiles: 0,
 });
 
 // Modals
@@ -1208,7 +1115,6 @@ const visionMissionImages = reactive({ vision: { file: null }, mission: { file: 
 const categoryForm = reactive({ id: null, name: '', type: 'news' });
 const userForm = reactive({ id: null, name: '', email: '', password: '', phone: '', role: 'admin_sekolah', is_active: true });
 const ppdbSchedule = reactive({ registration_start: '', registration_end: '' });
-const profileMenuForm = reactive({ id: null, label: '', description: '', path: '/profil', hash: '', icon: 'S', position: 1, is_active: true });
 
 // ===== Navigasi sidebar =====
 const navGroups = computed(() => [
@@ -1226,11 +1132,12 @@ const navGroups = computed(() => [
       { id: 'majors', label: 'Jurusan', icon: School, count: majors.value.length },
       { id: 'images', label: 'Gambar Website', icon: ImageIcon, count: images.value.length },
       { id: 'categories', label: 'Kategori', icon: Tag, count: categories.value.length },
-            { id: 'content-achievements', label: 'Prestasi Siswa', icon: Trophy, count: contentCounts.achievements },
-            { id: 'content-galleries', label: 'Galeri Foto', icon: Camera, count: contentCounts.galleries },
-            { id: 'content-industry_partners', label: 'Mitra Industri', icon: Building2, count: contentCounts.industry_partners },
-            { id: 'content-job_vacancies', label: 'Lowongan Kerja', icon: Briefcase, count: contentCounts.job_vacancies },
-            { id: 'content-products', label: 'Produk TEFA', icon: ShoppingBag, count: contentCounts.products },
+          { id: 'content-achievements', label: 'Prestasi Siswa', icon: Trophy, count: contentCounts.achievements },
+          { id: 'content-galleries', label: 'Galeri Foto', icon: Camera, count: contentCounts.galleries },
+          { id: 'content-industry_partners', label: 'Mitra Industri', icon: Building2, count: contentCounts.industry_partners },
+          { id: 'content-job_vacancies', label: 'Lowongan Kerja', icon: Briefcase, count: contentCounts.job_vacancies },
+          { id: 'content-products', label: 'Produk TEFA', icon: ShoppingBag, count: contentCounts.products },
+          { id: 'content-staff_profiles', label: 'Guru & Staf', icon: Users, count: contentCounts.staff_profiles },
     ],
   },
   {
@@ -1238,7 +1145,6 @@ const navGroups = computed(() => [
     items: [
       { id: 'users', label: 'Pengguna & Admin', icon: Users, count: usersList.value.length },
       { id: 'profile', label: 'Profil Sekolah', icon: Settings },
-      { id: 'profile-menu', label: 'Dropdown Profil', icon: List, count: profileMenuItems.value.length },
       { id: 'profile-page', label: 'Detail Profil', icon: FileText },
       { id: 'vision-mission-page', label: 'Detail Visi & Misi', icon: Building2 },
     ],
@@ -1257,9 +1163,9 @@ const pageTitles = {
   'content-industry_partners': 'Mitra Industri',
   'content-job_vacancies': 'Lowongan Kerja',
   'content-products': 'Produk TEFA',
+  'content-staff_profiles': 'Guru & Staf',
   users: 'Pengguna & Admin',
   profile: 'Profil Sekolah',
-  'profile-menu': 'Dropdown Profil',
   'profile-page': 'Detail Halaman Profil',
   'vision-mission-page': 'Detail Visi & Misi',
 };
@@ -1440,13 +1346,6 @@ async function loadUsers() {
   try {
     const response = await getUsers();
     usersList.value = response.data?.data || [];
-  } catch (error) { errorMessage(error); }
-}
-
-async function loadProfileMenuItems() {
-  try {
-    const response = await getProfileMenuItems(true);
-    profileMenuItems.value = response.data?.data || [];
   } catch (error) { errorMessage(error); }
 }
 
@@ -1833,6 +1732,9 @@ async function saveImage() {
         image_url: imageForm.image_url,
       };
       await updateSiteImage(imageForm.id, data);
+      if (imageForm.file) {
+        await uploadSiteImage(imageForm.id, imageForm.file);
+      }
       notify('Data gambar berhasil diperbarui.');
     } else {
       const data = new FormData();
@@ -1969,40 +1871,6 @@ async function saveProfile() {
   } catch (error) { errorMessage(error); }
 }
 
-function resetProfileMenu() {
-  Object.assign(profileMenuForm, { id: null, label: '', description: '', path: '/profil', hash: '', icon: 'S', position: profileMenuItems.value.length + 1, is_active: true });
-}
-
-function editProfileMenu(item) {
-  Object.assign(profileMenuForm, { ...item, hash: item.hash || '', icon: item.icon || 'S' });
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-async function saveProfileMenu() {
-  try {
-    const payload = { ...profileMenuForm };
-    delete payload.id;
-    if (profileMenuForm.id) {
-      await updateProfileMenuItem(profileMenuForm.id, payload);
-      notify('Menu dropdown profil berhasil diperbarui.');
-    } else {
-      await createProfileMenuItem(payload);
-      notify('Menu dropdown profil berhasil ditambahkan.');
-    }
-    resetProfileMenu();
-    await loadProfileMenuItems();
-  } catch (error) { errorMessage(error); }
-}
-
-async function removeProfileMenu(id) {
-  if (!window.confirm('Hapus item dropdown profil ini?')) return;
-  try {
-    await deleteProfileMenuItem(id);
-    notify('Item dropdown profil berhasil dihapus.');
-    await loadProfileMenuItems();
-  } catch (error) { errorMessage(error); }
-}
-
 async function saveProfilePage() {
   try {
     await updateSchoolProfile({ ...profilePageForm });
@@ -2088,7 +1956,6 @@ onMounted(() => {
     loadCategories(),
     loadContentCounts(),
     loadUsers(),
-    loadProfileMenuItems(),
     loadProfile(),
   ]);
 });
@@ -2583,6 +2450,9 @@ option {
 .form-group.grow { flex: 1; min-width: 180px; }
 
 .form-group label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
   font-size: 12.5px;
   font-weight: 600;
   color: var(--text-2);

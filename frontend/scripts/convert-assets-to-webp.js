@@ -3,34 +3,37 @@ import path from 'path';
 import sharp from 'sharp';
 
 const root = process.cwd();
-const assets = [
-  'src/assets/logo.png',
-  'src/assets/hero-lab.jpg',
-  'src/assets/hero-bintang.jpg',
-  'src/assets/profile-penobatan.jpg',
-  'src/assets/profile-bintang.jpg'
-];
+const assetsDirectory = path.resolve(root, 'src/assets');
+const sourceExtensions = new Set(['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tif', '.tiff']);
 
-async function convertImage(filePath) {
-  const inputPath = path.resolve(root, filePath);
-  const outputPath = inputPath.replace(/\.(png|jpe?g)$/i, '.webp');
+function findImageFiles(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const entryPath = path.join(directory, entry.name);
 
-  if (!fs.existsSync(inputPath)) {
-    console.warn(`Skip missing file: ${filePath}`);
-    return;
-  }
+    if (entry.isDirectory()) {
+      return findImageFiles(entryPath);
+    }
+
+    return sourceExtensions.has(path.extname(entry.name).toLowerCase()) ? [entryPath] : [];
+  });
+}
+
+async function convertImage(inputPath) {
+  const outputPath = inputPath.replace(/\.[^.]+$/, '.webp');
 
   await sharp(inputPath)
-    .webp({ quality: 80, effort: 6 })
+    .webp({ quality: 82, effort: 6 })
     .toFile(outputPath);
 
-  console.log(`Converted ${filePath} → ${path.relative(root, outputPath)}`);
+  fs.unlinkSync(inputPath);
+  console.log(`Converted ${path.relative(root, inputPath)} -> ${path.relative(root, outputPath)}`);
 }
 
 (async () => {
   try {
+    const assets = findImageFiles(assetsDirectory);
     await Promise.all(assets.map(convertImage));
-    console.log('All images converted to WebP.');
+    console.log(`Converted ${assets.length} image${assets.length === 1 ? '' : 's'} to WebP.`);
   } catch (error) {
     console.error('Image conversion failed:', error);
     process.exit(1);

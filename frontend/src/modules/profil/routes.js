@@ -1,10 +1,22 @@
 import ProfilSekolahPage from './views/ProfilSekolahPage.vue';
+import GuruStafPage from './views/GuruStafPage.vue';
+import GuruStafDetailPage from './views/GuruStafDetailPage.vue';
 
 export default [
   {
     path: '/profil',
     name: 'ProfilSekolah',
     component: ProfilSekolahPage,
+  },
+  {
+    path: '/profil/guru-staf',
+    name: 'ProfilGuruStaf',
+    component: GuruStafPage,
+  },
+  {
+    path: '/profil/guru-staf/:id',
+    name: 'ProfilGuruStafDetail',
+    component: GuruStafDetailPage,
   },
   {
     path: '/profil/sekolah',

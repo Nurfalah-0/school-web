@@ -51,7 +51,7 @@
             <div class="documents-heading">
               <div>
                 <span class="documents-title">DOKUMEN PENDAFTARAN</span>
-                <small>PDF/JPG/PNG, maksimal 2MB per file. Dokumen bertanda * wajib.</small>
+                <small>JPG/JPEG/PNG/GIF/WEBP, maksimal 2MB per file. Dokumen bertanda * wajib.</small>
               </div>
               <CloudUpload class="form-upload-icon" />
             </div>
@@ -60,7 +60,7 @@
                 <span>{{ document.label }}<b v-if="document.required"> *</b></span>
                 <input
                   type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
+                  accept=".jpg,.jpeg,.png,.gif,.webp,image/jpeg,image/png,image/gif,image/webp"
                   :required="document.required"
                   @change="handleDocumentChange($event, document.key)"
                 />
@@ -155,6 +155,7 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(['submit-pendaftaran']);
+const namaInput = ref(null);
 const isOpen = computed(() => props.schedule.is_open !== false);
 const scheduleMessage = computed(() => {
   if (props.schedule.registration_start && new Date(props.schedule.registration_start) > new Date()) return 'Pendaftaran belum dibuka.';
@@ -275,7 +276,7 @@ const handleSubmit = async () => {
     const noPendaftaran = data.no_pendaftaran || data.data?.no_pendaftaran;
     submitMessage.value = data.message || `Pendaftaran berhasil! No. Pendaftaran Anda: ${noPendaftaran}`;
     submitMessageType.value = 'success';
-    emit('submit-pendaftaran', { ...form, no_pendaftaran: noPendaftaran, file: fileName.value });
+    emit('submit-pendaftaran', { ...form, no_pendaftaran: noPendaftaran });
 
     // Reset form
     form.nama = '';

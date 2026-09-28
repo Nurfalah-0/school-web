@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             ContentDemoSeeder::class,
             CategorySeeder::class,
             SiteImageSeeder::class,
+            \Database\Seeders\StaffProfileSeeder::class,
         ]);
     }
 }

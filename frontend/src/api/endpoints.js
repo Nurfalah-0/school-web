@@ -140,9 +140,11 @@ export const createSiteImage = (data) => client.post('/admin/site-images', data,
   headers: { 'Content-Type': 'multipart/form-data' },
 });
 export const updateSiteImage = (id, data) => client.put(`/admin/site-images/${id}`, data);
-export const uploadSiteImage = (id, data) => client.post(`/admin/site-images/${id}/upload`, data, {
-  headers: { 'Content-Type': 'multipart/form-data' },
-});
+export const uploadSiteImage = (id, file) => {
+  const data = new FormData();
+  data.append('image', file);
+  return client.post(`/admin/site-images/${id}/upload`, data);
+};
 export const deleteSiteImage = (id) => client.delete(`/admin/site-images/${id}`);
 export const updateSchoolProfile = (data) => client.put('/admin/school/profile', data);
 export const getAdminContent = (type) => client.get(`/admin/content/${type}`);
