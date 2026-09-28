@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\PpdbController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProfileMenuItemController;
 use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\PklBkkApplicationController;
 
 // =============================================
 //  CSRF TOKEN — untuk SPA
@@ -79,6 +80,7 @@ Route::get('/profile-menu-items', [ProfileMenuItemController::class, 'index']);
 
 // Pesan kontak publik
 Route::post('/contact', [ContactController::class, 'send']);
+Route::post('/bkk/applications', [PklBkkApplicationController::class, 'store']);
 
 // =============================================
 //  PPDB — Publik (tidak perlu login)
@@ -257,5 +259,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(['role:bkk'])->prefix('bkk')->group(function () {
         Route::get('/job-vacancies',                  [StudentController::class, 'getJobVacancies']);
         Route::post('/job-vacancies/{id}/publish',    [StudentController::class, 'publishJobVacancy']);
+        Route::get('/applications',                   [PklBkkApplicationController::class, 'index']);
+        Route::get('/applications/{application}/cv',  [PklBkkApplicationController::class, 'downloadCv']);
     });
 });

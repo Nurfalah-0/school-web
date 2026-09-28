@@ -15,9 +15,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     libonig-dev \
     libxml2-dev \
-    libzip-dev
+    libzip-dev \
+    libsqlite3-dev
 
-RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd
+RUN docker-php-ext-install pdo_mysql pdo_sqlite mbstring zip exif pcntl bcmath gd
 RUN pecl install redis && docker-php-ext-enable redis
 
 # Allow more concurrent PHP requests while keeping the process pool bounded.

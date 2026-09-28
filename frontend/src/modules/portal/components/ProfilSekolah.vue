@@ -128,7 +128,7 @@ onMounted(async () => {
     const response = await getSchoolProfile();
     schoolProfile.value = response.data?.data || null;
   } catch (error) {
-    console.warn("Gagal memuat profil sekolah:", error);
+    // interceptor sudah tampilkan toast
   }
 });
 

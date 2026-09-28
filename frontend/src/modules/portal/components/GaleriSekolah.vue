@@ -49,11 +49,7 @@ onMounted(async () => {
   try {
     const res = await getPublicContent("galleries");
     const data = (res.data?.data || []).map(mapGallery);
-    if (data.length > 0) {
-      rawGalleries.value = data;
-    } else {
-      rawGalleries.value = galeriList;
-    }
+    rawGalleries.value = data.length > 0 ? data : galeriList;
   } catch (err) {
     rawGalleries.value = galeriList;
   }

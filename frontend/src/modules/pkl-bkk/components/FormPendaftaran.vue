@@ -61,7 +61,7 @@
             <div class="form-upload" @click.prevent="triggerUpload">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="form-upload-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               <span v-if="!fileName">Klik atau seret CV/Portofolio</span>
-              <span v-if="!fileName" class="upload-meta">PDF, JPG (Max 5MB)</span>
+              <span v-if="!fileName" class="upload-meta">PDF, JPG, PNG (Max 5MB)</span>
               <span v-else class="form-file-name">{{ fileName }}</span>
             </div>
             <input
@@ -85,9 +85,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { Check, AlertTriangle } from 'lucide-vue-next';
-import { getMajors } from '@/api/endpoints';
-
-const emit = defineEmits(['submit-lamaran']);
+import { getMajors, submitPklBkkApplication } from '@/api/endpoints';
 
 const props = defineProps({
   label: {
@@ -133,6 +131,7 @@ const majorOptions = ref([
 ]);
 
 const fileInput = ref(null);
+const selectedFile = ref(null);
 const fileName = ref('');
 const isSubmitting = ref(false);
 const successMessage = ref('');
@@ -156,6 +155,7 @@ const triggerUpload = () => {
 
 const handleFileChange = (event) => {
   const file = event.target.files?.[0];
+  selectedFile.value = file || null;
   fileName.value = file ? file.name : '';
 };
 
@@ -165,16 +165,23 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    // Simulate / Emit BKK Application Registration
-    await new Promise(resolve => setTimeout(resolve, 800));
-    emit('submit-lamaran', { ...form.value, file: fileName.value });
+    const payload = new FormData();
+    Object.entries(form.value).forEach(([key, value]) => payload.append(key, value));
+    if (selectedFile.value) payload.append('cv', selectedFile.value);
 
-    successMessage.value = 'Pendaftaran PKL/BKK berhasil dikirim! Tim kami akan menghubungi Anda via Email/WhatsApp.';
+    const response = await submitPklBkkApplication(payload);
+    const applicationId = response.data?.data?.id;
+
+    successMessage.value = applicationId
+      ? `Lamaran berhasil dikirim. Nomor referensi: ${applicationId}.`
+      : 'Lamaran berhasil dikirim.';
     form.value = { name: '', email: '', nisn: '', program: '' };
+    selectedFile.value = null;
     fileName.value = '';
     if (fileInput.value) fileInput.value.value = '';
   } catch (err) {
-    errorMessage.value = err.message || 'Terjadi kendala saat mengirim data.';
+    const validationErrors = Object.values(err.response?.data?.errors || {}).flat().join(' ');
+    errorMessage.value = validationErrors || err.response?.data?.message || 'Terjadi kendala saat mengirim data.';
   } finally {
     isSubmitting.value = false;
   }

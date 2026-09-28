@@ -4,7 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const client = axios.create({
   baseURL: API_URL,
-  timeout: 15000,
+  timeout: 5000,
   headers: {
     'Accept': 'application/json',
   },
@@ -102,12 +102,16 @@ client.interceptors.response.use(
       }
     } else if (error.response?.status >= 500 && !skipToast) {
       showNotification('Terjadi masalah pada server. Sedang dalam perbaikan.');
-      console.warn('API Server Error (500+). Cek backend database atau service.');
-      error.isHandled = true; // flag to components
-    } else if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+      error.isHandled = true;
+    } else if (
+      !skipToast && (
+        error.code === 'ERR_NETWORK' ||
+        error.code === 'ECONNABORTED' ||
+        error.message === 'Network Error'
+      )
+    ) {
       showNotification('Tidak dapat terhubung ke server. Pastikan server aktif.');
-      console.warn('Network Error. Cek apakah backend berjalan.');
-      error.isHandled = true; // flag to components
+      error.isHandled = true;
     }
     return Promise.reject(error);
   }

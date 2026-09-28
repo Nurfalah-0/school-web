@@ -18,7 +18,7 @@ Frontend akan tersedia di `http://localhost:3000` dan backend Laravel di `http:/
 2. Jalankan `docker compose up -d --build`.
 3. Tunggu sampai service berstatus `healthy` atau `Up` dengan `docker compose ps`.
 
-Aplikasi tersedia di `http://localhost`, backend API di `http://localhost:8000`, dan phpMyAdmin di `http://localhost:8081`. Redis digunakan untuk cache, session, dan queue; worker Laravel berjalan pada service `backend_worker`.
+Aplikasi tersedia di `http://localhost`, backend API di `http://localhost:8000` (juga melalui `http://localhost/api`), dan phpMyAdmin di `http://localhost:8081`. Redis digunakan untuk cache, session, dan queue; worker Laravel berjalan pada service `backend_worker`.
 
 Untuk melihat log aplikasi:
 

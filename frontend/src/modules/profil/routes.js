@@ -1,10 +1,8 @@
-import ProfilSekolahPage from './views/ProfilSekolahPage.vue';
-
 export default [
   {
     path: '/profil',
     name: 'ProfilSekolah',
-    component: ProfilSekolahPage,
+    component: () => import('./views/ProfilSekolahPage.vue'),
   },
   {
     path: '/profil/sekolah',

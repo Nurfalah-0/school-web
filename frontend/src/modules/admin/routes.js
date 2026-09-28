@@ -1,4 +1,3 @@
-import AdminLogin from '../admin/views/AdminLogin.vue';
 import AdminForgotPassword from './views/AdminForgotPassword.vue';
 
 export default [
@@ -9,7 +8,7 @@ export default [
   {
     path: '/admin/forgot-password',
     name: 'AdminForgotPassword',
-    component: AdminForgotPassword,
+    component: () => import('./views/AdminForgotPassword.vue'),
     meta: { blankLayout: true, requiresGuest: true }
   },
   {

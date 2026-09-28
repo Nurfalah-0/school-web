@@ -75,6 +75,7 @@ export const applyPpdb = (data) => {
   }
   return client.post('/ppdb/apply', data);
 };
+export const submitPklBkkApplication = (data) => client.post('/bkk/applications', data);
 export const checkPpdbStatus = (identifier) => client.get(`/ppdb/status/${identifier}`);
 export const getPpdbStatistics = () => client.get('/ppdb/statistics');
 export const getRegistrations = (params = {}) => client.get('/ppdb/applications', { params });

@@ -1,15 +1,12 @@
-import Lowongan from './views/Lowongan.vue';
-import DetailLowongan from './views/DetailLowongan.vue';
-
 export default [
   {
     path: '/lowongan',
     name: 'Lowongan',
-    component: Lowongan
+    component: () => import('./views/Lowongan.vue')
   },
   {
     path: '/lowongan/:slug',
     name: 'DetailLowongan',
-    component: DetailLowongan
+    component: () => import('./views/DetailLowongan.vue')
   }
 ];

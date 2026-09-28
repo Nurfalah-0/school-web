@@ -1,10 +1,8 @@
-import AdminLogin from '../admin/views/AdminLogin.vue';
-
 export default [
   {
     path: '/login',
     name: 'Login',
-    component: AdminLogin,
+    component: () => import('../admin/views/AdminLogin.vue'),
     meta: { blankLayout: true, requiresGuest: true }
   },
 ];

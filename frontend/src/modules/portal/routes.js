@@ -1,5 +1,4 @@
 import HomeView from './views/HomeView.vue';
-import ContactView from './views/ContactView.vue';
 
 export default [
   {
@@ -10,6 +9,6 @@ export default [
   {
     path: '/contact',
     name: 'Contact',
-    component: ContactView,
+    component: () => import('./views/ContactView.vue'),
   },
 ];

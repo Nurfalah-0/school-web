@@ -1,15 +1,12 @@
-import DetailBerita from './views/DetailBerita.vue'
-import SemuaBerita from './views/SemuaBerita.vue'
-
 export default [
   {
     path: '/berita',
     name: 'SemuaBerita',
-    component: SemuaBerita
+    component: () => import('./views/SemuaBerita.vue')
   },
   {
     path: '/berita/:slug',
     name: 'DetailBerita',
-    component: DetailBerita
+    component: () => import('./views/DetailBerita.vue')
   }
 ]

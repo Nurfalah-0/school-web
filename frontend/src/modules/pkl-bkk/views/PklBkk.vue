@@ -13,7 +13,7 @@
       <LowonganTerkini />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="400">
-      <FormPendaftaran @submit-lamaran="handleSubmitLamaran" />
+      <FormPendaftaran />
     </AnimateOnScroll>
     <AnimateOnScroll animation="fadeInUp" :delay="500">
       <TimelineSeleksi />
@@ -38,9 +38,6 @@ import TracerAlumni from '../components/TracerAlumni.vue';
 import FooterSection from '../../portal/components/FooterSection.vue';
 import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue';
 
-const handleSubmitLamaran = (payload) => {
-  console.log('Lamaran submitted:', payload);
-};
 </script>
 
 <style lang="scss" scoped>

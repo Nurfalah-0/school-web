@@ -94,7 +94,7 @@ onMounted(async () => {
     const response = await getNews(1, 4, { summary: 1 });
     const articles = response.data?.data?.data || response.data?.data || [];
     beritaDatabase.value = articles.map(mapNews);
-  } catch {
+  } catch (err) {
     beritaDatabase.value = [];
   }
 });
