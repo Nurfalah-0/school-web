@@ -15,12 +15,18 @@ class ContentController extends Controller
         'industry_partners' => ['company_name', 'slug', 'industry_type', 'address', 'city', 'phone', 'email', 'website', 'logo', 'description', 'is_active'],
         'job_vacancies' => ['title', 'slug', 'category', 'description', 'requirements', 'location', 'employment_type', 'salary_min', 'salary_max', 'deadline', 'is_remote', 'status'],
         'products' => ['name', 'slug', 'sku', 'category', 'short_description', 'description', 'base_price', 'compare_price', 'stock', 'image', 'options', 'status', 'featured'],
+        'staff_profiles' => ['name', 'slug', 'staff_role', 'staff_group', 'sort_order', 'description', 'image', 'current_position', 'expertise', 'education', 'additional_roles', 'professional_experience', 'publications', 'awards', 'motto', 'status'],
     ];
 
     public function index(string $type)
     {
         $table = $this->table($type);
-        $query = DB::table($table)->latest('id');
+        $query = DB::table($table);
+        if ($table === 'staff_profiles') {
+            $query->orderBy('staff_group')->orderBy('sort_order')->orderBy('name');
+        } else {
+            $query->latest('id');
+        }
         if (!request()->user()) {
             if (in_array($table, ['achievements', 'galleries'], true)) {
                 $query->where('is_published', true);
@@ -96,6 +102,7 @@ class ContentController extends Controller
         $required = match ($resolved) {
             'industry_partners' => 'company_name',
             'products' => 'name',
+            'staff_profiles' => 'name',
             default => 'title',
         };
         foreach (self::TABLES[$resolved] as $field) {
@@ -108,6 +115,20 @@ class ContentController extends Controller
         $rules['short_description'] = 'sometimes|string';
         $rules['options'] = 'sometimes|nullable|json';
         $rules['achieved_at'] = 'sometimes|nullable|date';
+
+        if ($resolved === 'staff_profiles') {
+            $rules['staff_role'] = $creating ? 'required|string|max:150' : 'sometimes|string|max:150';
+            $rules['staff_group'] = $creating
+                ? 'required|in:headmaster,leadership,productive,class_subject,staff'
+                : 'sometimes|in:headmaster,leadership,productive,class_subject,staff';
+            $rules['sort_order'] = 'sometimes|integer|min:0';
+            $rules['current_position'] = 'sometimes|nullable|string|max:255';
+            $rules['expertise'] = 'sometimes|nullable|string';
+            $rules['motto'] = 'sometimes|nullable|string';
+            foreach (['education', 'additional_roles', 'professional_experience', 'publications', 'awards'] as $listField) {
+                $rules[$listField] = 'sometimes|nullable|json';
+            }
+        }
 
         $data = $request->validate($rules);
 

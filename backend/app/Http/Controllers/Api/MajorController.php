@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class MajorController extends Controller
 {
@@ -343,7 +344,12 @@ class MajorController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'class_name'  => 'required|string|max:150',
+            'class_name'  => [
+                'required',
+                'string',
+                'max:150',
+                Rule::unique('major_curricula', 'class_name')->where(fn($query) => $query->where('major_id', $id)),
+            ],
             'color'       => 'required|in:navy,teal,gold',
             'description' => 'required|string',
             'tags'        => 'nullable|array',
@@ -372,7 +378,14 @@ class MajorController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'class_name'  => 'sometimes|string|max:150',
+            'class_name'  => [
+                'sometimes',
+                'string',
+                'max:150',
+                Rule::unique('major_curricula', 'class_name')
+                    ->where(fn($query) => $query->where('major_id', $majorId))
+                    ->ignore($curriculum->id),
+            ],
             'color'       => 'sometimes|in:navy,teal,gold',
             'description' => 'sometimes|string',
             'tags'        => 'nullable|array',
