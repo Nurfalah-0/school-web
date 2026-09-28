@@ -83,10 +83,63 @@
                 <input v-model="form.name" required :placeholder="currentDomain.namePlaceholder" />
               </div>
 
-              <div class="form-group">
+              <div v-if="type === 'staff_profiles'" class="form-group">
+                <label>Kelompok Profil <em>*</em></label>
+                <select v-model="form.category" required>
+                  <option value="headmaster">Kepala Sekolah</option>
+                  <option value="leadership">Guru Pimpinan / Waka</option>
+                  <option value="productive">Guru Produktif</option>
+                  <option value="class_subject">Wali Kelas & Guru Mata Pelajaran</option>
+                  <option value="staff">Staf & Karyawan</option>
+                </select>
+              </div>
+              <div v-else class="form-group">
                 <label>{{ currentDomain.categoryLabel }}</label>
                 <input v-model="form.category" :placeholder="currentDomain.categoryPlaceholder" />
               </div>
+
+              <template v-if="type === 'staff_profiles'">
+                <div class="form-group">
+                  <label>Jabatan <em>*</em></label>
+                  <input v-model="form.staffRole" required placeholder="Contoh: Wakil Kepala Sekolah Bidang Kurikulum" />
+                </div>
+                <div class="form-group">
+                  <label>Urutan Dalam Kelompok</label>
+                  <input v-model.number="form.sortOrder" type="number" min="0" />
+                </div>
+                <div class="form-group full">
+                  <label>Instansi / Pekerjaan Saat Ini</label>
+                  <input v-model="form.currentPosition" placeholder="Contoh: Guru Tetap di SMK Nurul Jadid" />
+                </div>
+                <div class="form-group full">
+                  <label>Bidang Keahlian / Mata Pelajaran</label>
+                  <textarea v-model="form.expertise" rows="2" placeholder="Contoh: Rekayasa Perangkat Lunak, Pemrograman Web"></textarea>
+                </div>
+                <div class="form-group full">
+                  <label>Riwayat Pendidikan</label>
+                  <textarea v-model="form.educationText" rows="3" placeholder="S1 - Jurusan, Universitas (Tahun)&#10;S2 - Jurusan, Universitas (Tahun)"></textarea>
+                </div>
+                <div class="form-group full">
+                  <label>Jabatan / Tugas Tambahan</label>
+                  <textarea v-model="form.additionalRolesText" rows="3" placeholder="Wali Kelas X RPL&#10;Pembina Ekstrakurikuler"></textarea>
+                </div>
+                <div class="form-group full">
+                  <label>Pengalaman Profesional</label>
+                  <textarea v-model="form.professionalExperienceText" rows="3" placeholder="Instruktur nasional, asesor, organisasi profesi"></textarea>
+                </div>
+                <div class="form-group full">
+                  <label>Karya Tulis / Penelitian</label>
+                  <textarea v-model="form.publicationsText" rows="3" placeholder="Judul buku, modul, jurnal, atau artikel"></textarea>
+                </div>
+                <div class="form-group full">
+                  <label>Prestasi &amp; Penghargaan <small class="hint">(opsional)</small></label>
+                  <textarea v-model="form.awardsText" rows="2" placeholder="Satu prestasi atau penghargaan per baris"></textarea>
+                </div>
+                <div class="form-group full">
+                  <label>Motto Hidup / Kutipan <small class="hint">(opsional)</small></label>
+                  <textarea v-model="form.motto" rows="2" placeholder="Kutipan singkat tentang mengajar"></textarea>
+                </div>
+              </template>
 
               <div v-if="type === 'achievements'" class="form-group">
                 <label>Tanggal Prestasi</label>
@@ -209,7 +262,7 @@
 
                 <div class="record-info">
                   <div class="record-badge-row">
-                    <span class="badge-soft">{{ record.category || record.industry_type || record.employment_type || 'Umum' }}</span>
+                    <span class="badge-soft">{{ record.staff_role || record.category || record.industry_type || record.employment_type || 'Umum' }}</span>
                     <span :class="['status-pill', record.status === 'published' ? 'status-approved' : 'status-pending']">
                       {{ record.status || 'published' }}
                     </span>
@@ -249,7 +302,7 @@ import { useRouter } from 'vue-router';
 import {
   ArrowLeft, Menu, X, LogOut, Search, Inbox, Calendar,
   Trophy, Camera, Building2, Briefcase, ShoppingBag, Palette,
-  Edit2, Plus, Save, RotateCw, Trash2, Banknote,
+  Edit2, Plus, Save, RotateCw, Trash2, Banknote, Users,
   CheckCircle2, XCircle, Sun, Moon
 } from 'lucide-vue-next';
 import { createAdminContent, deleteAdminContent, getAdminContent, updateAdminContent } from '../../../api/endpoints';
@@ -288,6 +341,7 @@ const domains = [
   { value: 'industry_partners', label: 'Mitra Industri', icon: Building2, iconColor: 'soft-green', description: 'Perusahaan yang bekerja sama dengan sekolah', nameLabel: 'Nama Perusahaan', namePlaceholder: 'Contoh: PT Astra Honda Motor', categoryLabel: 'Bidang Industri', categoryPlaceholder: 'Teknologi Informasi, Otomotif' },
   { value: 'job_vacancies', label: 'Lowongan Kerja', icon: Briefcase, iconColor: 'soft-violet', description: 'Info kerja & magang dari mitra', nameLabel: 'Posisi Lowongan', namePlaceholder: 'Contoh: Junior Web Developer', categoryLabel: 'Keahlian / Jurusan', categoryPlaceholder: 'RPL, TKJ' },
   { value: 'products', label: 'Produk TEFA', icon: ShoppingBag, iconColor: 'soft-red', description: 'Produk & jasa yang dijual sekolah', nameLabel: 'Nama Produk / Jasa', namePlaceholder: 'Contoh: Jasa Pembuatan Website Profil', categoryLabel: 'Kategori Produk', categoryPlaceholder: 'Software, Hardware, Merchandise' },
+  { value: 'staff_profiles', label: 'Guru & Staf', icon: Users, iconColor: 'soft-blue', description: 'Profil tenaga pendidik dan kependidikan', nameLabel: 'Nama Lengkap', namePlaceholder: 'Nama beserta gelar', categoryLabel: 'Kelompok Profil', categoryPlaceholder: 'Pilih kelompok' },
 ];
 
 const form = reactive({
@@ -307,6 +361,16 @@ const form = reactive({
   status: 'published',
   description: '',
   achieved_at: '',
+  staffRole: '',
+  sortOrder: 0,
+  currentPosition: '',
+  expertise: '',
+  educationText: '',
+  additionalRolesText: '',
+  professionalExperienceText: '',
+  publicationsText: '',
+  awardsText: '',
+  motto: '',
   image: null,
 });
 
@@ -374,6 +438,16 @@ function reset() {
     status: 'published',
     description: '',
     achieved_at: '',
+    staffRole: '',
+    sortOrder: 0,
+    currentPosition: '',
+    expertise: '',
+    educationText: '',
+    additionalRolesText: '',
+    professionalExperienceText: '',
+    publicationsText: '',
+    awardsText: '',
+    motto: '',
     image: null,
   });
 }
@@ -382,7 +456,7 @@ function edit(record) {
   Object.assign(form, {
     id: record.id,
     name: displayName(record),
-    category: record.category || record.industry_type || record.employment_type || '',
+    category: record.staff_group || record.category || record.industry_type || record.employment_type || '',
     company_name: record.company_name || '',
     employment_type: record.employment_type || 'Full Time',
     salary: record.salary || '',
@@ -396,6 +470,16 @@ function edit(record) {
     status: record.status || 'published',
     description: record.description || record.short_description || '',
     achieved_at: record.achieved_at || '',
+    staffRole: record.staff_role || '',
+    sortOrder: record.sort_order || 0,
+    currentPosition: record.current_position || '',
+    expertise: record.expertise || '',
+    educationText: listToText(record.education),
+    additionalRolesText: listToText(record.additional_roles),
+    professionalExperienceText: listToText(record.professional_experience),
+    publicationsText: listToText(record.publications),
+    awardsText: listToText(record.awards),
+    motto: record.motto || '',
     image: null,
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -403,9 +487,23 @@ function edit(record) {
 
 function buildPayload() {
   const data = new FormData();
-  const nameField = type.value === 'industry_partners' ? 'company_name' : type.value === 'products' ? 'name' : 'title';
+  const nameField = type.value === 'industry_partners' ? 'company_name' : ['products', 'staff_profiles'].includes(type.value) ? 'name' : 'title';
   data.append(nameField, form.name);
-  if (form.category) data.append(type.value === 'industry_partners' ? 'industry_type' : 'category', form.category);
+  if (type.value === 'staff_profiles') {
+    data.append('staff_role', form.staffRole);
+    data.append('staff_group', form.category);
+    data.append('sort_order', form.sortOrder || 0);
+    data.append('current_position', form.currentPosition || '');
+    data.append('expertise', form.expertise || '');
+    data.append('motto', form.motto || '');
+    data.append('education', JSON.stringify(textToList(form.educationText)));
+    data.append('additional_roles', JSON.stringify(textToList(form.additionalRolesText)));
+    data.append('professional_experience', JSON.stringify(textToList(form.professionalExperienceText)));
+    data.append('publications', JSON.stringify(textToList(form.publicationsText)));
+    data.append('awards', JSON.stringify(textToList(form.awardsText)));
+  } else if (form.category) {
+    data.append(type.value === 'industry_partners' ? 'industry_type' : 'category', form.category);
+  }
   if (form.slug) data.append('slug', form.slug);
   if (form.description) data.append('description', form.description);
   if (type.value === 'achievements' && form.achieved_at) data.append('achieved_at', form.achieved_at);
@@ -439,6 +537,21 @@ function buildPayload() {
   }
 
   return data;
+}
+
+function listToText(value) {
+  if (Array.isArray(value)) return value.join('\n');
+  if (typeof value !== 'string') return '';
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.join('\n') : value;
+  } catch {
+    return value;
+  }
+}
+
+function textToList(value) {
+  return String(value || '').split(/\r?\n/).map(item => item.trim()).filter(Boolean);
 }
 
 function normalizeOptions(options) {

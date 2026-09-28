@@ -33,8 +33,8 @@ class SiteImageController extends Controller
 
             // Order by position
             $images = $query->orderBy('section')
-                           ->orderBy('position')
-                           ->get();
+                ->orderBy('position')
+                ->get();
 
             return response()->json([
                 'success' => true,
@@ -62,7 +62,6 @@ class SiteImageController extends Controller
                     'total' => $images->count(),
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -82,9 +81,9 @@ class SiteImageController extends Controller
     {
         try {
             $images = SiteImage::bySection($section)
-                             ->active()
-                             ->ordered()
-                             ->get();
+                ->active()
+                ->ordered()
+                ->get();
 
             return response()->json([
                 'success' => true,
@@ -108,7 +107,6 @@ class SiteImageController extends Controller
                     'total' => $images->count(),
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -128,8 +126,8 @@ class SiteImageController extends Controller
     {
         try {
             $image = SiteImage::byKey($key)
-                            ->active()
-                            ->first();
+                ->active()
+                ->first();
 
             if (!$image) {
                 return response()->json([
@@ -158,7 +156,6 @@ class SiteImageController extends Controller
                     ]
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -258,7 +255,6 @@ class SiteImageController extends Controller
                     'image' => $image->getMetadata()
                 ]
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -292,6 +288,7 @@ class SiteImageController extends Controller
                 'key' => 'sometimes|string|max:100|unique:site_images,key,' . $id,
                 'title' => 'sometimes|string|max:255',
                 'description' => 'nullable|string',
+                'image_url' => 'nullable|url',
                 'section' => 'sometimes|string|max:50',
                 'alt_text' => 'nullable|string|max:255',
                 'position' => 'nullable|integer|min:1',
@@ -320,6 +317,7 @@ class SiteImageController extends Controller
                 'key' => $request->key ?? $image->key,
                 'title' => $request->title ?? $image->title,
                 'description' => $request->description ?? $image->description,
+                'image_url' => $request->image_url ?? $image->image_url,
                 'alt_text' => $request->alt_text ?? $image->alt_text,
                 'section' => $request->section ?? $image->section,
                 'position' => $request->position ?? $image->position,
@@ -334,7 +332,6 @@ class SiteImageController extends Controller
                     'image' => $image->getMetadata()
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -423,7 +420,6 @@ class SiteImageController extends Controller
                     'image' => $image->getMetadata()
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -461,7 +457,6 @@ class SiteImageController extends Controller
                 'success' => true,
                 'message' => "Site image '{$imageKey}' deleted successfully"
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -492,7 +487,6 @@ class SiteImageController extends Controller
                     })->values()
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -536,7 +530,6 @@ class SiteImageController extends Controller
                 'success' => true,
                 'message' => 'Positions updated successfully'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -559,16 +552,16 @@ class SiteImageController extends Controller
             $totalSize = SiteImage::sum('file_size');
 
             $bySection = SiteImage::selectRaw('section, COUNT(*) as count')
-                                ->groupBy('section')
-                                ->get()
-                                ->mapWithKeys(function ($item) {
-                                    return [
-                                        $item->section => [
-                                            'name' => SiteImage::SECTIONS[$item->section] ?? $item->section,
-                                            'count' => $item->count
-                                        ]
-                                    ];
-                                });
+                ->groupBy('section')
+                ->get()
+                ->mapWithKeys(function ($item) {
+                    return [
+                        $item->section => [
+                            'name' => SiteImage::SECTIONS[$item->section] ?? $item->section,
+                            'count' => $item->count
+                        ]
+                    ];
+                });
 
             return response()->json([
                 'success' => true,
@@ -582,7 +575,6 @@ class SiteImageController extends Controller
                     'by_section' => $bySection,
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
