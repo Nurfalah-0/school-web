@@ -44,5 +44,6 @@ import AnimateOnScroll from '@/shared/components/AnimateOnScroll.vue';
 .pkl-page {
   min-height: 100vh;
   background: #ffffff;
+  padding-top: var(--nav-height, 64px);
 }
 </style>

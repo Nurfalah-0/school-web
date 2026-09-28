@@ -166,6 +166,7 @@ onMounted(() => {
 .detail-jurusan-page {
   min-height: 100vh;
   background: #f8f7fb;
+  padding-top: var(--nav-height, 64px);
 }
 
 .detail-jurusan-layout {
