@@ -120,6 +120,7 @@ watch(() => route.query.kategori, (val) => {
 .lowongan-page {
   min-height: 100vh;
   background: #ffffff;
+  padding-top: var(--nav-height, 64px);
 }
 
 .lowongan-layout {
